@@ -43,7 +43,7 @@ void PhysicsState::enter()
 	camLook.z = atof(buffer);
 
 	OgreFramework::getSingletonPtr()->m_pLog->logMessage("Entering PhysicsState...");
-	
+
 	m_pSceneMgr = OgreFramework::getSingletonPtr()->m_pRoot->createSceneManager(ST_GENERIC, "GameSceneMgr");
 	m_pSceneMgr->setAmbientLight(Ogre::ColourValue(0.7, 0.7, 0.7));		
 
@@ -86,8 +86,10 @@ void PhysicsState::enter()
 	setUnbufferedMode();
 
 	createScene();
-
-	mTimeController = NxOgre::TimeController::getSingleton();
+#ifdef DEBUG_DRAW_ON
+	debugDraw_ = new cDebugDraw(OgreFramework::getSingletonPtr()->m_pRoot,OgreFramework::getSingletonPtr()->m_pViewport->getTarget());
+	debugDraw_->CopyCamera(m_pCamera);
+#endif
 
 }
 
@@ -128,12 +130,34 @@ void PhysicsState::exit()
 	
 	m_pSceneMgr->destroyCamera(m_pCamera);
 	m_pSceneMgr->destroyQuery(m_pRSQ);
+
 	if(m_pSceneMgr)
 		OgreFramework::getSingletonPtr()->m_pRoot->destroySceneManager(m_pSceneMgr);
 
-	mWorld->destroyWorld(true);
 
 }
+
+//|||||||||||||||||||||||||||||||||||||||||||||||
+
+void PhysicsState::createPhysics()
+{
+	// Define the size of the world. Simulation will still work
+	// if bodies reach the end of the world, but it will be slower.
+	b2AABB worldAABB;
+	worldAABB.lowerBound.Set(-100.0f, -100.0f);
+	worldAABB.upperBound.Set(100.0f, 100.0f);
+
+	// Define the gravity vector.
+	b2Vec2 gravity(0.0f, -10.0f);
+
+	// Do we want to let bodies sleep?
+	bool doSleep = true;
+
+	// Construct a world object, which will hold and simulate the rigid bodies.
+	world = new b2World(worldAABB, gravity, doSleep);
+
+}
+
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
@@ -143,54 +167,19 @@ void PhysicsState::createScene()
 
 	m_pSceneMgr->createLight("Light")->setPosition(75,75,75);
 
-	mWorld = NxOgre::World::createWorld();
-
-	NxOgre::SceneDescription sceneDesc;
-	sceneDesc.mGravity = NxOgre::Vec3(0, -9.805f, 0);
-	sceneDesc.mName = "PhysicsStateScene";
-
-	mScene = mWorld->createScene(sceneDesc);
-	
-	mScene->getMaterial(0)->setStaticFriction(0.1);
-	mScene->getMaterial(0)->setDynamicFriction(0.5);
-	mScene->getMaterial(0)->setRestitution(0.1);
-
-	mRenderSystem = new OGRE3DRenderSystem(mScene);
-	
-	OGRE3DBody* mCube;
-	
-	NxOgre::Real boxSize = 5;
-	mCube = mRenderSystem->createBody(new NxOgre::Box(boxSize, boxSize, boxSize), NxOgre::Vec3(50, 20, 0), "cube.1m.mesh");
-	Ogre::Vector3 mCubeSize = mCube->getEntity()->getBoundingBox().getSize();
-	mCube->getEntity()->getParentSceneNode()->scale(boxSize / mCubeSize.x, boxSize / mCubeSize.y, boxSize / mCubeSize.z);
-
-	NxOgre::RigidBodyDescription d;
-	d.mBodyFlags = NxOgre::Enums::BodyFlags_FreezePositionZ 
-				 | NxOgre::Enums::BodyFlags_FreezeRotationX 
-				 | NxOgre::Enums::BodyFlags_FreezeRotationY;
-
-	NxOgre::RigidBodyDescription capsuleDesc;
-	capsuleDesc.mBodyFlags = NxOgre::Enums::BodyFlags_FreezePositionZ
-				 | NxOgre::Enums::BodyFlags_FreezeRotation;
-
 	// Create myCharacter
-	myCharacter_ = new Character(mRenderSystem, mScene);
-
-	mCubeTwo = mRenderSystem->createBody(new NxOgre::Sphere(3), NxOgre::Vec3(50, 35, 0), "sphere.mesh",d);
-	Ogre::Vector3 sphereSize = mCubeTwo->getEntity()->getBoundingBox().getSize();
-	mCubeTwo->getEntity()->getParentSceneNode()->scale(6.0 / sphereSize.x, 6.0 / sphereSize.y, 6.0 / sphereSize.z);
-
-	// Create the plane geometry
-	NxOgre::SceneGeometry* pl = mScene->createSceneGeometry(new NxOgre::PlaneGeometry(0, NxOgre::Vec3(0, 1, 0)), Matrix44_Identity);
-	pl->setContactReportFlags(NxOgre::Enums::ContactPairFlags_All || NxOgre::Enums::ContactPairFlags_ContactModifcation );
-	pl->setContactCallback(myCharacter_);
+	myCharacter_ = new Character();
 
 	MovablePlane *plane = new MovablePlane("Plane");
 	plane->d = 0;
 	plane->normal = Vector3(0,1.0,0.0);
+
+
+	
 	Ogre::MeshManager::getSingleton().createPlane("PlaneMesh", 
 		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
 		*plane, 60, 60, 1, 1, true, 1, 3, 3, Vector3::UNIT_Z);
+	
 	Entity *planeEnt = m_pSceneMgr->createEntity("PlaneEntity", "PlaneMesh");
 	planeEnt->setMaterialName("Examples/GrassFloor");
 
@@ -198,18 +187,11 @@ void PhysicsState::createScene()
 	mPlaneNode->attachObject(planeEnt);
 	mPlaneNode->scale(10, 10, 10);
 
-	m_pSceneMgr->getEntity("PlaneEntity")->setQueryFlags(CUBE_MASK);
+	
+	
 
 
-#ifdef DEBUG_DRAW_ON
-	mVisualDebugger = mWorld->getVisualDebugger();
 
-	mVisualDebuggerRenderable = new OGRE3DRenderable(NxOgre::Enums::RenderableType_VisualDebugger);
-	mVisualDebugger->setRenderable(mVisualDebuggerRenderable);
-	mVisualDebuggerNode = m_pSceneMgr->getRootSceneNode()->createChildSceneNode();
-	mVisualDebuggerNode->attachObject(mVisualDebuggerRenderable);
-	mVisualDebugger->setVisualisationMode(NxOgre::Enums::VisualDebugger_ShowAll);
-#endif
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
@@ -319,33 +301,7 @@ bool PhysicsState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID 
 
 void PhysicsState::onLeftPressed(const OIS::MouseEvent &evt)
 {
-	if(m_pCurrentObject)
-	{
-		m_pCurrentObject->showBoundingBox(false);
-		m_pCurrentEntity->getSubEntity(1)->setMaterial(m_pOgreHeadMat);
-	}
-		
-	CEGUI::Point mousePos = CEGUI::MouseCursor::getSingleton().getPosition();
-	Ogre::Ray mouseRay = m_pCamera->getCameraToViewportRay(mousePos.d_x/float(evt.state.width), mousePos.d_y/float(evt.state.height));
-	m_pRSQ->setRay(mouseRay);
-	m_pRSQ->setSortByDistance(true);
 
-	Ogre::RaySceneQueryResult &result = m_pRSQ->execute();
-	Ogre::RaySceneQueryResult::iterator itr;
-
-    for(itr = result.begin(); itr != result.end(); itr++)
-    {
-        if(itr->movable)
-        {
-			OgreFramework::getSingletonPtr()->m_pLog->logMessage("MovableName: " + itr->movable->getName());
-			m_pCurrentObject = m_pSceneMgr->getEntity(itr->movable->getName())->getParentSceneNode();
-			OgreFramework::getSingletonPtr()->m_pLog->logMessage("ObjName " + m_pCurrentObject->getName());
-			m_pCurrentObject->showBoundingBox(true);
-			m_pCurrentEntity = m_pSceneMgr->getEntity(itr->movable->getName());
-			m_pCurrentEntity->getSubEntity(1)->setMaterial(m_pOgreHeadMatHigh);
-            break;
-        }			
-    }
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
@@ -439,7 +395,6 @@ void PhysicsState::update(double timeSinceLastFrame)
 
 	while(dt >= timeStep)
 	{
-		mTimeController->advance();
 		dt = dt - timeStep;
 	}
 	myCharacter_->GetInput(timeSinceLastFrame);
@@ -448,8 +403,7 @@ void PhysicsState::update(double timeSinceLastFrame)
 	
 
 #ifdef DEBUG_DRAW_ON
-	mVisualDebugger->draw();
-	mVisualDebuggerNode->needUpdate();
+
 #endif
 
 	
