@@ -44,6 +44,8 @@ public:
 	// Call this to send out delayed messages
 	void DispatchDelayedMessages();
 
+	void ClearDelayedMessages(){ messageQueue_.clear(); }
+
 private:  
 
 	// This method discharges the message to all Entitys

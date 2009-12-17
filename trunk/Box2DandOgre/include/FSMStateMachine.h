@@ -85,9 +85,9 @@ public:
 		return typeid(*currentState_) == typeid(st);
 	}
 
-	FSMState<T>*  CurrentState()  const { return currentState_;}
-	FSMState<T>*  GlobalState()   const { return globalState_;}
-	FSMState<T>*  PreviousState() const { return previousState_;}
+	FSMState<T>*  GetCurrentState()  const { return currentState_;}
+	FSMState<T>*  GetGlobalState()   const { return globalState_;}
+	FSMState<T>*  GetPreviousState() const { return previousState_;}
 
 private:
 

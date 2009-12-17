@@ -15,11 +15,10 @@ using std::cout;
 using std::set;
 
 template<> KGBMessageDispatcher* Ogre::Singleton<KGBMessageDispatcher>::ms_Singleton = 0;
-
-//----------------------------- Dispatch ---------------------------------
-//  
-//  See description in header
-//------------------------------------------------------------------------
+//=============================================================================
+//	Discharge
+///
+///	Discharges a message to the Entitys.
 void KGBMessageDispatcher::Discharge(const KGBMessage& pMsg)
 {
 
@@ -43,6 +42,10 @@ void KGBMessageDispatcher::Discharge(const KGBMessage& pMsg)
 	}
 }
 
+
+//=============================================================================
+//	DischargeToAll
+//
 /// Dispatch a message to all Entitys
 void KGBMessageDispatcher::DischargeToAll(const KGBMessage& pMsg)
 {
@@ -57,12 +60,12 @@ void KGBMessageDispatcher::DischargeToAll(const KGBMessage& pMsg)
 	}
 }
 
-//---------------------------- DispatchMessage ---------------------------
+//=============================================================================
+//	Dispatch Message
 //
-//  given a message, a receiver, a sender and any time delay , this function
-//  routes the message to the correct agent (if no delay) or stores
-//  in the message queue to be dispatched at the correct time
-//------------------------------------------------------------------------
+/// Given a message, a receiver, a sender and any time delay , this function
+/// routes the message to the correct agent (if no delay) or stores
+/// in the message queue to be dispatched at the correct time
 void KGBMessageDispatcher:: DispatchMessage(double			pDelay,
 											int				pSender,
 											int				pReceiver,
@@ -78,6 +81,7 @@ void KGBMessageDispatcher:: DispatchMessage(double			pDelay,
 	if (pDelay <= SEND_IMMEDIATELY)                                                        
 	{
 
+		// Discharge the message
 		Discharge(message);
 
 		/*
@@ -85,19 +89,15 @@ void KGBMessageDispatcher:: DispatchMessage(double			pDelay,
 		<< " by " << GetNameOfEntity(pSender->ID()) << " for " << GetNameOfEntity(pReceiver->ID()) 
 		<< ". Msg is "<< MsgToStr(msg);
 		*/
-
-		//send the KGBMessage to the recipient
-		//Discharge(pReceiver, message);
 	}
-
-	//else calculate the time when the KGBMessage should be dispatched
+	// Else calculate the time when the KGBMessage should be dispatched
 	else
 	{
 		double CurrentTime = GameFramework::getSingletonPtr()->timer_->getMillisecondsCPU();
 
 		message.dispatchTime = CurrentTime + pDelay;
 
-		//and put it in the queue
+		// Insert the message into the queue
 		messageQueue_.insert(message);   
 
 		/*
@@ -110,11 +110,11 @@ void KGBMessageDispatcher:: DispatchMessage(double			pDelay,
 }
 
 
-//---------------------- DispatchDelayedMessages -------------------------
+//=============================================================================
+//	DispatchDelayedMessages
 //
-//  This function dispatches any KGBMessages with a timestamp that has
-//  expired. Any dispatched KGBMessages are removed from the queue
-//------------------------------------------------------------------------
+/// This function dispatches any KGBMessages with a timestamp that has
+/// expired. Any dispatched KGBMessages are removed from the queue
 void KGBMessageDispatcher::DispatchDelayedMessages()
 {
   

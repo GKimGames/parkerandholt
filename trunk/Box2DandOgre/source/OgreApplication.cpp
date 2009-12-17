@@ -31,8 +31,6 @@ KGBOgreApplication::~KGBOgreApplication()
 
 void KGBOgreApplication::Start()
 {
-	//new OgreFramework();
-	//new PaH::GameEventDispatcher();
 
 	new GameFramework();
 	new KGBMessageDispatcher();
