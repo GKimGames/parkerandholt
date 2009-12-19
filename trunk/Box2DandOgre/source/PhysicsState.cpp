@@ -2,8 +2,6 @@
 
 #include "PhysicsState.h"
 
-
-
 using namespace Ogre;
 
 class LedgeSensor;
@@ -107,7 +105,7 @@ void PhysicsState::exit()
 
 	sceneManager_->destroyCamera(camera_);
 
-	PaH::Entity::GetEntityList().clear();
+	GameObject::objectList.clear();
 	
 
 	if(sceneManager_)
@@ -193,9 +191,9 @@ void PhysicsState::createScene()
 	float mCurvature = 1;
 	float mTiling = 15;
 	//sceneManager_->setSkyDome(true, "Examples/CloudySky", mCurvature, mTiling);
-	sceneManager_->createLight("Light")->setPosition(75,75,75);
+	sceneManager_->createLight("Light")->setPosition(0,75,0);
 
-	
+	/*
 	//=============================================================
 	// Create background
 	// Create background material
@@ -228,10 +226,10 @@ void PhysicsState::createScene()
 
 	// Create background
 	//============================================================
-	
+	*/
 
 	createPhysics();
-
+	
 }
 
 
@@ -242,6 +240,7 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 	{
 		pause_ = true;
 	}
+
 
 	if(m_bChatMode == true)
 	{
@@ -386,6 +385,16 @@ void PhysicsState::getInput()
 			camera_->pitch(-m_RotScale);
 		}
 
+		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_NUMPAD4))
+		{
+			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, myCharacter_->GetId(), CHARACTER_MOVE_LEFT, NULL);
+		}
+
+		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_NUMPAD6))
+		{
+			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, myCharacter_->GetId(), CHARACTER_MOVE_RIGHT, NULL);
+		}
+
 
 	}
 }
@@ -444,7 +453,7 @@ void PhysicsState::update(double timeSinceLastFrame)
 
 	}
 
-	PaH::Entity::UpdateEntityList(dt);
+	GameObject::UpdateObjectList(dt);
 
 }
 
@@ -457,19 +466,19 @@ void PhysicsState::setUnbufferedMode()
 }
 
 /// Called when two fixtures cease to touch.
-/// This calls the BeginContact method of an EntityBox2DResponder if the user data 
+/// This calls the BeginContact method of an GameObjectOgreBox2D if the user data 
 /// for one the touching fixtures is there. The called BeginContact method passes
-/// which fixture was of the EntityBox2DResponder and which one it collided with.
+/// which fixture was of the GameObjectOgreBox2D and which one it collided with.
 void PhysicsState::BeginContact(b2Contact* contact)
 {
 	// Check if fixtureA's body has some user data
-	// If it does check if the Entity respondes to contacts
+	// If it does check if the Object respondes to contacts
 	if(contact->GetFixtureA()->GetBody()->GetUserData() != NULL)
 	{
-		PaH::Entity* entity = (PaH::Entity*) contact->GetFixtureA()->GetBody()->GetUserData();
-		PaH::EntityBox2DResponder* contactableA;
+		GameObject* object = (GameObject*) contact->GetFixtureA()->GetBody()->GetUserData();
+		GameObjectOgreBox2D* contactableA;
 		
-		contactableA = dynamic_cast<PaH::EntityBox2DResponder*> (entity);
+		contactableA = dynamic_cast<GameObjectOgreBox2D*> (object);
 
 		if(contactableA)
 		{
@@ -478,13 +487,13 @@ void PhysicsState::BeginContact(b2Contact* contact)
 	}
 	
 	// Check if fixtureB's body has some user data
-	// If it does check if the Entity respondes to contacts
+	// If it does check if the Object respondes to contacts
 	if(contact->GetFixtureB()->GetBody()->GetUserData() != NULL)
 	{
-	    PaH::Entity* entity = (PaH::Entity*) contact->GetFixtureB()->GetBody()->GetUserData();
-		PaH::EntityBox2DResponder* contactableB;
+	    GameObject* object = (GameObject*) contact->GetFixtureB()->GetBody()->GetUserData();
+		GameObjectOgreBox2D* contactableB;
 
-		contactableB = dynamic_cast<PaH::EntityBox2DResponder*> (entity);
+		contactableB = dynamic_cast<GameObjectOgreBox2D*> (object);
 
 		if(contactableB)
 		{
@@ -494,39 +503,39 @@ void PhysicsState::BeginContact(b2Contact* contact)
 }
 
 /// Called when two fixtures cease to touch.
-/// This calls the EndContact method of an EntityBox2DResponder if the user data 
+/// This calls the EndContact method of an GameObjectOgreBox2D if the user data 
 /// for one the touching fixtures is there. The called EndContact method passes
-/// which fixture was of the EntityBox2DResponder and which one it collided with.
+/// which fixture was of the GameObjectOgreBox2D and which one it collided with.
 void PhysicsState::EndContact(b2Contact* contact)
 {
 
 	// Check if fixtureA's body has some user data
-	// If it does check if the Entity respondes to contacts
+	// If it does check if the Object respondes to contacts
 	if(contact->GetFixtureA()->GetBody()->GetUserData() != NULL)
 	{
-	    PaH::Entity* entity = (PaH::Entity*) contact->GetFixtureA()->GetBody()->GetUserData();
-		PaH::EntityBox2DResponder* contactable;
+	    GameObject* object = (GameObject*) contact->GetFixtureA()->GetBody()->GetUserData();
+		GameObjectOgreBox2D* contactableA;
 
-		contactable = dynamic_cast<PaH::EntityBox2DResponder*> (entity);
+		contactableA = dynamic_cast<GameObjectOgreBox2D*> (object);
 
-		if(contactable)
+		if(contactableA)
 		{
-			contactable->EndContact(contact,contact->GetFixtureA(),contact->GetFixtureB());
+			contactableA->EndContact(contact,contact->GetFixtureA(),contact->GetFixtureB());
 		}
 	}
 
 	// Check if fixtureA's body has some user data
-	// If it does check if the Entity respondes to contacts
+	// If it does check if the Object respondes to contacts
 	if(contact->GetFixtureB()->GetBody()->GetUserData() != NULL)
 	{
-		PaH::Entity* entity = (PaH::Entity*) contact->GetFixtureB()->GetBody()->GetUserData();
-		PaH::EntityBox2DResponder* contactable;
+		GameObject* object = (GameObject*) contact->GetFixtureB()->GetBody()->GetUserData();
+		GameObjectOgreBox2D* contactableB;
 
-		contactable = dynamic_cast<PaH::EntityBox2DResponder*> (entity);
+		contactableB = dynamic_cast<GameObjectOgreBox2D*> (object);
 
-		if(contactable)
+		if(contactableB)
 		{
-			contactable->EndContact(contact,contact->GetFixtureB(),contact->GetFixtureA());
+			contactableB->EndContact(contact,contact->GetFixtureB(),contact->GetFixtureA());
 		}
 	}
 

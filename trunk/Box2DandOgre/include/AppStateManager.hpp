@@ -34,11 +34,12 @@ public:
 	void shutdown(void);
 
 protected:
+
 	void init(AppState *state);
 
-	std::vector<AppState*>		m_ActiveStateStack;
-	std::vector<state_info>		m_States;
-	bool						m_bShutdown;
+	std::vector<AppState*>			m_ActiveStateStack;
+	std::vector<state_info>			m_States;
+	bool							m_bShutdown;
 	Ogre::GpuCommandBufferFlush		m_BufferFlush;
 };
 

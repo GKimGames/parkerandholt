@@ -4,7 +4,7 @@
 
 	Author: Matt King
 
-	Dispatches messages to Entitys.
+	Dispatches messages to GameObjects.
 
 =============================================================================*/
 
@@ -28,15 +28,15 @@ void KGBMessageDispatcher::Discharge(const KGBMessage& pMsg)
 	}
 	else
 	{
-		PaH::Entity* entity = PaH::Entity::GetEntity(pMsg.receiver);
+		GameObject* object = GameObject::GetObjectById(pMsg.receiver);
 		
-		if(entity)
+		if(object)
 		{
-			entity->HandleMessage(pMsg);
+			object->HandleMessage(pMsg);
 		}
 		else
 		{
-			//KGBMessage could not be handled
+			// KGBMessage could not be handled
 			cout << "Message not handled";
 		}
 	}
@@ -46,15 +46,15 @@ void KGBMessageDispatcher::Discharge(const KGBMessage& pMsg)
 //=============================================================================
 //	DischargeToAll
 //
-/// Dispatch a message to all Entitys
+/// Dispatch a message to all objects
 void KGBMessageDispatcher::DischargeToAll(const KGBMessage& pMsg)
 {
 	
-	PaH::EntityMap::iterator it;
+	GameObjectMap::iterator it;
 
-	PaH::EntityMap entityList = PaH::Entity::entityList;
+	GameObjectMap objectList = GameObject::objectList;
 
-	for (it = entityList.begin(); it != entityList.end(); it++)
+	for (it = objectList.begin(); it != objectList.end(); it++)
 	{
 		(*it).second->HandleMessage(pMsg);	
 	}

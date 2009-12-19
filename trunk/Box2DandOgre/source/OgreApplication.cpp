@@ -19,7 +19,7 @@ KGBOgreApplication::KGBOgreApplication()
 KGBOgreApplication::~KGBOgreApplication()
 {
 	delete GameFramework::getSingletonPtr();
-	delete PaH::GameEventDispatcher::getSingletonPtr();
+	delete KGBMessageDispatcher::getSingletonPtr();
 
 	if(appStateManager_)
 	{

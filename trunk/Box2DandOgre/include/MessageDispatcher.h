@@ -17,9 +17,18 @@
 
 #include "OgreSingleton.h"
 #include "Message.h"
-#include "Entity.h"
+#include "GameObject.h"
 
 #define Dispatch KGBMessageDispatcher::getSingletonPtr()
+
+/// This will identify what type of Game Entity an entity is.
+/// This is useful due to Box2D having all contact callbacks go through a single
+/// world wide callback.
+enum KGBMessageType
+{
+	CHARACTER_MOVE_LEFT,
+	CHARACTER_MOVE_RIGHT
+}; 
 
 /// Send the message immediately with no delay.
 const double SEND_IMMEDIATELY = 0.0;
@@ -65,6 +74,7 @@ private:
 	//copy ctor and assignment should be private
 	KGBMessageDispatcher(const KGBMessageDispatcher&);
 	KGBMessageDispatcher& operator=(const KGBMessageDispatcher&);
+
 };
 
 
