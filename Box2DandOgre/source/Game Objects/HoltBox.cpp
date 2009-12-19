@@ -23,8 +23,6 @@ HoltBox::HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center)
 
 	ModifyBoxWidth(0.1);
 
-	Initialize();
-
 	CreateBox2DBox();
 	
 }
@@ -52,15 +50,22 @@ bool HoltBox::CreateBox2DBox()
 	boxDef.position = position_;
 	body_ = world_->CreateBody(&boxDef);
 
-	b2PolygonDef sd;
-	sd.SetAsBox(boxWidth_, boxWidth_);
-	sd.density = 10.0;
-	body_->CreateFixture(&sd);
-	body_->SetMassFromShapes();
+	if(body_)
+	{
+		b2PolygonDef sd;
+		sd.SetAsBox(boxWidth_, boxWidth_);
+		sd.density = 10.0;
+		body_->CreateFixture(&sd);
+		body_->SetMassFromShapes();
 
-	body_->SetUserData(this);
+		body_->SetUserData(this);
 
-	Initialize();
+		Initialize();
 
-	return true;
+		return true;
+	}
+
+	return false;
+
+	
 }

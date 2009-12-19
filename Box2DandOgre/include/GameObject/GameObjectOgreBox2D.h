@@ -41,14 +41,14 @@ public:
 	/// Contact fixture is the fixture in this Object's body.
 	/// Collided fixture is the fixture that hit this Object's body.
 	/// By default this does nothing.
-	virtual void BeginContact(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)=0;
+	virtual void BeginContact(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture){}
 
 
 	/// Called when two fixtures cease to touch.
 	/// Contact fixture is the fixture in this Object's body.
 	/// Collided fixture is the fixture that hit this Object's body.
 	/// By default this does nothing.
-	virtual void EndContact(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)=0;
+	virtual void EndContact(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture){}
 
 
 	/// Returns the b2Body for this GameObjectOgreBox2D.
