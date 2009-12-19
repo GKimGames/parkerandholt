@@ -52,6 +52,9 @@ public:
 
 	void SetWorld(b2World* world){world_ = world;};
 	b2World* GetWorld(){return world_;};
+	
+	double GetTimeSinceLastFrame(){ return timeSinceLastFrame_; }
+	void SetTimeSinceLastFrame(double timeSinceLastFrame){ timeSinceLastFrame_ = timeSinceLastFrame; }
 
 	Ogre::Root*					root_;
 	Ogre::RenderWindow*			renderWindow_;
@@ -71,9 +74,10 @@ private:
 	GameFramework(const GameFramework&);
 	GameFramework& operator= (const GameFramework&);
 
-	Ogre::Overlay*				debugOverlay_;
-	Ogre::Overlay*				infoOverlay_;
-	int							numScreenShots_;
+	Ogre::Overlay*			debugOverlay_;
+	Ogre::Overlay*			infoOverlay_;
+	int						numScreenShots_;
+	double					timeSinceLastFrame_;
 };
 
 

@@ -17,7 +17,6 @@
 
 #include "Character.h"
 
-
 #include "OgreB2DebugDraw.h"
 #include "MousePicking.h"
 
@@ -25,14 +24,11 @@
 #include "LedgeSensor.h"
 #include "HoltBox.h"
 
-#include "EntityDrawable.h"
-#include "EntityDrawableContactResponder.h"
-#include "EntityContactResponder.h"
+#include "GameObjectOgreBox2D.h"
 
 #include "GameFramework.h"
 #include "MessageDispatcher.h"
 
-class PaH::EntityDrawable;
 #define DEBUG_DRAW_ON 1
 
 class PhysicsState : public AppState, public b2ContactListener

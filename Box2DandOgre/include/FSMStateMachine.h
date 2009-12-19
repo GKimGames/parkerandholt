@@ -17,6 +17,8 @@
 #include "FSMState.h"
 
 
+/// Finite state machines have two states at a time, a global state and a
+/// current state, both are updated 
 template <class T>
 class FSMStateMachine
 {
@@ -31,9 +33,13 @@ public:
 
 	virtual ~FSMStateMachine(){}
 
-	// Use these methods to initialize the FSM
+	/// Set the current state
 	void SetCurrentState(FSMState<T>* s)  {  currentState_	= s;}
+	
+	/// Set the global state
 	void SetGlobalState(FSMState<T>* s)   {  globalState_	= s;}
+	
+	/// Set the previous state
 	void SetPreviousState(FSMState<T>* s) {  previousState_	= s;}
 
 	/// Update the FSM
@@ -45,6 +51,7 @@ public:
 			globalState_->Update(owner_);
 		}
 
+		// If a current state exists update it.
 		if (currentState_)
 		{
 			currentState_->Update(owner_);
@@ -72,7 +79,8 @@ public:
 		currentState_->Enter(owner_);
 	}
 
-	/// Change the current state back to the previous state
+	/// Change the current state back to the previous state. This calls
+	/// ChangeState to change the state.
 	void RevertToPreviousState()
 	{
 		ChangeState(previousState_);
@@ -91,12 +99,12 @@ public:
 
 private:
 
-	// A pointer to the agent that owns this instance
+	// A pointer to the agent that owns this instance.
 	T*          owner_;
 
 	FSMState<T>*   currentState_;
 
-	// A record of the last state the agent was in
+	// A record of the last state the agent was in.
 	FSMState<T>*   previousState_;
 
 	// This is called every time the FSM is updated

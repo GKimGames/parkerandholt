@@ -4,8 +4,8 @@
 
 	Author: Matt King
 
-	This is a message that allows Entitys to send commands to each other.
-	All Entitys have the method HandleMessage
+	This is a message that allows objects to send commands to each other.
+	All objects have the method HandleMessage
 
 =============================================================================*/
 
@@ -19,10 +19,10 @@
 
 struct KGBMessage
 {
-  /// The entity that sent this Message
+  /// The object that sent this Message
   int			sender;
 
-  /// The entity that is to receive this Message
+  /// The object that is to receive this Message
   int			receiver;
 
   /// The message itself

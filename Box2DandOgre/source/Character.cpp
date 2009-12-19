@@ -3,11 +3,8 @@
 
 Character::Character(Ogre::SceneManager* sceneManager, b2World* world)
 {
-	// Macros to define type of entity
-	//	REGISTEREVENTLISTENER(this);
 
-
-	gameEntityType_ = PaH::Character;
+	gameObjectType_ = GOType_Character;
 	InitVariables();
 
 	TiXmlDocument configXML_( "..\\CharacterSettings.xml" );
@@ -114,7 +111,7 @@ Character::Character(Ogre::SceneManager* sceneManager, b2World* world)
 	feetSensor_Def.vertices[2].Set(capsuleRadius_/2  - 0.05,  -capsuleHeight_/2 - 0.1);
 	feetSensor_Def.vertices[3].Set(capsuleRadius_/2  - 0.05,  -capsuleHeight_/2 + 0.1);
 
-	feetSensor_Def.userData = &gameEntityType_;
+	feetSensor_Def.userData = &gameObjectType_;
 
 	// Create the definition of the polygon for the wall jump sensor
 	b2PolygonDef wallJumpSensor_Def;
@@ -126,7 +123,7 @@ Character::Character(Ogre::SceneManager* sceneManager, b2World* world)
 	wallJumpSensor_Def.vertices[2].Set(capsuleRadius_/2 - 0.1, capsuleHeight_/2);
 	wallJumpSensor_Def.vertices[3].Set(capsuleRadius_/2 - 0.1, -capsuleHeight_/2);
 
-	wallJumpSensor_Def.userData = &gameEntityType_;
+	wallJumpSensor_Def.userData = &gameObjectType_;
 
 	// Create the definition of the polygon for the shin sensor
 	b2PolygonDef shinSensor_Def;
@@ -135,7 +132,7 @@ Character::Character(Ogre::SceneManager* sceneManager, b2World* world)
 
 	shinSensor_Def.SetAsBox(0.1,capsuleHeight_/6,b2Vec2(capsuleRadius_/2 + 0.1, -capsuleHeight_/6),0); 
 
-	shinSensor_Def.userData = &gameEntityType_;
+	shinSensor_Def.userData = &gameObjectType_;
 
 	// Create the definition of the polygon for the thigh sensor
 	b2PolygonDef thighSensor_Def;
@@ -143,7 +140,7 @@ Character::Character(Ogre::SceneManager* sceneManager, b2World* world)
 	thighSensor_Def.vertexCount = 4;
 
 	thighSensor_Def.SetAsBox(0.1,capsuleHeight_/16,b2Vec2(capsuleRadius_/2 + 0.1, -capsuleHeight_/16),0); 
-	thighSensor_Def.userData = &gameEntityType_;
+	thighSensor_Def.userData = &gameObjectType_;
 
 	// Create the definition of the polygon for the torso sensor
 	b2PolygonDef torsoSensor_Def;
@@ -151,7 +148,7 @@ Character::Character(Ogre::SceneManager* sceneManager, b2World* world)
 	torsoSensor_Def.vertexCount = 4;
 
 	torsoSensor_Def.SetAsBox(0.1,capsuleHeight_/6,b2Vec2(capsuleRadius_/2 + 0.1, capsuleHeight_/6),0); 
-	torsoSensor_Def.userData = &gameEntityType_;
+	torsoSensor_Def.userData = &gameObjectType_;
 
 	b2Fixture* f = body_->CreateFixture(&bodyShapeDef);
 	b2FilterData fd;
@@ -185,7 +182,7 @@ Character::Character(Ogre::SceneManager* sceneManager, b2World* world)
 
 void Character::InitVariables()
 {
-	gameEntityType_ = PaH::Character;
+	gameObjectType_ = GOType_Character;
 
 	justJumped = false;
 	justWallJumped_ = false;
@@ -220,7 +217,7 @@ void Character::InitVariables()
 	thighSensorHitCount_ = 0;
 	torsoSensorHitCount_ = 0;
 
-	stateMachine_ = new FSMStateMachine<Character>(this);
+	//stateMachine_ = new FSMStateMachine<Character>(this);
 }
 
 Character::~Character()
@@ -240,39 +237,20 @@ void Character::KeyReleased(const OIS::KeyEvent &keyEventRef)
 
 }
 
-void Character::GetInput(double timeSinceLastFrame)
+
+void Character::MoveLeft()
 {
-	static double xPos = 0;
 
-
-	// The time is passed in milliseconds
-	//timeSinceLastFrame /= 1000;
-	isTouchingSurface_ = true;
+	double timeSinceLastFrame = GameFramework::getSingletonPtr()->GetTimeSinceLastFrame() / 1000;
 
 	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_NUMPAD4))
 	{
-		double force;
 
 		if(canJump_ > 0)
 		{
-			double maxVel;
-
-			if(isRunning_)
+			if(body_->GetLinearVelocity().x > -maximumRunningVelocity_)
 			{
-				maxVel = maximumRunningVelocity_;
-				force = runningForce_;
-			}
-			// Not running - walking
-			else
-			{
-				maxVel = maximumWalkingVelocity_;
-				force = walkingForce_;
-			}
-
-			if(body_->GetLinearVelocity().x > -maxVel)
-			{
-				body_->ApplyForce(b2Vec2(-force * timeSinceLastFrame,0), body_->GetPosition());
-				xPos -= 15 * timeSinceLastFrame;
+				body_->ApplyForce(b2Vec2(-runningForce_ * timeSinceLastFrame,0), body_->GetPosition());
 			}
 		}
 		else
@@ -284,31 +262,23 @@ void Character::GetInput(double timeSinceLastFrame)
 		}
 	}
 
+}
+
+void Character::MoveRight()
+{
+	double timeSinceLastFrame = GameFramework::getSingletonPtr()->GetTimeSinceLastFrame() / 1000;
+
 	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_NUMPAD6))
 	{
-		double force;
 
 		if(canJump_ > 0)
 		{
-			double maxVel;
 
-			if(isRunning_)
+			if(body_->GetLinearVelocity().x < maximumRunningVelocity_)
 			{
-				maxVel = maximumRunningVelocity_;
-				force = runningForce_;
-			}
-			// Not running - walking
-			else
-			{
-				maxVel = maximumWalkingVelocity_;
-				force = walkingForce_;
+				body_->ApplyForce(b2Vec2(runningForce_ * timeSinceLastFrame,0), body_->GetPosition());
 			}
 
-			if(body_->GetLinearVelocity().x < maxVel)
-			{
-				body_->ApplyForce(b2Vec2(force * timeSinceLastFrame,0), body_->GetPosition());
-				xPos -= 15 * timeSinceLastFrame;
-			}
 		}
 		else
 		{
@@ -318,11 +288,22 @@ void Character::GetInput(double timeSinceLastFrame)
 			}
 		}
 	}
+}
+
+void Character::GetInput(double timeSinceLastFrame)
+{
+	static double xPos = 0;
+
+
+	// The time is passed in milliseconds
+	//timeSinceLastFrame /= 1000;
+	isTouchingSurface_ = true;
+
+	
 
 	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_NUMPAD8))
 	{
 		Jump();
-
 		//animationBlender_->blend("JumpNoHeight",AnimationBlender::BlendWhileAnimating,1, false); 
 	}
 }

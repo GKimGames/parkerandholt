@@ -31,13 +31,12 @@
 
 #include "AnimationBlender.h"
 
-#include "Entity.h"
-#include "EntityBox2DResponder.h"
+#include "GameObjectOgreBox2D.h"
 
 #include "FSMStateMachine.h"
 
-/// Base class for a character. Character extends PaH::EntityDrawableContactResponder
-class Character :public PaH::EntityBox2DResponder
+/// Base class for a character. Character extends GameObjectOgreBox2D
+class Character :public GameObjectOgreBox2D
 {
 public:
 
@@ -67,7 +66,16 @@ public:
 
 	bool HandleMessage(const KGBMessage message)
 	{
-		Jump();
+
+		if(message.messageType == CHARACTER_MOVE_LEFT)
+		{
+			MoveLeft();
+		}
+
+		if(message.messageType == CHARACTER_MOVE_RIGHT)
+		{
+			MoveRight();
+		}
 
 		return true;
 	}
@@ -81,8 +89,12 @@ protected:
 	/// Applies "friction" to the character if they are on a surface.
 	virtual void ApplyWalkingFriction(double timeSinceLastFrame);
 
-	FSMStateMachine<Character>*	stateMachine_;
+	virtual void MoveLeft();
+	virtual void MoveRight();
 
+	// There needs to be a finite state machine but I didn't want to have to 
+	// template the character class so I left this here as a reminder.
+	//FSMStateMachine<Character>*	stateMachine_;
   
 	Ogre::String			meshName_;
 	Ogre::AnimationState*	animationState_; // The current animation state of the object
@@ -91,6 +103,7 @@ protected:
 	Ogre::SceneNode*	bodyNode_;
 
 	b2PolygonDef*		bodyDef;
+
 	/// On the bottom of the character to tell if its on something
 	b2Fixture*			feetSensor_;
 

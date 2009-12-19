@@ -13,7 +13,7 @@
 #include "Box2D.h"
 
 #include "AnimationBlender.h"
-#include "Entity.h"
+#include "GameObject.h"
 
 
 class MousePicking

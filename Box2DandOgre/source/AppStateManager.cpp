@@ -91,6 +91,7 @@ void AppStateManager::start(AppState* state)
 			GameFramework::getSingletonPtr()->keyboard_->capture();
 			GameFramework::getSingletonPtr()->mouse_->capture();
 
+			GameFramework::getSingletonPtr()->SetTimeSinceLastFrame(timeSinceLastFrame);
 			m_ActiveStateStack.back()->update(timeSinceLastFrame);
 			
 			Dispatch->DispatchDelayedMessages();
