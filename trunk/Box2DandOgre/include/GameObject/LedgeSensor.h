@@ -35,7 +35,7 @@ public:
 		}
 	}
 
-	virtual void EndContact(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture){}
+	//virtual void EndContact(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture){}
 
 	void OnContact(const OnTouch::slot_type& slot)
 	{

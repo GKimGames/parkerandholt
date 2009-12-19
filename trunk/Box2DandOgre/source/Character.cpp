@@ -352,6 +352,8 @@ void Character::Jump()
 			animationState_->setEnabled(true);
 		}
 	}
+
+	
 }
 
 

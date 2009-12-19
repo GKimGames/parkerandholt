@@ -5,10 +5,11 @@
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-#include "AppState.hpp"
-#include "GameState.hpp"
+
 
 #include "DotSceneLoader.hpp"
+
+#include <vector>
 
 #include <OgreSubEntity.h>
 #include <OgreMaterialManager.h>
@@ -26,11 +27,15 @@
 
 #include "GameObjectOgreBox2D.h"
 
+#include "AppState.hpp"
+#include "GameState.hpp"
+
 #include "GameFramework.h"
 #include "MessageDispatcher.h"
 
 #define DEBUG_DRAW_ON 1
 
+typedef std::vector<b2Contact*> b2ContactList;
 class PhysicsState : public AppState, public b2ContactListener
 {
 	
@@ -69,10 +74,15 @@ public:
 	/// Called when two fixtures cease to touch.
 	void EndContact(b2Contact* contact);
 
+	void ProcessContacts();
+
 	void CreateBox();
 
 
 protected:
+	
+	b2ContactList beginContactList_;
+	b2ContactList endContactList_;
 
 	b2World* world;
 	Ogre::Vector3 camPosition;
@@ -103,7 +113,6 @@ private:
 	Ogre::Entity*				m_pCurrentEntity;
 	bool						m_bLMouseDown, m_bRMouseDown;
 	bool						m_bChatMode;
-
 
 	double						gravity_;
 

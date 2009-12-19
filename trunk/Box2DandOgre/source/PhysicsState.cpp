@@ -449,11 +449,13 @@ void PhysicsState::update(double timeSinceLastFrame)
 		//camera_->setPosition(charPos.x,  camera_->getPosition().y, camera_->getPosition().z);
 		//camera_->lookAt(charPos.x,charPos.y, 0);
 
-		
+		// Process b2Contacts that happened in this world step.
+		ProcessContacts();
 
+		GameObject::UpdateObjectList(dt);
 	}
 
-	GameObject::UpdateObjectList(dt);
+	
 
 }
 
@@ -471,35 +473,9 @@ void PhysicsState::setUnbufferedMode()
 /// which fixture was of the GameObjectOgreBox2D and which one it collided with.
 void PhysicsState::BeginContact(b2Contact* contact)
 {
-	// Check if fixtureA's body has some user data
-	// If it does check if the Object respondes to contacts
-	if(contact->GetFixtureA()->GetBody()->GetUserData() != NULL)
-	{
-		GameObject* object = (GameObject*) contact->GetFixtureA()->GetBody()->GetUserData();
-		GameObjectOgreBox2D* contactableA;
-		
-		contactableA = dynamic_cast<GameObjectOgreBox2D*> (object);
-
-		if(contactableA)
-		{
-			contactableA->BeginContact(contact,contact->GetFixtureA(),contact->GetFixtureB());
-		}
-	}
+	b2Contact* c = new b2Contact(contact->GetFixtureA(), contact->GetFixtureB());
+	beginContactList_.push_back(c);
 	
-	// Check if fixtureB's body has some user data
-	// If it does check if the Object respondes to contacts
-	if(contact->GetFixtureB()->GetBody()->GetUserData() != NULL)
-	{
-	    GameObject* object = (GameObject*) contact->GetFixtureB()->GetBody()->GetUserData();
-		GameObjectOgreBox2D* contactableB;
-
-		contactableB = dynamic_cast<GameObjectOgreBox2D*> (object);
-
-		if(contactableB)
-		{
-			contactableB->BeginContact(contact,contact->GetFixtureB(),contact->GetFixtureA());
-		}
-	}
 }
 
 /// Called when two fixtures cease to touch.
@@ -508,35 +484,89 @@ void PhysicsState::BeginContact(b2Contact* contact)
 /// which fixture was of the GameObjectOgreBox2D and which one it collided with.
 void PhysicsState::EndContact(b2Contact* contact)
 {
+	b2Contact* c = new b2Contact(contact->GetFixtureA(), contact->GetFixtureB());
+	beginContactList_.push_back(c);
+}
 
-	// Check if fixtureA's body has some user data
-	// If it does check if the Object respondes to contacts
-	if(contact->GetFixtureA()->GetBody()->GetUserData() != NULL)
+
+void PhysicsState::ProcessContacts()
+{
+
+	b2Contact* contact; 
+	b2ContactList::iterator iter;
+
+	// Process the EndContact list of b2Contacts
+	for(iter = beginContactList_.begin(); iter != beginContactList_.end(); iter++)
 	{
-	    GameObject* object = (GameObject*) contact->GetFixtureA()->GetBody()->GetUserData();
-		GameObjectOgreBox2D* contactableA;
+		contact = (*iter);
 
-		contactableA = dynamic_cast<GameObjectOgreBox2D*> (object);
-
-		if(contactableA)
+		// Check if fixtureA's body has some user data
+		// If it does check if the Object respondes to contacts
+		if(contact->GetFixtureA()->GetBody()->GetUserData() != NULL)
 		{
-			contactableA->EndContact(contact,contact->GetFixtureA(),contact->GetFixtureB());
+			GameObject* object = (GameObject*) contact->GetFixtureA()->GetBody()->GetUserData();
+			GameObjectOgreBox2D* contactableA;
+
+			contactableA = dynamic_cast<GameObjectOgreBox2D*> (object);
+
+			if(contactableA)
+			{
+				contactableA->BeginContact(contact,contact->GetFixtureA(),contact->GetFixtureB());
+			}
+		}
+
+		// Check if fixtureB's body has some user data
+		// If it does check if the Object respondes to contacts
+		if(contact->GetFixtureB()->GetBody()->GetUserData() != NULL)
+		{
+			GameObject* object = (GameObject*) contact->GetFixtureB()->GetBody()->GetUserData();
+			GameObjectOgreBox2D* contactableB;
+
+			contactableB = dynamic_cast<GameObjectOgreBox2D*> (object);
+
+			if(contactableB)
+			{
+				contactableB->BeginContact(contact,contact->GetFixtureB(),contact->GetFixtureA());
+			}
 		}
 	}
 
-	// Check if fixtureA's body has some user data
-	// If it does check if the Object respondes to contacts
-	if(contact->GetFixtureB()->GetBody()->GetUserData() != NULL)
+	// Process the EndContact list of b2Contacts
+	for(iter = endContactList_.begin(); iter != endContactList_.end(); iter++)
 	{
-		GameObject* object = (GameObject*) contact->GetFixtureB()->GetBody()->GetUserData();
-		GameObjectOgreBox2D* contactableB;
+		contact = (*iter);
 
-		contactableB = dynamic_cast<GameObjectOgreBox2D*> (object);
-
-		if(contactableB)
+		// Check if fixtureA's body has some user data
+		// If it does check if the Object responds to contacts
+		if(contact->GetFixtureA()->GetBody()->GetUserData() != NULL)
 		{
-			contactableB->EndContact(contact,contact->GetFixtureB(),contact->GetFixtureA());
+			GameObject* object = (GameObject*) contact->GetFixtureA()->GetBody()->GetUserData();
+			GameObjectOgreBox2D* contactableA;
+
+			contactableA = dynamic_cast<GameObjectOgreBox2D*> (object);
+
+			if(contactableA)
+			{
+				contactableA->EndContact(contact,contact->GetFixtureA(),contact->GetFixtureB());
+			}
+		}
+
+		// Check if fixtureA's body has some user data
+		// If it does check if the Object respondes to contacts
+		if(contact->GetFixtureB()->GetBody()->GetUserData() != NULL)
+		{
+			GameObject* object = (GameObject*) contact->GetFixtureB()->GetBody()->GetUserData();
+			GameObjectOgreBox2D* contactableB;
+
+			contactableB = dynamic_cast<GameObjectOgreBox2D*> (object);
+
+			if(contactableB)
+			{
+				contactableB->EndContact(contact,contact->GetFixtureB(),contact->GetFixtureA());
+			}
 		}
 	}
 
+	endContactList_.clear();
+	beginContactList_.clear();
 }
