@@ -13,7 +13,14 @@
 
 #include "GameObjectOgre.h"
 
-
+struct ContactPoint
+{
+	b2Fixture* fixtureA;
+	b2Fixture* fixtureB;
+	b2Vec2 normal;
+	b2Vec2 position;
+	b2PointState state;
+};
 
 /// This extends GameObjectOgre and adds a Box2D component.
 class GameObjectOgreBox2D  : public GameObjectOgre
@@ -41,14 +48,14 @@ public:
 	/// Contact fixture is the fixture in this Object's body.
 	/// Collided fixture is the fixture that hit this Object's body.
 	/// By default this does nothing.
-	virtual void BeginContact(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture){}
+	virtual void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture){}
 
 
 	/// Called when two fixtures cease to touch.
 	/// Contact fixture is the fixture in this Object's body.
 	/// Collided fixture is the fixture that hit this Object's body.
 	/// By default this does nothing.
-	virtual void EndContact(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture){}
+	virtual void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture){}
 
 
 	/// Returns the b2Body for this GameObjectOgreBox2D.

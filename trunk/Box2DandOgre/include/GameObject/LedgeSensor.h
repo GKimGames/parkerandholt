@@ -26,7 +26,7 @@ public:
 
 	/// Called when two fixtures begin to touch.
 	/// Sends out the signal OnTouch to its subscribers
-	virtual void BeginContact(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+	virtual void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 	{
 
 		if(collidedFixture->IsSensor() == false)
@@ -34,8 +34,6 @@ public:
 			onTouch();
 		}
 	}
-
-	//virtual void EndContact(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture){}
 
 	void OnContact(const OnTouch::slot_type& slot)
 	{

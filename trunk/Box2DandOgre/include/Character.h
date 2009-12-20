@@ -55,10 +55,10 @@ public:
 	void GetInput(double timeSinceLastFrame);
 
 	/// Called when two fixtures begin to touch.
-	void BeginContact(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
+	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 
 	/// Called when two fixtures cease to touch.
-	void EndContact(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
+	void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 	
 	virtual bool UpdateGraphics(double timeSinceLastFrame){return true;};
 
