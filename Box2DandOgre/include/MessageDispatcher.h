@@ -21,9 +21,7 @@
 
 #define Dispatch KGBMessageDispatcher::getSingletonPtr()
 
-/// This will identify what type of Game Entity an entity is.
-/// This is useful due to Box2D having all contact callbacks go through a single
-/// world wide callback.
+/// An Enum for Messages.
 enum KGBMessageType
 {
 	CHARACTER_MOVE_LEFT,

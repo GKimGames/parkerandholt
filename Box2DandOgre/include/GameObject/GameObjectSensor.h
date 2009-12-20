@@ -25,20 +25,33 @@ namespace PaH
 		bool Update(double timeSinceLastFrame){ return true;};
 
 		/// Called when two fixtures begin to touch.
-		virtual void BeginContact(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture){;}
+		virtual void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+		{
+			if(ignoreSensors_ && collidedFixture->IsSensor())
+			{
+				return;
+			}
+		}
 
 		/// Called when two fixtures cease to touch.
-		virtual void EndContact(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture){;}
+		virtual void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+		{
+			if(ignoreSensors_ && collidedFixture->IsSensor())
+			{
+				return;
+			}
+
+		}
 
 		/// Send out a message to all the Objects in messageList_.
-		virtual void SendToMessageList(double pDelay, boost::any* pUserData)
+		virtual void SendToMessageList(double pDelay,KGBMessageType messageType, boost::any* pUserData)
 		{
 			std::vector<unsigned int>::iterator it;
 
 			for(it = messageList_.begin(); it != messageList_.end(); it++)
 			{
 
-				//Dispatch->DispatchMessage(pDelay, objectId_, (*it), messageType_, pUserData);
+				//Dispatch->DispatchMessage(pDelay, objectId_, (*it), messageType, pUserData);
 			}
 
 		}
@@ -63,12 +76,18 @@ namespace PaH
 			}
 		}
 
+		void IgnoreSensors(bool b) { ignoreSensors = b; } 
+
 	protected:
 
 		/// This stores a list of Object Id's to send a message to when this Object
 		/// comes in contact with something.
 		std::vector<unsigned int>	messageList_;
-		int messageType_;
+
+		/// The message this sensor will send out when it is hit.
+		KGBMessageType messageType_;
+
+		bool ignoreSensors_;
 
 	};
 }

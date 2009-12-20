@@ -450,12 +450,12 @@ void PhysicsState::update(double timeSinceLastFrame)
 		//camera_->lookAt(charPos.x,charPos.y, 0);
 
 		// Process b2Contacts that happened in this world step.
-		ProcessContacts();
-
-		GameObject::UpdateObjectList(dt);
+		
 	}
 
-	
+	ProcessContacts();
+
+	GameObject::UpdateObjectList(dt);
 
 }
 
@@ -467,15 +467,24 @@ void PhysicsState::setUnbufferedMode()
 {
 }
 
-/// Called when two fixtures cease to touch.
+/// Called when two fixtures begin to touch.
 /// This calls the BeginContact method of an GameObjectOgreBox2D if the user data 
 /// for one the touching fixtures is there. The called BeginContact method passes
 /// which fixture was of the GameObjectOgreBox2D and which one it collided with.
 void PhysicsState::BeginContact(b2Contact* contact)
 {
+
+
+	ContactPoint* c = new ContactPoint();
+	c->fixtureA = contact->GetFixtureA();
+	c->fixtureB = contact->GetFixtureB();
+
+	beginContactList_.push_back(c);
+
+	/*
 	b2Contact* c = new b2Contact(contact->GetFixtureA(), contact->GetFixtureB());
 	beginContactList_.push_back(c);
-	
+	*/
 }
 
 /// Called when two fixtures cease to touch.
@@ -484,11 +493,102 @@ void PhysicsState::BeginContact(b2Contact* contact)
 /// which fixture was of the GameObjectOgreBox2D and which one it collided with.
 void PhysicsState::EndContact(b2Contact* contact)
 {
+	
+	ContactPoint* c = new ContactPoint();
+	c->fixtureA = contact->GetFixtureA();
+	c->fixtureB = contact->GetFixtureB();
+
+	endContactList_.push_back(c);
+
+	/*
 	b2Contact* c = new b2Contact(contact->GetFixtureA(), contact->GetFixtureB());
 	beginContactList_.push_back(c);
+	*/
 }
 
+void PhysicsState::ProcessContacts()
+{
 
+	ContactPoint* contact; 
+	ContactList::iterator iter;
+
+	// Process the EndContact list of b2Contacts
+	for(iter = beginContactList_.begin(); iter != beginContactList_.end(); iter++)
+	{
+		contact = (*iter);
+
+		// Check if fixtureA's body has some user data
+		// If it does check if the Object responds to contacts
+		if(contact->fixtureA->GetBody()->GetUserData() != NULL)
+		{
+			GameObject* object = (GameObject*) contact->fixtureA->GetBody()->GetUserData();
+			GameObjectOgreBox2D* contactableA;
+
+			contactableA = dynamic_cast<GameObjectOgreBox2D*> (object);
+
+			if(contactableA)
+			{
+				contactableA->BeginContact(contact,contact->fixtureA,contact->fixtureB);
+			}
+		}
+
+		// Check if fixtureB's body has some user data
+		// If it does check if the Object responds to contacts
+		if(contact->fixtureB->GetBody()->GetUserData() != NULL)
+		{
+			GameObject* object = (GameObject*) contact->fixtureB->GetBody()->GetUserData();
+			GameObjectOgreBox2D* contactableB;
+
+			contactableB = dynamic_cast<GameObjectOgreBox2D*> (object);
+
+			if(contactableB)
+			{
+				contactableB->BeginContact(contact,contact->fixtureB,contact->fixtureA);
+			}
+		}
+	}
+
+	// Process the EndContact list of b2Contacts
+	for(iter = endContactList_.begin(); iter != endContactList_.end(); iter++)
+	{
+		contact = (*iter);
+
+		// Check if fixtureA's body has some user data
+		// If it does check if the Object responds to contacts
+		if(contact->fixtureA->GetBody()->GetUserData() != NULL)
+		{
+			GameObject* object = (GameObject*) contact->fixtureA->GetBody()->GetUserData();
+			GameObjectOgreBox2D* contactableA;
+
+			contactableA = dynamic_cast<GameObjectOgreBox2D*> (object);
+
+			if(contactableA)
+			{
+				contactableA->EndContact(contact,contact->fixtureA,contact->fixtureB);
+			}
+		}
+
+		// Check if fixtureA's body has some user data
+		// If it does check if the Object responds to contacts
+		if(contact->fixtureB->GetBody()->GetUserData() != NULL)
+		{
+			GameObject* object = (GameObject*) contact->fixtureB->GetBody()->GetUserData();
+			GameObjectOgreBox2D* contactableB;
+
+			contactableB = dynamic_cast<GameObjectOgreBox2D*> (object);
+
+			if(contactableB)
+			{
+				contactableB->EndContact(contact,contact->fixtureB,contact->fixtureA);
+			}
+		}
+	}
+
+	endContactList_.clear();
+	beginContactList_.clear();
+}
+
+/*
 void PhysicsState::ProcessContacts()
 {
 
@@ -570,3 +670,36 @@ void PhysicsState::ProcessContacts()
 	endContactList_.clear();
 	beginContactList_.clear();
 }
+
+
+void PhysicsState::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
+{
+	const b2Manifold* manifold = contact->GetManifold();
+
+	if (manifold->m_pointCount == 0)
+	{
+		return;
+	}
+
+	b2Fixture* fixtureA = contact->GetFixtureA();
+	b2Fixture* fixtureB = contact->GetFixtureB();
+
+	b2PointState state1[b2_maxManifoldPoints], state2[b2_maxManifoldPoints];
+	b2GetPointStates(state1, state2, oldManifold, manifold);
+
+	b2WorldManifold worldManifold;
+	contact->GetWorldManifold(&worldManifold);
+
+	for (int32 i = 0; i < manifold->m_pointCount && m_pointCount < k_maxContactPoints; ++i)
+	{
+		ContactPoint* cp = m_points + m_pointCount;
+		cp->fixtureA = fixtureA;
+		cp->fixtureB = fixtureB;
+		cp->position = worldManifold.m_points[i];
+		cp->normal = worldManifold.m_normal;
+		cp->state = state2[i];
+		++m_pointCount;
+	}
+}
+
+*/

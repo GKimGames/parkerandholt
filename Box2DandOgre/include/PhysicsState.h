@@ -33,12 +33,16 @@
 #include "GameFramework.h"
 #include "MessageDispatcher.h"
 
+#include "GameObjectOgreBox2D.h"
+
 #define DEBUG_DRAW_ON 1
 
-typedef std::vector<b2Contact*> b2ContactList;
+
 class PhysicsState : public AppState, public b2ContactListener
 {
-	
+
+typedef std::vector<ContactPoint*> ContactList;
+
 public:
 
 	PhysicsState();
@@ -74,6 +78,8 @@ public:
 	/// Called when two fixtures cease to touch.
 	void EndContact(b2Contact* contact);
 
+	//virtual void PreSolve(b2Contact* contact, const b2Manifold* oldManifold);
+
 	void ProcessContacts();
 
 	void CreateBox();
@@ -81,8 +87,7 @@ public:
 
 protected:
 	
-	b2ContactList beginContactList_;
-	b2ContactList endContactList_;
+
 
 	b2World* world;
 	Ogre::Vector3 camPosition;
@@ -115,6 +120,12 @@ private:
 	bool						m_bChatMode;
 
 	double						gravity_;
+
+	ContactList beginContactList_;
+	ContactList endContactList_;
+
+	//ContactPoint m_points[k_maxContactPoints];
+	int32 m_pointCount;
 
 };
 

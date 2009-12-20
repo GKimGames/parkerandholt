@@ -28,8 +28,6 @@ public:
 		return true;
 	};
 
-	//virtual void BeginContact(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture){}
-	//virtual void EndContact(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture){}
 
 
 protected:

@@ -488,7 +488,7 @@ void Character::UpdateAnimation(double timeSinceLastFrame)
 }
 
 /// Called when two fixtures begin to touch.
-void Character::BeginContact(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+void Character::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
 	if(contactFixture == feetSensor_)
 	{
@@ -509,7 +509,7 @@ void Character::BeginContact(b2Contact* contact, b2Fixture* contactFixture, b2Fi
 }
 
 /// Called when two fixtures cease to touch.
-void Character::EndContact(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+void Character::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
 	if(contactFixture == feetSensor_)
 	{
