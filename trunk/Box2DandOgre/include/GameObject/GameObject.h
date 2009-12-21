@@ -26,6 +26,7 @@ typedef std::map<int, GameObject*> GameObjectMap;
 enum GameObjectType
 {
 	GOType_Character,		//< \brief Character Object
+	GOType_Character_Parker,		//< \brief Character Object
 	CharacterFoot,
 	GOType_HoltBox,
 	GOType_LedgeSensor,

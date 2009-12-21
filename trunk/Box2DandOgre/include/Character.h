@@ -40,19 +40,10 @@ class Character :public GameObjectOgreBox2D
 {
 public:
 
-	Character(Ogre::SceneManager* sceneManager, b2World* world);
+	Character(Ogre::SceneManager* sceneManager);
 	~Character();
 
-	virtual void KeyPressed(const OIS::KeyEvent &keyEventRef);
-	virtual void KeyReleased(const OIS::KeyEvent &keyEventRef);
-
-	void MouseMoved(const OIS::MouseEvent &arg);
-	void MousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id); 
-	void MouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
-
 	bool Update(double timeSinceLastFrame);
-
-	void GetInput(double timeSinceLastFrame);
 
 	/// Called when two fixtures begin to touch.
 	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
@@ -60,24 +51,37 @@ public:
 	/// Called when two fixtures cease to touch.
 	void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 	
-	virtual bool UpdateGraphics(double timeSinceLastFrame){return true;};
+	virtual bool UpdateGraphics(double timeSinceLastFrame)
+	{
+		return true;
+	};
 
 	virtual void Jump();
 
-	bool HandleMessage(const KGBMessage message)
+	virtual bool HandleMessage(const KGBMessage message)
 	{
 
-		if(message.messageType == CHARACTER_MOVE_LEFT)
+		switch(message.messageType)
 		{
-			MoveLeft();
+			case CHARACTER_MOVE_LEFT:
+			{
+				MoveLeft();
+				return true;
+			}
+			case CHARACTER_MOVE_RIGHT:
+			{
+				MoveRight();
+				return true;
+			}
+			case CHARACTER_JUMP:
+			{
+				Jump();
+				return true;
+			}
+	
 		}
 
-		if(message.messageType == CHARACTER_MOVE_RIGHT)
-		{
-			MoveRight();
-		}
-
-		return true;
+		return false;
 	}
 
 protected:

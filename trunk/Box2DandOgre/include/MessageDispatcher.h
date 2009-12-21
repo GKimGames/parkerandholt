@@ -25,7 +25,8 @@
 enum KGBMessageType
 {
 	CHARACTER_MOVE_LEFT,
-	CHARACTER_MOVE_RIGHT
+	CHARACTER_MOVE_RIGHT,
+	CHARACTER_JUMP
 }; 
 
 /// Send the message immediately with no delay.

@@ -28,7 +28,6 @@ public:
 	/// Sends out the signal OnTouch to its subscribers
 	virtual void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 	{
-
 		if(collidedFixture->IsSensor() == false)
 		{
 			onTouch();

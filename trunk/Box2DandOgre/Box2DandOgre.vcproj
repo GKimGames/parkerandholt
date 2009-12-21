@@ -256,6 +256,10 @@
 					RelativePath=".\source\Character.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\source\Parker.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="App State"
@@ -366,10 +370,14 @@
 					RelativePath=".\include\Character.h"
 					>
 				</File>
-				<File
-					RelativePath=".\include\Parker.h"
+				<Filter
+					Name="Parker"
 					>
-				</File>
+					<File
+						RelativePath=".\include\Parker.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="App State"
