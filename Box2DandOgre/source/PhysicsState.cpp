@@ -144,7 +144,7 @@ void PhysicsState::createPhysics()
 
 
 	// Create myCharacter
-	myCharacter_ = new Character(sceneManager_, world);
+	myCharacter_ = new Character(sceneManager_);
 
 	HoltBox* bb = new HoltBox(sceneManager_, b2Vec2(-5.0f, 10.0f));
 	bb->Initialize();
@@ -395,6 +395,12 @@ void PhysicsState::getInput()
 			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, myCharacter_->GetId(), CHARACTER_MOVE_RIGHT, NULL);
 		}
 
+		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_NUMPAD8))
+		{
+			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, myCharacter_->GetId(), CHARACTER_JUMP, NULL);
+		}
+		
+
 
 	}
 }
@@ -440,8 +446,6 @@ void PhysicsState::update(double timeSinceLastFrame)
 #if DEBUG_DRAW_ON
 		debugDraw_->clear();
 #endif
-		myCharacter_->GetInput(timeStep);
-		//myCharacter_->Update(timeStep);	
 
 		world->Step(timeStep,10,9);
 		time -= timeStep;
@@ -587,119 +591,3 @@ void PhysicsState::ProcessContacts()
 	endContactList_.clear();
 	beginContactList_.clear();
 }
-
-/*
-void PhysicsState::ProcessContacts()
-{
-
-	b2Contact* contact; 
-	b2ContactList::iterator iter;
-
-	// Process the EndContact list of b2Contacts
-	for(iter = beginContactList_.begin(); iter != beginContactList_.end(); iter++)
-	{
-		contact = (*iter);
-
-		// Check if fixtureA's body has some user data
-		// If it does check if the Object respondes to contacts
-		if(contact->GetFixtureA()->GetBody()->GetUserData() != NULL)
-		{
-			GameObject* object = (GameObject*) contact->GetFixtureA()->GetBody()->GetUserData();
-			GameObjectOgreBox2D* contactableA;
-
-			contactableA = dynamic_cast<GameObjectOgreBox2D*> (object);
-
-			if(contactableA)
-			{
-				contactableA->BeginContact(contact,contact->GetFixtureA(),contact->GetFixtureB());
-			}
-		}
-
-		// Check if fixtureB's body has some user data
-		// If it does check if the Object respondes to contacts
-		if(contact->GetFixtureB()->GetBody()->GetUserData() != NULL)
-		{
-			GameObject* object = (GameObject*) contact->GetFixtureB()->GetBody()->GetUserData();
-			GameObjectOgreBox2D* contactableB;
-
-			contactableB = dynamic_cast<GameObjectOgreBox2D*> (object);
-
-			if(contactableB)
-			{
-				contactableB->BeginContact(contact,contact->GetFixtureB(),contact->GetFixtureA());
-			}
-		}
-	}
-
-	// Process the EndContact list of b2Contacts
-	for(iter = endContactList_.begin(); iter != endContactList_.end(); iter++)
-	{
-		contact = (*iter);
-
-		// Check if fixtureA's body has some user data
-		// If it does check if the Object responds to contacts
-		if(contact->GetFixtureA()->GetBody()->GetUserData() != NULL)
-		{
-			GameObject* object = (GameObject*) contact->GetFixtureA()->GetBody()->GetUserData();
-			GameObjectOgreBox2D* contactableA;
-
-			contactableA = dynamic_cast<GameObjectOgreBox2D*> (object);
-
-			if(contactableA)
-			{
-				contactableA->EndContact(contact,contact->GetFixtureA(),contact->GetFixtureB());
-			}
-		}
-
-		// Check if fixtureA's body has some user data
-		// If it does check if the Object respondes to contacts
-		if(contact->GetFixtureB()->GetBody()->GetUserData() != NULL)
-		{
-			GameObject* object = (GameObject*) contact->GetFixtureB()->GetBody()->GetUserData();
-			GameObjectOgreBox2D* contactableB;
-
-			contactableB = dynamic_cast<GameObjectOgreBox2D*> (object);
-
-			if(contactableB)
-			{
-				contactableB->EndContact(contact,contact->GetFixtureB(),contact->GetFixtureA());
-			}
-		}
-	}
-
-	endContactList_.clear();
-	beginContactList_.clear();
-}
-
-
-void PhysicsState::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
-{
-	const b2Manifold* manifold = contact->GetManifold();
-
-	if (manifold->m_pointCount == 0)
-	{
-		return;
-	}
-
-	b2Fixture* fixtureA = contact->GetFixtureA();
-	b2Fixture* fixtureB = contact->GetFixtureB();
-
-	b2PointState state1[b2_maxManifoldPoints], state2[b2_maxManifoldPoints];
-	b2GetPointStates(state1, state2, oldManifold, manifold);
-
-	b2WorldManifold worldManifold;
-	contact->GetWorldManifold(&worldManifold);
-
-	for (int32 i = 0; i < manifold->m_pointCount && m_pointCount < k_maxContactPoints; ++i)
-	{
-		ContactPoint* cp = m_points + m_pointCount;
-		cp->fixtureA = fixtureA;
-		cp->fixtureB = fixtureB;
-		cp->position = worldManifold.m_points[i];
-		cp->normal = worldManifold.m_normal;
-		cp->state = state2[i];
-		++m_pointCount;
-	}
-}
-
-*/

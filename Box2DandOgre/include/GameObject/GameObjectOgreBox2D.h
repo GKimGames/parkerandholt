@@ -13,6 +13,8 @@
 
 #include "GameObjectOgre.h"
 
+
+/// Structure to represent a contact point.
 struct ContactPoint
 {
 	b2Fixture* fixtureA;

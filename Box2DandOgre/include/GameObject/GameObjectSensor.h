@@ -19,10 +19,10 @@ namespace PaH
 	public:
 
 
-		GameObjectSensor(b2Vec2 position);
+		GameObjectSensor();
 		~GameObjectSensor();
 
-		bool Update(double timeSinceLastFrame){ return true;};
+		bool Update(double timeSinceLastFrame){ return true;}
 
 		/// Called when two fixtures begin to touch.
 		virtual void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
@@ -31,6 +31,7 @@ namespace PaH
 			{
 				return;
 			}
+			
 		}
 
 		/// Called when two fixtures cease to touch.

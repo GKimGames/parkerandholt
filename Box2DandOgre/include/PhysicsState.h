@@ -78,8 +78,6 @@ public:
 	/// Called when two fixtures cease to touch.
 	void EndContact(b2Contact* contact);
 
-	//virtual void PreSolve(b2Contact* contact, const b2Manifold* oldManifold);
-
 	void ProcessContacts();
 
 	void CreateBox();

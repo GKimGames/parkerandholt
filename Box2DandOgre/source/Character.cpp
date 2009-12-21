@@ -1,7 +1,8 @@
 
 #include "Character.h"
 
-Character::Character(Ogre::SceneManager* sceneManager, b2World* world)
+Character::Character(Ogre::SceneManager* sceneManager)
+:sceneManager_(sceneManager)
 {
 
 	gameObjectType_ = GOType_Character;
@@ -182,8 +183,6 @@ Character::Character(Ogre::SceneManager* sceneManager, b2World* world)
 
 void Character::InitVariables()
 {
-	gameObjectType_ = GOType_Character;
-
 	justJumped = false;
 	justWallJumped_ = false;
 
@@ -223,20 +222,6 @@ void Character::InitVariables()
 Character::~Character()
 {
 }
-
-void Character::KeyPressed(const OIS::KeyEvent &keyEventRef)
-{
-	if(keyEventRef.key == OIS::KC_R)
-	{
-		isRunning_ = !isRunning_;
-	}
-}
-
-void Character::KeyReleased(const OIS::KeyEvent &keyEventRef)
-{
-
-}
-
 
 void Character::MoveLeft()
 {
@@ -287,24 +272,6 @@ void Character::MoveRight()
 				body_->ApplyForce(b2Vec2(airForce_ * timeSinceLastFrame,0), body_->GetPosition());
 			}
 		}
-	}
-}
-
-void Character::GetInput(double timeSinceLastFrame)
-{
-	static double xPos = 0;
-
-
-	// The time is passed in milliseconds
-	//timeSinceLastFrame /= 1000;
-	isTouchingSurface_ = true;
-
-	
-
-	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_NUMPAD8))
-	{
-		Jump();
-		//animationBlender_->blend("JumpNoHeight",AnimationBlender::BlendWhileAnimating,1, false); 
 	}
 }
 

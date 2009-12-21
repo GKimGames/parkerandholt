@@ -22,6 +22,4 @@ LedgeSensor::LedgeSensor(b2Vec2 position)
 
 	gameObjectType_ = GOType_LedgeSensor;
 
-
-
 }
