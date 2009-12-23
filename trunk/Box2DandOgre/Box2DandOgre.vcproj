@@ -256,10 +256,22 @@
 					RelativePath=".\source\Character.cpp"
 					>
 				</File>
-				<File
-					RelativePath=".\source\Parker.cpp"
+				<Filter
+					Name="Parker"
 					>
-				</File>
+					<File
+						RelativePath=".\source\Parker.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\source\ParkerStateInAir.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\source\ParkerStateOnGround.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="App State"
@@ -375,6 +387,14 @@
 					>
 					<File
 						RelativePath=".\include\Parker.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\ParkerStateInAir.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\ParkerStateOnGround.h"
 						>
 					</File>
 				</Filter>

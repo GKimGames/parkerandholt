@@ -35,6 +35,8 @@
 
 #include "GameObjectOgreBox2D.h"
 
+#include "Parker.h"
+
 #define DEBUG_DRAW_ON 1
 
 
@@ -86,6 +88,8 @@ public:
 protected:
 	
 
+
+	CharacterParker* parker_;
 
 	b2World* world;
 	Ogre::Vector3 camPosition;

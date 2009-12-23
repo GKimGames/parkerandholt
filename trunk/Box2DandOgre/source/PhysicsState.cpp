@@ -144,7 +144,11 @@ void PhysicsState::createPhysics()
 
 
 	// Create myCharacter
-	myCharacter_ = new Character(sceneManager_);
+	//myCharacter_ = new Character(sceneManager_);
+	//myCharacter_->Initialize();
+	
+	parker_  = new CharacterParker(sceneManager_);
+	parker_->Initialize();
 
 	HoltBox* bb = new HoltBox(sceneManager_, b2Vec2(-5.0f, 10.0f));
 	bb->Initialize();
@@ -158,7 +162,7 @@ void PhysicsState::createPhysics()
 
 	ls2->OnContact(boost::bind(&PhysicsState::CreateBox, this));
 
-	Dispatch->DispatchMessage(3000,0,myCharacter_->GetId(),1,NULL);
+	//Dispatch->DispatchMessage(3000,0,myCharacter_->GetId(),1,NULL);
 
 #if DEBUG_DRAW_ON
 	debugDraw_ = new OgreB2DebugDraw(sceneManager_, "debugDraw", 0);
@@ -241,15 +245,6 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 		pause_ = true;
 	}
 
-
-	if(m_bChatMode == true)
-	{
-
-	}
-	else
-	{
-		myCharacter_->KeyPressed(keyEventRef);
-	}
 
 	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_ESCAPE))
 	{
@@ -367,17 +362,20 @@ void PhysicsState::getInput()
 
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_LEFT))
 		{
-			camera_->yaw(m_RotScale);
+			//camera_->yaw(m_RotScale);
+			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, parker_->GetId(), CHARACTER_MOVE_LEFT, NULL);
 		}
 
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_RIGHT))
 		{
-			camera_->yaw(-m_RotScale);
+			//camera_->yaw(-m_RotScale);
+			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, parker_->GetId(), CHARACTER_MOVE_RIGHT, NULL);
 		}
 
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_UP))
 		{
-			camera_->pitch(m_RotScale);
+			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, parker_->GetId(), CHARACTER_JUMP, NULL);
+			//camera_->pitch(m_RotScale);
 		}
 
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_DOWN))
@@ -385,6 +383,7 @@ void PhysicsState::getInput()
 			camera_->pitch(-m_RotScale);
 		}
 
+		/*
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_NUMPAD4))
 		{
 			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, myCharacter_->GetId(), CHARACTER_MOVE_LEFT, NULL);
@@ -399,6 +398,7 @@ void PhysicsState::getInput()
 		{
 			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, myCharacter_->GetId(), CHARACTER_JUMP, NULL);
 		}
+		*/
 		
 
 

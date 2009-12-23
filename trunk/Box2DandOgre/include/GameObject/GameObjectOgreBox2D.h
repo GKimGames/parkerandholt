@@ -116,9 +116,6 @@ protected:
 	/// Reference to the b2World
 	b2World* world_;
 
-	/// Has the Object been initialized
-	bool initialized_;
-
 	float prevAngle;
 
 
