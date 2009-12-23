@@ -31,7 +31,18 @@ public:
 		globalState_(NULL)
 	{}
 
-	virtual ~FSMStateMachine(){}
+	virtual ~FSMStateMachine()
+	{
+		if(currentState_)
+		{
+			delete currentState_;
+		}
+
+		if(globalState_)
+		{
+			delete globalState_;
+		}
+	}
 
 	/// Set the current state
 	void SetCurrentState(FSMState<T>* s)  {  currentState_	= s;}
@@ -43,19 +54,51 @@ public:
 	void SetPreviousState(FSMState<T>* s) {  previousState_	= s;}
 
 	/// Update the FSM
-	void Update() const
+	bool Update() const
 	{
 		// If a global state exists update it.
 		if(globalState_)
 		{
-			globalState_->Update(owner_);
+			globalState_->Update();
 		}
 
 		// If a current state exists update it.
 		if (currentState_)
 		{
-			currentState_->Update(owner_);
+			return currentState_->Update();
 		}
+
+		return true;
+	}
+
+	/// Send a message to the FSM
+	bool HandleMessage(const KGBMessage message) const
+	{
+		// If a global state exists update it.
+		if(globalState_)
+		{
+			globalState_->HandleMessage(message);
+		}
+
+		// If a current state exists update it.
+		if (currentState_)
+		{
+			return currentState_->HandleMessage(message);
+		}
+
+		return true;
+	}
+
+	/// Called when two fixtures begin to touch.
+	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+	{
+		currentState_->BeginContact(contact,contactFixture, collidedFixture);
+	}
+
+	/// Called when two fixtures cease to touch.
+	void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+	{
+		currentState_->EndContact(contact,contactFixture, collidedFixture);
 	}
 
 	/// Change current state to newState.
@@ -70,13 +113,13 @@ public:
 		previousState_ = currentState_;
 
 		// Call the exit method of the existing state
-		currentState_->Exit(owner_);
+		currentState_->Exit();
 
 		// Change state to the new state
 		currentState_ = newState;
 
 		// Call the entry method of the new state
-		currentState_->Enter(owner_);
+		currentState_->Enter();
 	}
 
 	/// Change the current state back to the previous state. This calls

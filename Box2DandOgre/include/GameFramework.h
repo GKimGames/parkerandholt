@@ -22,6 +22,7 @@
 #include "Box2D.h"
 #include "BetaGUI.h"
 
+#define GAMEFRAMEWORK GameFramework::getSingletonPtr()
 
 /// GameFramework srarts up Ogre and loads resource to be used as well as
 /// storing the current states b2World reference

@@ -11,25 +11,42 @@
 #define FSMSTATE_H
 
 #include "Message.h"
+#include "GameObjectOgreBox2D.h"
+#include "GameFramework.h"
 
 template <class T>
 class FSMState
 {
 public:
 
-  virtual ~FSMState(){}
 
-  /// This is called when the state is entered.
-  virtual void Enter(T*)=0;
+	FSMState(T* owner):owner_(owner){}
 
-  /// Update.
-  virtual void Update(T*)=0;
+	virtual ~FSMState(){}
 
-  /// Used to handle messages.
-  virtual void HandleMessage(T*, const KGBMessage message)=0;
+	/// This is called when the state is entered.
+	virtual void Enter()=0;
 
-  /// This will execute when the state is exited.
-  virtual void Exit(T*)=0;
+	/// Update.
+	virtual bool Update()=0;
+
+	/// Used to handle messages.
+	virtual bool HandleMessage(const KGBMessage message)=0;
+
+	/// Called when two fixtures begin to touch.
+	virtual void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)=0;
+
+	/// Called when two fixtures cease to touch.
+	virtual void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)=0;
+
+	/// This will execute when the state is exited.
+	virtual void Exit()=0;
+
+protected:
+
+	T* owner_;
+
+
 };
 
 #endif

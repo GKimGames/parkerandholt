@@ -43,7 +43,7 @@ public:
 	Character(Ogre::SceneManager* sceneManager);
 	~Character();
 
-	bool Update(double timeSinceLastFrame);
+	virtual bool Update(double timeSinceLastFrame);
 
 	/// Called when two fixtures begin to touch.
 	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
@@ -84,11 +84,16 @@ public:
 		return false;
 	}
 
+	virtual bool Initialize();
+
 protected:
 		 
 	virtual void UpdateAnimation(double timeSinceLastFrame);
+	
 	virtual void InitVariables();
-	virtual void EvaluateContacts(){;};
+	virtual bool ReadXMLConfig();
+	virtual void CreatePhysics();
+	virtual void CreateGraphics();
 
 	/// Applies "friction" to the character if they are on a surface.
 	virtual void ApplyWalkingFriction(double timeSinceLastFrame);

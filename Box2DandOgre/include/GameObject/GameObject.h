@@ -25,8 +25,10 @@ typedef std::map<int, GameObject*> GameObjectMap;
 /// world wide callback.
 enum GameObjectType
 {
-	GOType_Character,		//< \brief Character Object
-	GOType_Character_Parker,		//< \brief Character Object
+	GOType_Character,						//< \brief Character Object
+	GOType_Character_Parker,				//< \brief Character Parker Object
+	GOType_Character_Parker_FEET_SENSOR,	//< \brief Character Parker Object
+	GOType_Character_Holt,					//< \brief Character Holt Object
 	CharacterFoot,
 	GOType_HoltBox,
 	GOType_LedgeSensor,
@@ -100,9 +102,11 @@ public:
 	virtual bool HandleMessage(const KGBMessage message){ return false; };
 
 	/// Initialize the GameObjectOgreBox2D.
-	virtual void Initialize()
+	virtual bool Initialize()
 	{
 		initialized_ = true;
+
+		return true;
 	}
 
 	/// Return initialized_.
@@ -112,7 +116,6 @@ public:
 	}
 
 protected:
-
 
 	GameObjectType			gameObjectType_;	//< \brief GameObjectType of the object.
 

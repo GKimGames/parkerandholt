@@ -21,10 +21,12 @@ public:
 	HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center);
 	~HoltBox(){}
 
-	void Initialize()
+	bool Initialize()
 	{
 		prevAngle = 0;
 		initialized_ = true;
+
+		return true;
 	}
 
 

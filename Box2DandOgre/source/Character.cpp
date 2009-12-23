@@ -2,93 +2,26 @@
 #include "Character.h"
 
 Character::Character(Ogre::SceneManager* sceneManager)
-:sceneManager_(sceneManager)
 {
+	sceneManager_ = sceneManager;
+}
 
-	gameObjectType_ = GOType_Character;
+bool Character::Initialize()
+{
 	InitVariables();
 
-	TiXmlDocument configXML_( "..\\CharacterSettings.xml" );
-	configXML_.LoadFile();
-	TiXmlHandle hDoc(&configXML_);
+	if(!ReadXMLConfig())
+		return false;
 
-	TiXmlElement* pElem;
-	TiXmlHandle hRoot(0);
+	CreateGraphics();
 
-	pElem = hDoc.FirstChildElement().Element();
+	CreatePhysics();
 
-	// The XML file didn't load, we can't do anything.
-	if (!pElem) return;
+	return true;
+}
 
-	hRoot = TiXmlHandle(pElem);
-
-	TiXmlElement* meshNode = hRoot.FirstChild( "MeshInfo" ).FirstChild().Element();
-	meshName_ = meshNode->Attribute("name");
-	meshNode->QueryDoubleAttribute("translateX", &translateX);
-	meshNode->QueryDoubleAttribute("translateY", &translateY);
-	meshNode->QueryDoubleAttribute("translateZ", &translateZ);
-	meshNode->QueryDoubleAttribute("rotateY", &rotateY);
-
-	TiXmlElement* sizeNode = hRoot.FirstChild( "ShapeInfo" ).FirstChild( "Size" ).Element();
-
-	sizeNode->QueryDoubleAttribute("radius", &capsuleRadius_);
-	sizeNode->QueryDoubleAttribute("height", &capsuleHeight_);
-	sizeNode->QueryDoubleAttribute("scaleX", &scaleX_);
-	sizeNode->QueryDoubleAttribute("scaleY", &scaleY_);
-	sizeNode->QueryDoubleAttribute("scaleZ", &scaleZ_);
-
-	TiXmlElement* shapeDefNode = hRoot.FirstChild( "ShapeInfo" ).FirstChild( "ShapeDef" ).Element();
-	shapeDefNode->QueryDoubleAttribute("friction", &friction_);
-	shapeDefNode->QueryDoubleAttribute("restitution", &restitution_);
-	shapeDefNode->QueryDoubleAttribute("mass", &mass_);
-	shapeDefNode->QueryDoubleAttribute("linearDamping", &linearDamping_);
-
-
-	// Testing printing debug
-	Ogre::String s = Ogre::StringConverter::toString(Ogre::Real(capsuleRadius_));
-	DLOG(s.c_str());
-
-	// Get the walking and running information
-	TiXmlElement* movementNode = hRoot.FirstChild( "MovementInfo" ).FirstChildElement( "WalkingInfo" ).Element();
-	movementNode->QueryDoubleAttribute("walkingForce", &walkingForce_);
-	movementNode->QueryDoubleAttribute("maximumVelocity", &maximumWalkingVelocity_);
-
-	TiXmlElement* runningNode = hRoot.FirstChild( "MovementInfo" ).FirstChildElement( "RunningInfo" ).Element();
-	runningNode->QueryDoubleAttribute("runningForce", &runningForce_);
-	runningNode->QueryDoubleAttribute("maximumVelocity", &maximumRunningVelocity_);
-
-	TiXmlElement* jumpingNode = hRoot.FirstChild( "MovementInfo" ).FirstChildElement( "JumpingInfo" ).Element();
-	jumpingNode->QueryDoubleAttribute("jumpingForce", &jumpingForce_);
-	jumpingNode->QueryDoubleAttribute("jumpingAfterForce", &jumpingAfterForce_);
-
-	TiXmlElement* airNode = hRoot.FirstChild( "MovementInfo" ).FirstChildElement( "AirInfo" ).Element();
-	airNode->QueryDoubleAttribute("airForce", &airForce_);
-	airNode->QueryDoubleAttribute("maximumVelocity", &maximumAirVelocity_);
-
-	sceneManager_ = sceneManager;
-	world_ = world;
-
-	entity_ = sceneManager_->createEntity("Ninja", meshName_);
-	animationState_ = entity_->getAnimationState("Walk");
-	animationState_->setLoop(true);
-	animationState_->setEnabled(true);
-
-	/*
-	animationBlender_ = new AnimationBlender(entity_);
-	animationBlender_->init("Walk");
-	*/
-
-	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode( "CharacterNode" );
-	bodyNode_ = sceneNode_->createChildSceneNode( "CharacterBodyNode" );
-	bodyNode_->attachObject(entity_);
-
-	Ogre::Vector3 sizeV = entity_->getBoundingBox().getSize();
-
-	bodyNode_->scale(scaleX_,scaleY_,scaleZ_);
-	bodyNode_->translate(translateX,translateY,translateZ);
-	bodyNode_->rotate(Ogre::Vector3::UNIT_Y,Ogre::Degree(rotateY));
-	bodyNode_->setInitialState();
-
+void Character::CreatePhysics()
+{
 	b2BodyDef bd;
 	bd.position.Set(0, 2);
 	bd.fixedRotation = true;
@@ -165,8 +98,6 @@ Character::Character(Ogre::SceneManager* sceneManager)
 
 	//wallJumpSensor_ = body_->CreateFixture(&wallJumpSensor_Def);
 
-
-
 	body_->SetMassFromShapes();
 
 	b2MassData md = body_->GetMassData();
@@ -178,11 +109,103 @@ Character::Character(Ogre::SceneManager* sceneManager)
 	world_->Refilter(f);
 
 	body_->SetUserData(this);
+}
 
+
+
+void Character::CreateGraphics()
+{
+	entity_ = sceneManager_->createEntity("Ninja", meshName_);
+	animationState_ = entity_->getAnimationState("Walk");
+	animationState_->setLoop(true);
+	animationState_->setEnabled(true);
+
+	/*
+	animationBlender_ = new AnimationBlender(entity_);
+	animationBlender_->init("Walk");
+	*/
+
+	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode( "CharacterNode" );
+	bodyNode_ = sceneNode_->createChildSceneNode( "CharacterBodyNode" );
+	bodyNode_->attachObject(entity_);
+
+	Ogre::Vector3 sizeV = entity_->getBoundingBox().getSize();
+
+	bodyNode_->scale(scaleX_,scaleY_,scaleZ_);
+	bodyNode_->translate(translateX,translateY,translateZ);
+	bodyNode_->rotate(Ogre::Vector3::UNIT_Y,Ogre::Degree(rotateY));
+	bodyNode_->setInitialState();
+}
+
+
+bool Character::ReadXMLConfig()
+{
+	TiXmlDocument configXML_( "..\\CharacterSettings.xml" );
+	configXML_.LoadFile();
+	TiXmlHandle hDoc(&configXML_);
+
+	TiXmlElement* pElem;
+	TiXmlHandle hRoot(0);
+
+	pElem = hDoc.FirstChildElement().Element();
+
+	// The XML file didn't load, we can't do anything.
+	if (!pElem) 
+		return false;
+
+	hRoot = TiXmlHandle(pElem);
+
+	TiXmlElement* meshNode = hRoot.FirstChild( "MeshInfo" ).FirstChild().Element();
+	meshName_ = meshNode->Attribute("name");
+	meshNode->QueryDoubleAttribute("translateX", &translateX);
+	meshNode->QueryDoubleAttribute("translateY", &translateY);
+	meshNode->QueryDoubleAttribute("translateZ", &translateZ);
+	meshNode->QueryDoubleAttribute("rotateY", &rotateY);
+
+	TiXmlElement* sizeNode = hRoot.FirstChild( "ShapeInfo" ).FirstChild( "Size" ).Element();
+
+	sizeNode->QueryDoubleAttribute("radius", &capsuleRadius_);
+	sizeNode->QueryDoubleAttribute("height", &capsuleHeight_);
+	sizeNode->QueryDoubleAttribute("scaleX", &scaleX_);
+	sizeNode->QueryDoubleAttribute("scaleY", &scaleY_);
+	sizeNode->QueryDoubleAttribute("scaleZ", &scaleZ_);
+
+	TiXmlElement* shapeDefNode = hRoot.FirstChild( "ShapeInfo" ).FirstChild( "ShapeDef" ).Element();
+	shapeDefNode->QueryDoubleAttribute("friction", &friction_);
+	shapeDefNode->QueryDoubleAttribute("restitution", &restitution_);
+	shapeDefNode->QueryDoubleAttribute("mass", &mass_);
+	shapeDefNode->QueryDoubleAttribute("linearDamping", &linearDamping_);
+
+
+	// Testing printing debug
+	Ogre::String s = Ogre::StringConverter::toString(Ogre::Real(capsuleRadius_));
+	DLOG(s.c_str());
+
+	// Get the walking and running information
+	TiXmlElement* movementNode = hRoot.FirstChild( "MovementInfo" ).FirstChildElement( "WalkingInfo" ).Element();
+	movementNode->QueryDoubleAttribute("walkingForce", &walkingForce_);
+	movementNode->QueryDoubleAttribute("maximumVelocity", &maximumWalkingVelocity_);
+
+	TiXmlElement* runningNode = hRoot.FirstChild( "MovementInfo" ).FirstChildElement( "RunningInfo" ).Element();
+	runningNode->QueryDoubleAttribute("runningForce", &runningForce_);
+	runningNode->QueryDoubleAttribute("maximumVelocity", &maximumRunningVelocity_);
+
+	TiXmlElement* jumpingNode = hRoot.FirstChild( "MovementInfo" ).FirstChildElement( "JumpingInfo" ).Element();
+	jumpingNode->QueryDoubleAttribute("jumpingForce", &jumpingForce_);
+	jumpingNode->QueryDoubleAttribute("jumpingAfterForce", &jumpingAfterForce_);
+
+	TiXmlElement* airNode = hRoot.FirstChild( "MovementInfo" ).FirstChildElement( "AirInfo" ).Element();
+	airNode->QueryDoubleAttribute("airForce", &airForce_);
+	airNode->QueryDoubleAttribute("maximumVelocity", &maximumAirVelocity_);
+
+	return true;
 }
 
 void Character::InitVariables()
 {
+
+	gameObjectType_ = GOType_Character;
+
 	justJumped = false;
 	justWallJumped_ = false;
 
@@ -215,8 +238,6 @@ void Character::InitVariables()
 	shinSensorHitCount_ = 0;
 	thighSensorHitCount_ = 0;
 	torsoSensorHitCount_ = 0;
-
-	//stateMachine_ = new FSMStateMachine<Character>(this);
 }
 
 Character::~Character()
@@ -228,24 +249,22 @@ void Character::MoveLeft()
 
 	double timeSinceLastFrame = GameFramework::getSingletonPtr()->GetTimeSinceLastFrame() / 1000;
 
-	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_NUMPAD4))
-	{
 
-		if(canJump_ > 0)
+	if(canJump_ > 0)
+	{
+		if(body_->GetLinearVelocity().x > -maximumRunningVelocity_)
 		{
-			if(body_->GetLinearVelocity().x > -maximumRunningVelocity_)
-			{
-				body_->ApplyForce(b2Vec2(-runningForce_ * timeSinceLastFrame,0), body_->GetPosition());
-			}
-		}
-		else
-		{
-			if(body_->GetLinearVelocity().x > -maximumAirVelocity_)
-			{
-				body_->ApplyForce(b2Vec2(-airForce_ * timeSinceLastFrame,0), body_->GetPosition());
-			}
+			body_->ApplyForce(b2Vec2(-runningForce_ * timeSinceLastFrame,0), body_->GetPosition());
 		}
 	}
+	else
+	{
+		if(body_->GetLinearVelocity().x > -maximumAirVelocity_)
+		{
+			body_->ApplyForce(b2Vec2(-airForce_ * timeSinceLastFrame,0), body_->GetPosition());
+		}
+	}
+	
 
 }
 
@@ -253,26 +272,24 @@ void Character::MoveRight()
 {
 	double timeSinceLastFrame = GameFramework::getSingletonPtr()->GetTimeSinceLastFrame() / 1000;
 
-	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_NUMPAD6))
+
+	if(canJump_ > 0)
 	{
 
-		if(canJump_ > 0)
+		if(body_->GetLinearVelocity().x < maximumRunningVelocity_)
 		{
-
-			if(body_->GetLinearVelocity().x < maximumRunningVelocity_)
-			{
-				body_->ApplyForce(b2Vec2(runningForce_ * timeSinceLastFrame,0), body_->GetPosition());
-			}
-
+			body_->ApplyForce(b2Vec2(runningForce_ * timeSinceLastFrame,0), body_->GetPosition());
 		}
-		else
+
+	}
+	else
+	{
+		if(body_->GetLinearVelocity().x < maximumAirVelocity_)
 		{
-			if(body_->GetLinearVelocity().x < maximumAirVelocity_)
-			{
-				body_->ApplyForce(b2Vec2(airForce_ * timeSinceLastFrame,0), body_->GetPosition());
-			}
+			body_->ApplyForce(b2Vec2(airForce_ * timeSinceLastFrame,0), body_->GetPosition());
 		}
 	}
+
 }
 
 //	Jump
@@ -405,33 +422,6 @@ bool Character::Update(double timeSinceLastFrame)
 	return true;
 }
 
-
-/*
-void Character::ProcessEvent(PaH::GameEvent* gameEvent)
-{
-	if(gameEvent->GetType() == PaH::GameEventType::Jump)
-	{
-		if(justJumped)
-		{
-			double timeLeft = (animationState_->getLength() - animationState_->getTimePosition()) / animationState_->getLength();
-			body_->ApplyForce(b2Vec2(0,jumpingAfterForce_ * timeLeft), body_->GetPosition());
-		}
-
-		if(canJump_ > 0  && !justJumped)
-		{
-			body_->ApplyImpulse(b2Vec2(0,jumpingForce_), body_->GetPosition());
-			justJumped = true;
-
-			animationState_->setEnabled(false);
-			animationState_ = entity_->getAnimationState("JumpNoHeight");
-			animationState_->setLoop(false);
-			animationState_->setEnabled(true);
-		}
-	}
-
-	gameEvent->Release();
-}
-*/
 
 void Character::UpdateAnimation(double timeSinceLastFrame)
 {
