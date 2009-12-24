@@ -41,13 +41,20 @@ public:
 	/// This will execute when the state is exited.
 	virtual void Exit();
 	
-	void MoveLeft();
-	void MoveRight();
-	void Jump();
+	
 
 protected:
 
+	void MoveLeft();
+	void MoveRight();
+	void Jump();
+	void UpdateAnimation();
+
 	int feetContactCount_;
+
+	bool isJumping_;
+
+	double jumpTimer_;
 
 };
 

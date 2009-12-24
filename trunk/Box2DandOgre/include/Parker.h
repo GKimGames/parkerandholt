@@ -42,12 +42,28 @@ public:
 	/// Called when two fixtures begin to touch.
 	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 	{
+		if(collidedFixture->IsSensor() == false)
+		{
+			if(contactFixture == feetSensor_ )
+			{
+				feetSensorHitCount_++;
+			}
+		}
+
 		stateMachine_->BeginContact(contact,contactFixture, collidedFixture);
 	}
 
 	/// Called when two fixtures cease to touch.
 	void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 	{
+		if(collidedFixture->IsSensor() == false)
+		{
+			if(contactFixture == feetSensor_ )
+			{
+				feetSensorHitCount_--;
+			}
+		}
+
 		stateMachine_->EndContact(contact,contactFixture, collidedFixture);
 	}
 
@@ -84,10 +100,13 @@ private:
 	int					shinSensorHitCount_;
 	int					thighSensorHitCount_;
 	int					torsoSensorHitCount_;
+	int					feetSensorHitCount_;
 
 	double boundingBoxHeight_;
 	double boundingBoxWidth_;
 	double wallJumpForce_;
+
+	double timeBetweenJump_;
 
 };
 

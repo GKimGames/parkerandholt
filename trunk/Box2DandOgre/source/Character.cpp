@@ -11,11 +11,15 @@ bool Character::Initialize()
 	InitVariables();
 
 	if(!ReadXMLConfig())
+	{
 		return false;
+	}
 
 	CreateGraphics();
 
 	CreatePhysics();
+
+	initialized_ = true;
 
 	return true;
 }
