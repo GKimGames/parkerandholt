@@ -42,7 +42,10 @@ public:
 
 	virtual ~GameObjectOgreBox2D()
 	{
-		world_->DestroyBody(body_);
+		if(body_)
+		{
+			world_->DestroyBody(body_);
+		}
 	}
 
 

@@ -41,6 +41,7 @@ class Character :public GameObjectOgreBox2D
 public:
 
 	Character(Ogre::SceneManager* sceneManager);
+	
 	~Character();
 
 	virtual bool Update(double timeSinceLastFrame);

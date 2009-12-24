@@ -31,6 +31,7 @@ bool CharacterParker::Initialize()
 
 	CreatePhysics();
 
+	initialized_ = true;
 
 	return true;
 }
@@ -52,6 +53,9 @@ void CharacterParker::InitVariables()
 	shinSensorHitCount_ = 0;
 	thighSensorHitCount_ = 0;
 	torsoSensorHitCount_ = 0;
+	feetSensorHitCount_ = 0;
+
+	timeBetweenJump_ = .25;
 
 }
 
@@ -247,6 +251,8 @@ bool CharacterParker::ReadXMLConfig()
 	return true;
 }
 
+//=============================================================================
+//								CharacterParker
 /// Applies "friction" to the character if they are on a surface.
 /// It applies a force in the opposite direction the character's velocity is
 /// going. 
@@ -279,7 +285,8 @@ void CharacterParker::ApplyWalkingFriction(double timeSinceLastFrame)
 }
 
 
-
+//=============================================================================
+//								UpdateAnimation
 void CharacterParker::UpdateAnimation(double timeSinceLastFrame)
 {
 	double maxVel = 0;

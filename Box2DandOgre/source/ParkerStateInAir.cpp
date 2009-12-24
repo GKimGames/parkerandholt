@@ -35,36 +35,32 @@ bool ParkerStateInAir::Update()
 	
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame() / 1000;
 
-	b2Vec2 v = owner_->body_->GetPosition();
-	owner_->sceneNode_->setPosition(v.x, v.y,0);
-
-	if(owner_->body_->GetLinearVelocity().x > 0.1)
-	{
-		direction = Ogre::Vector3(0,0,1);
-	}
-	else if(owner_->body_->GetLinearVelocity().x < -0.1)
-	{
-		direction = Ogre::Vector3(0,0,-1);
-	}
-
-	owner_->sceneNode_->setDirection(direction,Ogre::Node::TS_WORLD);
-
-	owner_->UpdateAnimation(timeSinceLastFrame);
-
-	/*
-	b2XForm xform;
-	xform.SetIdentity();
-	b2AABB aabb;
-
-	b2World* world = GAMEFRAMEWORK->GetWorld();
-	owner_->feetSensor_->GetShape()->ComputeAABB(&aabb, xform);
-
-	if(world->Query(aabb,NULL,0))
+	if(owner_->feetSensorHitCount_ > 0)
 	{
 		owner_->stateMachine_->ChangeState(owner_->onGroundState_);
 	}
-	*/
+	else
+	{
+		// Set the position of the scene node to that of the Box2D body
+		b2Vec2 v = owner_->body_->GetPosition();
+		owner_->sceneNode_->setPosition(v.x, v.y,0);
 
+		// Make the scene face the direction the body is moving
+		if(owner_->body_->GetLinearVelocity().x > 0.1)
+		{
+			direction = Ogre::Vector3(0,0,1);
+		}
+		else if(owner_->body_->GetLinearVelocity().x < -0.1)
+		{
+			direction = Ogre::Vector3(0,0,-1);
+		}
+
+		owner_->sceneNode_->setDirection(direction,Ogre::Node::TS_WORLD);
+
+		UpdateAnimation();
+	}
+
+	// We've successfully updated.
 	return true;
 }
 
@@ -114,8 +110,8 @@ void ParkerStateInAir::BeginContact(ContactPoint* contact, b2Fixture* contactFix
 	{
 		if(contactFixture == owner_->feetSensor_)
 		{
-			owner_->stateMachine_->ChangeState(owner_->onGroundState_);
-			owner_->BeginContact(contact,contactFixture,collidedFixture);
+			//owner_->stateMachine_->ChangeState(owner_->onGroundState_);
+			//owner_->BeginContact(contact,contactFixture,collidedFixture);
 		}
 	}
 
@@ -173,7 +169,6 @@ void ParkerStateInAir::Jump()
 	double timeLeft = (owner_->animationState_->getLength() - owner_->animationState_->getTimePosition()) / owner_->animationState_->getLength();
 	owner_->body_->ApplyForce(b2Vec2(0,owner_->jumpingAfterForce_ * timeLeft), owner_->body_->GetPosition());
 
-
 	// Code to wall jump
 	/*
 	if(torsoSensorHitCount_ > 0 && justWallJumped_ == false)
@@ -190,4 +185,13 @@ void ParkerStateInAir::Jump()
 	}
 	*/
 
+}
+
+//=============================================================================
+//								UpdateAnimation
+void ParkerStateInAir::UpdateAnimation()
+{
+	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame() / 1000;
+
+	owner_->animationState_->addTime(timeSinceLastFrame);
 }

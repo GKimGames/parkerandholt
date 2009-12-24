@@ -10,6 +10,8 @@ HoltBox::HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center)
 
 	sceneManager_ = sceneManager;
 	Ogre::String entityName = "HoltBox";
+
+	// Add the entity number to the HoltBox name to make it unique.
 	entityName += Ogre::StringConverter::toString(objectId_);
 
 	entity_ = sceneManager_->createEntity(entityName, "cube.1m.mesh");
@@ -29,6 +31,11 @@ HoltBox::HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center)
 
 bool HoltBox::CreateBox2DBox()
 {
+	if(initialized_ == true)
+	{
+		return true;
+	}
+
 	b2AABB aabb;
 	aabb.lowerBound.Set(position_.x - boxWidth_, position_.y - boxWidth_);
 	aabb.upperBound.Set(position_.x + boxWidth_, position_.y + boxWidth_);

@@ -41,10 +41,12 @@ public:
 	/// Called when two fixtures cease to touch.
 	void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 
-	
+protected:
+
 	void MoveLeft();
 	void MoveRight();
 	void Jump();
+	void UpdateAnimation();
 
 };
 

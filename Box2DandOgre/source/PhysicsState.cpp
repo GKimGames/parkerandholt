@@ -183,7 +183,11 @@ void PhysicsState::createPhysics()
 void PhysicsState::CreateBox()
 {
 	HoltBox* bb = new HoltBox(sceneManager_, b2Vec2(-0.0f, 15.0f));
-	bb->Initialize();
+
+	if(!bb->CreateBox2DBox())
+	{
+		delete bb;
+	}
 }
 
 
