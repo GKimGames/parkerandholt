@@ -19,7 +19,7 @@
 #include <OISKeyboard.h>
 #include <OISMouse.h>
 
-#include "Box2D.h"
+#include <Box2D/Box2D.h>
 #include "BetaGUI.h"
 
 #define GAMEFRAMEWORK GameFramework::getSingletonPtr()

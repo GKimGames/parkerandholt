@@ -204,7 +204,7 @@ void OgreB2DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Co
 	m_shapes->end();
 }
 
-void OgreB2DebugDraw::DrawXForm(const b2XForm& xf)
+void OgreB2DebugDraw::DrawTransform(const b2Transform& xf)
 {
 	// XForm data
 	b2Vec2 p1 = xf.position, p2;

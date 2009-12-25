@@ -36,6 +36,7 @@ bool HoltBox::CreateBox2DBox()
 		return true;
 	}
 
+	/*
 	b2AABB aabb;
 	aabb.lowerBound.Set(position_.x - boxWidth_, position_.y - boxWidth_);
 	aabb.upperBound.Set(position_.x + boxWidth_, position_.y + boxWidth_);
@@ -52,18 +53,26 @@ bool HoltBox::CreateBox2DBox()
 	{
 		return false;
 	}
+	*/
 
 	b2BodyDef boxDef;
 	boxDef.position = position_;
+	boxDef.active = true;
+	boxDef.type = b2_dynamicBody;
 	body_ = world_->CreateBody(&boxDef);
 
 	if(body_)
 	{
-		b2PolygonDef sd;
+		b2PolygonShape sd;
 		sd.SetAsBox(boxWidth_, boxWidth_);
-		sd.density = 10.0;
+
 		body_->CreateFixture(&sd);
-		body_->SetMassFromShapes();
+
+		b2FixtureDef fd;
+		fd.shape = &sd;
+		fd.density = 10.0;
+
+		body_->CreateFixture(&fd);
 
 		body_->SetUserData(this);
 
@@ -71,6 +80,9 @@ bool HoltBox::CreateBox2DBox()
 
 		return true;
 	}
+
+
+	
 
 	return false;
 
