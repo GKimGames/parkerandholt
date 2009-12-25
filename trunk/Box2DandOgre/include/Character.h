@@ -27,8 +27,6 @@
 #include <Ogre.h>
 #include <tinyxml.h>
 
-#include "Box2D.h"
-
 #include "AnimationBlender.h"
 
 #include "GameObjectOgreBox2D.h"
@@ -111,8 +109,6 @@ protected:
 	AnimationBlender*		animationBlender_;
 
 	Ogre::SceneNode*	bodyNode_;
-
-	b2PolygonDef*		bodyDef;
 
 	/// On the bottom of the character to tell if its on something
 	b2Fixture*			feetSensor_;

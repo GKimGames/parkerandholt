@@ -56,6 +56,7 @@ MousePicking::MousePicking (Ogre::SceneManager *sceneManager, b2World *world, Og
 	//creates the 4 boxes used in the game, avoids null pointer errors
 	for(int i = 0; i<4; i++)
 	{
+		/*
 		sprintf(name, "Box%d", i);
 		boxes_[i] = sceneManager_->createEntity(name, "cube.1m.mesh");
 		sceneManager_->getRootSceneNode()->createChildSceneNode(pointClicked_)->attachObject(boxes_[i]);
@@ -81,6 +82,7 @@ MousePicking::MousePicking (Ogre::SceneManager *sceneManager, b2World *world, Og
 		md.mass = 15;
 		cubes_[i]->SetMassData(&md);
 		cubes_[i]->SetFixedRotation(false);
+		*/
 	}
 }
 

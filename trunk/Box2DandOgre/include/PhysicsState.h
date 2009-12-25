@@ -14,7 +14,7 @@
 #include <OgreSubEntity.h>
 #include <OgreMaterialManager.h>
 #include <OgreMeshManager.h>
-#include "Box2D.h"
+#include <Box2D/Box2D.h>
 
 #include "Character.h"
 
@@ -32,8 +32,6 @@
 
 #include "GameFramework.h"
 #include "MessageDispatcher.h"
-
-#include "GameObjectOgreBox2D.h"
 
 #include "Parker.h"
 
@@ -103,6 +101,7 @@ protected:
 
 #ifdef DEBUG_DRAW_ON
 	OgreB2DebugDraw* debugDraw_;
+	bool			 debugDrawOn_;
 #endif
 
 private:

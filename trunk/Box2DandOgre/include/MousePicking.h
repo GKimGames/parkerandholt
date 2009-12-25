@@ -10,7 +10,7 @@
 #include <Ogre.h>
 #include <tinyxml.h>
 
-#include "Box2D.h"
+#include <Box2D\Box2D.h>
 
 #include "AnimationBlender.h"
 #include "GameObject.h"

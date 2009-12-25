@@ -65,12 +65,16 @@ Platform::Platform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2)
 	// Create body and fixture
 	b2BodyDef bd;
 	bd.position.Set(0.0f, 0.0f);
+	bd.type = b2_staticBody;
 	body_= world_->CreateBody(&bd);
 
-	b2EdgeDef ed;
-	ed.vertex1 = p1;
-	ed.vertex2 = p2;
-	body_->CreateFixture(&ed);
+	b2PolygonShape ed;
+	ed.SetAsEdge(p1,p2);
+
+	b2FixtureDef fd;
+	fd.shape = &ed;
+
+	body_->CreateFixture(&fd);
 
 }
 

@@ -65,90 +65,93 @@ void CharacterParker::InitVariables()
 /// Create the Box2D representation of Parker.
 void CharacterParker::CreatePhysics()
 {
-	// Set up the Box2D part of Parker
 	b2BodyDef bd;
 	bd.position.Set(0, 2);
 	bd.fixedRotation = true;
+	bd.type = b2_dynamicBody;
 	body_ = world_->CreateBody(&bd);
 
-	b2PolygonDef bodyShapeDef;
+	b2PolygonShape bodyShapeDef;
 
 	// The extents are the half-widths of the box.
 	bodyShapeDef.SetAsBox(boundingBoxWidth_/2, boundingBoxHeight_/2);
-	bodyShapeDef.density = 1.013f;
-	bodyShapeDef.friction = 0.2;
-	bodyShapeDef.restitution = restitution_;
+
+	b2FixtureDef fd;
+	fd.shape = &bodyShapeDef;
+	// This effectively makes the mass of the body the correct amount
+	// by setting the density to the appropriate amount.
+	fd.density = (boundingBoxWidth_ * boundingBoxHeight_) * mass_;
+	fd.friction = 0.3f;
+	fd.restitution = restitution_;
+	fd.filter.maskBits = 0x0001;
+	fd.filter.categoryBits = 0x0100;
+
+	b2Fixture* f = body_->CreateFixture(&fd);
+
+	//body_->SetLinearDamping(linearDamping_);
 
 	// Create the sensor for the feet
-	b2PolygonDef feetSensor_Def;
-	feetSensor_Def.isSensor = true;
-	feetSensor_Def.vertexCount = 4;
+	b2PolygonShape feetSensor_Def;
+	feetSensor_Def.m_vertexCount = 4;
+	feetSensor_Def.m_vertices[0].Set(-boundingBoxWidth_/2 + 0.05, -boundingBoxHeight_/2 + 0.1);
+	feetSensor_Def.m_vertices[1].Set(-boundingBoxWidth_/2 + 0.05, -boundingBoxHeight_/2 - 0.1);
+	feetSensor_Def.m_vertices[2].Set(boundingBoxWidth_/2  - 0.05,  -boundingBoxHeight_/2 - 0.1);
+	feetSensor_Def.m_vertices[3].Set(boundingBoxWidth_/2  - 0.05,  -boundingBoxHeight_/2 + 0.1);
+	
+	fd.shape = &feetSensor_Def;
+	fd.isSensor = true;
+	fd.userData = &gameObjectType_;
 
-	feetSensor_Def.vertices[0].Set(-boundingBoxWidth_/2 + 0.05, -boundingBoxHeight_/2 + 0.1);
-	feetSensor_Def.vertices[1].Set(-boundingBoxWidth_/2 + 0.05, -boundingBoxHeight_/2 - 0.1);
-	feetSensor_Def.vertices[2].Set(boundingBoxWidth_/2  - 0.05,  -boundingBoxHeight_/2 - 0.1);
-	feetSensor_Def.vertices[3].Set(boundingBoxWidth_/2  - 0.05,  -boundingBoxHeight_/2 + 0.1);
-
-	feetSensor_Def.userData = &gameObjectType_;
+	feetSensor_ = body_->CreateFixture(&fd);
 
 	// Create the definition of the polygon for the wall jump sensor
-	b2PolygonDef wallJumpSensor_Def;
-	wallJumpSensor_Def.isSensor = true;
-	wallJumpSensor_Def.vertexCount = 4;
+	b2PolygonShape wallJumpSensor_Def;
 
-	wallJumpSensor_Def.vertices[0].Set(boundingBoxWidth_/2 + 0.1, -boundingBoxHeight_/2);
-	wallJumpSensor_Def.vertices[1].Set(boundingBoxWidth_/2 + 0.1, boundingBoxHeight_/2);
-	wallJumpSensor_Def.vertices[2].Set(boundingBoxWidth_/2 - 0.1, boundingBoxHeight_/2);
-	wallJumpSensor_Def.vertices[3].Set(boundingBoxWidth_/2 - 0.1, -boundingBoxHeight_/2);
+	wallJumpSensor_Def.m_vertexCount = 4;
 
-	wallJumpSensor_Def.userData = &gameObjectType_;
+	wallJumpSensor_Def.m_vertices[0].Set(boundingBoxWidth_/2 + 0.1, -boundingBoxHeight_/2);
+	wallJumpSensor_Def.m_vertices[1].Set(boundingBoxWidth_/2 + 0.1, boundingBoxHeight_/2);
+	wallJumpSensor_Def.m_vertices[2].Set(boundingBoxWidth_/2 - 0.1, boundingBoxHeight_/2);
+	wallJumpSensor_Def.m_vertices[3].Set(boundingBoxWidth_/2 - 0.1, -boundingBoxHeight_/2);
+
+	fd.shape = &wallJumpSensor_Def;
+	fd.isSensor = true;
+	fd.userData = &gameObjectType_;
+
+	wallJumpSensor_ = body_->CreateFixture(&fd);
 
 	// Create the definition of the polygon for the shin sensor
-	b2PolygonDef shinSensor_Def;
-	shinSensor_Def.isSensor = true;	    
-	shinSensor_Def.vertexCount = 4;
+	b2PolygonShape shinSensor_Def;
 
+	shinSensor_Def.m_vertexCount = 4;
 	shinSensor_Def.SetAsBox(0.1,boundingBoxHeight_/6,b2Vec2(boundingBoxWidth_/2 + 0.1, -boundingBoxHeight_/6),0); 
 
-	shinSensor_Def.userData = &gameObjectType_;
+	fd.shape = &shinSensor_Def;
+	fd.isSensor = true;
+	fd.userData = &gameObjectType_;
+
+	shinSensor_ = body_->CreateFixture(&fd);
+
 
 	// Create the definition of the polygon for the thigh sensor
-	b2PolygonDef thighSensor_Def;
-	thighSensor_Def.isSensor = true;
-	thighSensor_Def.vertexCount = 4;
-
+	b2PolygonShape thighSensor_Def;
+	thighSensor_Def.m_vertexCount = 4;
 	thighSensor_Def.SetAsBox(0.1,boundingBoxHeight_/16,b2Vec2(boundingBoxWidth_/2 + 0.1, -boundingBoxHeight_/16),0); 
-	thighSensor_Def.userData = &gameObjectType_;
+
+	fd.shape = &thighSensor_Def;
+	fd.isSensor = true;
+	fd.userData = &gameObjectType_;
+
+	shinSensor_ = body_->CreateFixture(&fd);
 
 	// Create the definition of the polygon for the torso sensor
-	b2PolygonDef torsoSensor_Def;
-	torsoSensor_Def.isSensor = true;
-	torsoSensor_Def.vertexCount = 4;
-
+	b2PolygonShape torsoSensor_Def;
+	torsoSensor_Def.m_vertexCount = 4;
 	torsoSensor_Def.SetAsBox(0.1,boundingBoxHeight_/6,b2Vec2(boundingBoxWidth_/2 + 0.1, boundingBoxHeight_/6),0); 
-	torsoSensor_Def.userData = &gameObjectType_;
 
-	b2Fixture* f = body_->CreateFixture(&bodyShapeDef);
-	b2FilterData fd;
-	//fd.maskBits = 0x0000;
-	fd.maskBits = 0x0001;
-	fd.categoryBits = 0x0100;
-	f->SetFilterData(fd);
-
-	feetSensor_ = body_->CreateFixture(&feetSensor_Def);
-	shinSensor_ = body_->CreateFixture(&shinSensor_Def);
-	//thighSensor_ = body_->CreateFixture(&thighSensor_Def);
-	torsoSensor_ = body_->CreateFixture(&torsoSensor_Def);
-
-	body_->SetMassFromShapes();
-
-	b2MassData md = body_->GetMassData();
-	md.mass = mass_;
-	body_->SetMassData(&md);
-
-	body_->SetLinearDamping(linearDamping_);
-
-	world_->Refilter(f);
+	fd.shape = &torsoSensor_Def;
+	fd.userData = &gameObjectType_;
+	torsoSensor_ = body_->CreateFixture(&fd);
 
 	body_->SetUserData(this);
 }

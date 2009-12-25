@@ -5,6 +5,7 @@
 using namespace Ogre;
 
 class LedgeSensor;
+
 PhysicsState::PhysicsState()
 {
 	m_MoveSpeed			= 0.1;
@@ -127,12 +128,14 @@ void PhysicsState::createPhysics()
 
 	// Define the gravity vector.
 	b2Vec2 gravity(0.0f, -gravity_);
+	//b2Vec2 gravity(0.0f, -20);
 
 	// Do we want to let bodies sleep?
 	bool doSleep = true;
 
 	// Construct a world object, which will hold and simulate the rigid bodies.
-	world = new b2World(worldAABB, gravity, doSleep);
+	//world = new b2World(worldAABB, gravity, doSleep);
+	world = new b2World(gravity,doSleep);
 	GameFramework::getSingletonPtr()->SetWorld(world);
 	world->SetContactListener(this);
 
@@ -154,6 +157,7 @@ void PhysicsState::createPhysics()
 	bb->Initialize();
 	//bb->GetBody()->SetTimeScale(0.5f);
 
+	/*
 	LedgeSensor* ls = new LedgeSensor(b2Vec2(30.0f, 6.4f));
 
 	ls->OnContact(boost::bind(&Character::Jump, myCharacter_));
@@ -161,18 +165,20 @@ void PhysicsState::createPhysics()
 	LedgeSensor* ls2 = new LedgeSensor(b2Vec2(-5.0f, 1.0f));
 
 	ls2->OnContact(boost::bind(&PhysicsState::CreateBox, this));
-
+	*/
 	//Dispatch->DispatchMessage(3000,0,myCharacter_->GetId(),1,NULL);
 
 #if DEBUG_DRAW_ON
 	debugDraw_ = new OgreB2DebugDraw(sceneManager_, "debugDraw", 0);
 	debugDraw_->SetFlags(
-		b2DebugDraw::e_obbBit
+		b2DebugDraw::e_jointBit	
 		| b2DebugDraw::e_shapeBit
-		| b2DebugDraw::e_aabbBit 
+		//| b2DebugDraw::e_aabbBit 
 		);
 
 	world->SetDebugDraw(debugDraw_);
+	debugDrawOn_ = true;
+
 #endif
 
 	//myPicking_ = new MousePicking(sceneManager_, world, camera_, pickingPlane);
@@ -345,13 +351,28 @@ void PhysicsState::getInput()
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_A))
 		{
 			m_TranslateVector.x = -m_MoveScale;
-			world->SetDebugDraw(NULL);
+
+		}
+
+		// Turn Debug Draw off
+		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_Z))
+		{
+#if DEBUG_DRAW_ON
+			debugDrawOn_ = false;
+#endif
+		}
+
+		// Turn Debug Draw on
+		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_X))
+		{
+#if DEBUG_DRAW_ON
+			debugDrawOn_ = true;
+#endif
 		}
 
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_D))
 		{
 			m_TranslateVector.x = m_MoveScale;
-			world->SetDebugDraw(debugDraw_);
 		}
 
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_W))
@@ -441,17 +462,29 @@ void PhysicsState::update(double timeSinceLastFrame)
 
 	m_TranslateVector = Vector3::ZERO;
 
-	getInput();
-	moveCamera();
+
 
 	while(time >= timeStep)
 	{
+
+		getInput();
+		moveCamera();
+
 		// Only compile the debug draw commands if DEBUG_DRAW_ON
 #if DEBUG_DRAW_ON
 		debugDraw_->clear();
 #endif
 
-		world->Step(timeStep,10,9);
+		world->Step(timeStep,10,10);
+		world->ClearForces();
+
+#if DEBUG_DRAW_ON
+		if(debugDrawOn_)
+		{
+			world->DrawDebugData();
+		}
+#endif
+
 		time -= timeStep;
 		//b2Vec2 charPos = myCharacter_->GetBodyPosition();
 		//camera_->setPosition(charPos.x,  camera_->getPosition().y, camera_->getPosition().z);

@@ -24,7 +24,7 @@
 #define _OGRE_B2_DEBUGDRAW_H
 
 #include <Ogre.h>
-#include <Box2D.h>
+#include <Box2D\Box2D.h>
 
 class OgreB2DebugDraw : public b2DebugDraw
 {
@@ -72,7 +72,7 @@ public:
    void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color);
 
     /// Method called by the b2World for XForms.
-   void DrawXForm(const b2XForm& xf);
+   void DrawTransform(const b2Transform& xf);
 
 private:
     /// ManualObject which holds all the shapes each frame
