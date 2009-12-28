@@ -146,6 +146,8 @@ void PhysicsState::createPhysics()
 	new Platform(sceneManager_, b2Vec2(22.0f, 7.5f),   b2Vec2(27.0f, 7.5f));
 
 
+
+
 	// Create myCharacter
 	//myCharacter_ = new Character(sceneManager_);
 	//myCharacter_->Initialize();
@@ -153,8 +155,10 @@ void PhysicsState::createPhysics()
 	parker_  = new CharacterParker(sceneManager_);
 	parker_->Initialize();
 
-	HoltBox* bb = new HoltBox(sceneManager_, b2Vec2(-5.0f, 10.0f));
+	HoltBox* bb = new HoltBox(sceneManager_, b2Vec2(8.0f, 10.0f));
 	bb->Initialize();
+
+	new MovingPlatform(sceneManager_, b2Vec2(10.0f, 1.0f), b2Vec2(0.0f, 1.0f), b2Vec2(5.0f, 1.0f), b2Vec2(0.0f, 5.0f), 2);
 	//bb->GetBody()->SetTimeScale(0.5f);
 
 	/*
@@ -387,20 +391,17 @@ void PhysicsState::getInput()
 
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_LEFT))
 		{
-			//camera_->yaw(m_RotScale);
 			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, parker_->GetId(), CHARACTER_MOVE_LEFT, NULL);
 		}
 
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_RIGHT))
 		{
-			//camera_->yaw(-m_RotScale);
 			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, parker_->GetId(), CHARACTER_MOVE_RIGHT, NULL);
 		}
 
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_UP))
 		{
 			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, parker_->GetId(), CHARACTER_JUMP, NULL);
-			//camera_->pitch(m_RotScale);
 		}
 
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_DOWN))
@@ -425,8 +426,6 @@ void PhysicsState::getInput()
 		}
 		*/
 		
-
-
 	}
 }
 
@@ -448,25 +447,15 @@ void PhysicsState::update(double timeSinceLastFrame)
 		return;
 	}
 
-	double dt = timeSinceLastFrame / 1000;
-
-	time += dt;
-
-	if(time > 0.2)
-	{
-		time = timeStep;
-	}
+	time += timeSinceLastFrame;
 
 	m_MoveScale = m_MoveSpeed   * timeSinceLastFrame;
 	m_RotScale  = m_RotateSpeed * timeSinceLastFrame;
 
 	m_TranslateVector = Vector3::ZERO;
-
-
-
+	
 	while(time >= timeStep)
 	{
-
 		getInput();
 		moveCamera();
 
@@ -486,17 +475,18 @@ void PhysicsState::update(double timeSinceLastFrame)
 #endif
 
 		time -= timeStep;
-		//b2Vec2 charPos = myCharacter_->GetBodyPosition();
-		//camera_->setPosition(charPos.x,  camera_->getPosition().y, camera_->getPosition().z);
-		//camera_->lookAt(charPos.x,charPos.y, 0);
 
 		// Process b2Contacts that happened in this world step.
+		ProcessContacts();
+
+		GameObject::UpdateObjectList(timeStep);
+
+		camera_->setPosition(parker_->GetBodyPosition().x,parker_->GetBodyPosition().y + 7,camera_->getPosition().z);
+		camera_->lookAt(parker_->GetBodyPosition().x,parker_->GetBodyPosition().y,0);
 		
 	}
 
-	ProcessContacts();
-
-	GameObject::UpdateObjectList(dt);
+	
 
 }
 

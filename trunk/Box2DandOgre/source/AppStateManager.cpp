@@ -3,6 +3,8 @@
 #include "AppStateManager.hpp"
 
 #include <OgreWindowEventUtilities.h>
+#include <stdio.h>
+#include "windows.h"
 
 
 
@@ -68,10 +70,23 @@ void AppStateManager::start(AppState* state)
 {
 	changeAppState(state);
 	
-	int timeSinceLastFrame = 1;
-	int startTime = 0;
+	static double timeSinceLastFrame = 1;
+	static double startTime = 0;
+	static double timeAccum = 0;
+	static double currentTime = 0;
 
-	m_BufferFlush.start(2);
+	//m_BufferFlush.start(2);
+
+	LARGE_INTEGER frequency;        // ticks per second
+	LARGE_INTEGER t1, t2;           // ticks
+	t1.QuadPart = t2.QuadPart = 0;
+	double elapsedTime;
+
+	// get ticks per second
+	QueryPerformanceFrequency(&frequency);
+	
+	double timeStep = 1.0 / 60.0;
+	GAMEFRAMEWORK->SetTimeSinceLastFrame(timeStep);
 
 	while(!m_bShutdown) 
 	{
@@ -85,27 +100,61 @@ void AppStateManager::start(AppState* state)
 #endif	
 		if(GameFramework::getSingletonPtr()->renderWindow_->isActive())
 		{
-			
-			startTime = GameFramework::getSingletonPtr()->timer_->getMillisecondsCPU();
-			
-			if(timeSinceLastFrame > 250)
-			{
-				timeSinceLastFrame = 250;
-			}
 
-			GameFramework::getSingletonPtr()->SetTimeSinceLastFrame(timeSinceLastFrame);
-			GameFramework::getSingletonPtr()->keyboard_->capture();
-			GameFramework::getSingletonPtr()->mouse_->capture();
+			QueryPerformanceCounter(&t2);
+
+			// compute time
+			LONGLONG qpart = (t2.QuadPart - t1.QuadPart);
+			timeSinceLastFrame = LONGLONG( (qpart * 10000000) / frequency.QuadPart );
+			timeSinceLastFrame /= 10000000.0;
+			// start timer
+			QueryPerformanceCounter(&t1);
+
+			if(timeSinceLastFrame > .0250)
+			{
+				timeSinceLastFrame = .0250;
+			}
+			
+			timeAccum += timeSinceLastFrame;
+			
+			// if the timeAccum is corrupted and somehow is below 0
+			// we will set it back to zero
+			if(timeAccum < -0.1)
+			{
+				timeAccum = 0;
+			}
+			
+			while(timeAccum >= timeStep)
+			{
+
+				GAMEFRAMEWORK->keyboard_->capture();
+				GAMEFRAMEWORK->mouse_->capture();
+
+				m_ActiveStateStack.back()->update(timeStep);
+
+				Dispatch->DispatchDelayedMessages();
+
+				GAMEFRAMEWORK->UpdateOgre(timeStep);
+				GAMEFRAMEWORK->root_->renderOneFrame();
+
+				timeAccum -= timeStep;
+			}
+			
+			/*
+			GAMEFRAMEWORK->SetTimeSinceLastFrame(timeSinceLastFrame);
+			GAMEFRAMEWORK->keyboard_->capture();
+			GAMEFRAMEWORK->mouse_->capture();
 
 			m_ActiveStateStack.back()->update(timeSinceLastFrame);
-			
+
 			Dispatch->DispatchDelayedMessages();
+
+			GAMEFRAMEWORK->UpdateOgre(timeSinceLastFrame);
+			GAMEFRAMEWORK->root_->renderOneFrame();
+			*/
+
 			
-			GameFramework::getSingletonPtr()->UpdateOgre(timeSinceLastFrame);
-			GameFramework::getSingletonPtr()->root_->renderOneFrame();
-
-			timeSinceLastFrame = GameFramework::getSingletonPtr()->timer_->getMillisecondsCPU() - startTime;
-
+			Sleep(5);
 		}
 		else
 		{

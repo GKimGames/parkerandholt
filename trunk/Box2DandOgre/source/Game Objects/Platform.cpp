@@ -44,9 +44,9 @@ Platform::Platform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2)
 	// Create background material
 	MaterialPtr material = MaterialManager::getSingleton().create("Background", "General");
 	material->getTechnique(0)->getPass(0)->createTextureUnitState("roadtexture.jpg");
+	material->getTechnique(0)->getPass(0)->setLightingEnabled(true);
 	//material->getTechnique(0)->getPass(0)->setDepthCheckEnabled(false);
 	//material->getTechnique(0)->getPass(0)->setDepthWriteEnabled(false);
-	//material->getTechnique(0)->getPass(0)->setLightingEnabled(false);
 	// Temporary
 
 	Ogre::Entity* planeEnt = sceneManager_->createEntity(planeEntityName , planeMeshName);

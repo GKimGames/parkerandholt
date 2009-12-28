@@ -56,6 +56,11 @@ protected:
 
 	double jumpTimer_;
 
+	bool moveLeftDown_;
+	bool moveRightDown_;
+
+	b2Body* elevator_;
+
 };
 
 #endif

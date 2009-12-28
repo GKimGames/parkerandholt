@@ -100,7 +100,7 @@ public:
 		if(initialized_)
 		{
 			b2Vec2 v = body_->GetPosition();
-			sceneNode_->setPosition(v.x,v.y,0);
+			sceneNode_->setPosition(Ogre::Real(v.x),Ogre::Real(v.y),0);
 			sceneNode_->rotate(Ogre::Vector3::UNIT_Z, Ogre::Radian(-prevAngle)); 
 			sceneNode_->rotate(Ogre::Vector3::UNIT_Z, Ogre::Radian(body_->GetAngle()));
 
@@ -110,6 +110,8 @@ public:
 
 		return true;
 	};
+
+	virtual void CreatePhysics(){}
 
 protected:
 

@@ -411,7 +411,7 @@ bool Character::Update(double timeSinceLastFrame)
 	ApplyWalkingFriction(timeSinceLastFrame);
 
 	b2Vec2 v = body_->GetPosition();
-	sceneNode_->setPosition(v.x, v.y,0);
+	sceneNode_->setPosition(Ogre::Real(v.x),Ogre::Real(v.y),0);
 
 	if(body_->GetLinearVelocity().x > 0.1)
 	{

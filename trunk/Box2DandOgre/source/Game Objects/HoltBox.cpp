@@ -15,6 +15,7 @@ HoltBox::HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center)
 	entityName += Ogre::StringConverter::toString(objectId_);
 
 	entity_ = sceneManager_->createEntity(entityName, "cube.1m.mesh");
+	//entity_ = sceneManager_->createEntity(entityName, "Cube.002.mesh");
 
 	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
 	sceneNode_->attachObject(entity_);

@@ -32,7 +32,10 @@ enum GameObjectType
 	CharacterFoot,
 	GOType_HoltBox,
 	GOType_LedgeSensor,
-	GOType_Platform
+	GOType_Platform,
+	GOType_ElevatorBeginTypes,
+	GOType_MovingPlatform,
+	GOType_ElevatorEndTypes
 };
 
 /// Objects represents the base class for anything that is in the game.
@@ -115,6 +118,16 @@ public:
 		return initialized_;
 	}
 
+	unsigned int GetParkerId()
+	{
+		return parkerId_;
+	}
+
+	unsigned int GetHoltId()
+	{
+		return holtId_;
+	}
+
 protected:
 
 	GameObjectType			gameObjectType_;	//< \brief GameObjectType of the object.
@@ -122,6 +135,9 @@ protected:
 	unsigned int			objectId_;			//< \brief Unique Id for the object
 
 	bool					initialized_;
+
+	static unsigned int		parkerId_;			//< \brief these are stored here to make easy access to parker and holt
+	static unsigned int		holtId_;
 
 private:
 

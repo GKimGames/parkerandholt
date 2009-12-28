@@ -9,6 +9,9 @@
 #include "GameObject.h"
 
 unsigned int GameObject::staticObjectId_ = 1;
+unsigned int GameObject::parkerId_ = -1;
+unsigned int GameObject::holtId_ = -1;
+
 
 GameObjectMap GameObject::objectList;
 
@@ -24,4 +27,6 @@ GameObject::GameObject()
 	objectId_ = staticObjectId_;
 
 	objectList.insert(std::make_pair(objectId_,this));
+
+
 }

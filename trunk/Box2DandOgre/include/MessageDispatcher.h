@@ -24,6 +24,7 @@
 /// An Enum for Messages.
 enum KGBMessageType
 {
+	NO_MESSAGE,
 	CHARACTER_MOVE_LEFT,
 	CHARACTER_MOVE_RIGHT,
 	CHARACTER_JUMP

@@ -33,7 +33,7 @@ bool ParkerStateInAir::Update()
 {
 	static Ogre::Vector3 direction;
 	
-	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame() / 1000;
+	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
 	if(owner_->feetSensorHitCount_ > 0)
 	{
@@ -110,8 +110,8 @@ void ParkerStateInAir::BeginContact(ContactPoint* contact, b2Fixture* contactFix
 	{
 		if(contactFixture == owner_->feetSensor_)
 		{
-			//owner_->stateMachine_->ChangeState(owner_->onGroundState_);
-			//owner_->BeginContact(contact,contactFixture,collidedFixture);
+			owner_->stateMachine_->ChangeState(owner_->onGroundState_);
+			owner_->BeginContact(contact,contactFixture,collidedFixture);
 		}
 	}
 
@@ -133,7 +133,7 @@ void ParkerStateInAir::EndContact(ContactPoint* contact, b2Fixture* contactFixtu
 void ParkerStateInAir::MoveLeft()
 {
 
-	double timeSinceLastFrame = GameFramework::getSingletonPtr()->GetTimeSinceLastFrame() / 1000;
+	double timeSinceLastFrame = GameFramework::getSingletonPtr()->GetTimeSinceLastFrame();
 
 	if(owner_->body_->GetLinearVelocity().x > -owner_->maximumAirVelocity_)
 	{
@@ -148,7 +148,7 @@ void ParkerStateInAir::MoveLeft()
 /// 
 void ParkerStateInAir::MoveRight()
 {
-	double timeSinceLastFrame = GameFramework::getSingletonPtr()->GetTimeSinceLastFrame() / 1000;
+	double timeSinceLastFrame = GameFramework::getSingletonPtr()->GetTimeSinceLastFrame();
 
 	if(owner_->body_->GetLinearVelocity().x < owner_->maximumAirVelocity_)
 	{
@@ -191,7 +191,7 @@ void ParkerStateInAir::Jump()
 //								UpdateAnimation
 void ParkerStateInAir::UpdateAnimation()
 {
-	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame() / 1000;
+	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
 	owner_->animationState_->addTime(timeSinceLastFrame);
 }
