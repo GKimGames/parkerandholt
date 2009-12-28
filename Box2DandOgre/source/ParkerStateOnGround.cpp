@@ -17,6 +17,8 @@ ParkerStateOnGround::ParkerStateOnGround(CharacterParker* parker):
 FSMState(parker)
 {
 	isJumping_ = false;
+	moveLeftDown_ = false;
+	moveRightDown_ = false;
 	feetContactCount_ = 0;
 }
 
@@ -27,6 +29,9 @@ void ParkerStateOnGround::Enter()
 {
 
 	isJumping_ = false;
+	moveLeftDown_ = false;
+	moveRightDown_ = false;
+	
 	feetContactCount_ = 0;
 	jumpTimer_ = owner_->timeBetweenJump_;
 
@@ -46,7 +51,7 @@ bool ParkerStateOnGround::Update()
 {
 	static Ogre::Vector3 direction;
 	
-	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame() / 1000;
+	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 	
 	if(owner_->feetSensorHitCount_ == 0)
 	{
@@ -63,10 +68,14 @@ bool ParkerStateOnGround::Update()
 			isJumping_ = false;
 		}
 
-		owner_->ApplyWalkingFriction(timeSinceLastFrame);
+		//if(moveRightDown_ || moveLeftDown_)
+		{
+			owner_->ApplyWalkingFriction(timeSinceLastFrame);
+		}
 
-		b2Vec2 v = owner_->body_->GetPosition();
-		owner_->sceneNode_->setPosition(v.x, v.y,0);
+		moveRightDown_ = false;
+		moveLeftDown_ = false;
+		
 
 		if(owner_->body_->GetLinearVelocity().x > 0.1)
 		{
@@ -77,9 +86,11 @@ bool ParkerStateOnGround::Update()
 			direction = Ogre::Vector3(0,0,-1);
 		}
 
-		owner_->sceneNode_->setDirection(direction,Ogre::Node::TS_WORLD);
-
 		UpdateAnimation();
+
+		b2Vec2 v = owner_->body_->GetPosition();
+		owner_->sceneNode_->setPosition(Ogre::Real(v.x),Ogre::Real(v.y),0);
+		owner_->sceneNode_->setDirection(direction,Ogre::Node::TS_WORLD);
 	}
 
 	return true;
@@ -118,7 +129,8 @@ bool ParkerStateOnGround::HandleMessage(const KGBMessage message)
 //
 void ParkerStateOnGround::Exit()
 {
-
+	owner_->elevator_ = NULL;
+	owner_->feetSensorHitCount_ = 0;                                                                              
 }
 
 //=============================================================================
@@ -132,7 +144,22 @@ void ParkerStateOnGround::BeginContact(ContactPoint* contact, b2Fixture* contact
 		if(contactFixture == owner_->feetSensor_)
 		{
 			feetContactCount_++;
+
+			if(collidedFixture->GetBody()->GetUserData())
+			{
+				GameObject* go = (GameObject*) collidedFixture->GetBody()->GetUserData();
+				int type = go->GetGameObjectType();
+
+				if(owner_->elevator_ == NULL)
+				{
+					owner_->elevator_ = collidedFixture->GetBody();
+				}
+
+			}
 		}
+
+		
+		
 	}
 }
 
@@ -146,14 +173,18 @@ void ParkerStateOnGround::EndContact(ContactPoint* contact, b2Fixture* contactFi
 	{
 		if(contactFixture == owner_->feetSensor_)
 		{
-
 			feetContactCount_--;
 
 			if(feetContactCount_ == 0)
 			{
-				//owner_->stateMachine_->ChangeState(owner_->inAirState_);
+				owner_->stateMachine_->ChangeState(owner_->inAirState_);
 			}
-			
+
+			if(elevator_ == collidedFixture->GetBody())
+			{
+				owner_->elevator_ = NULL;
+			}
+
 		}
 	}
 }
@@ -168,7 +199,8 @@ void ParkerStateOnGround::MoveLeft()
 
 	if(isJumping_ == false)
 	{
-		double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame() / 1000;
+		moveLeftDown_ = true;
+		double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
 		if(owner_->body_->GetLinearVelocity().x > -owner_->maximumRunningVelocity_)
 		{
@@ -186,8 +218,9 @@ void ParkerStateOnGround::MoveRight()
 {
 	if(isJumping_ == false)
 	{
-		double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame() / 1000;
-
+		moveRightDown_ = true;
+		double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
+		
 		if(owner_->body_->GetLinearVelocity().x < owner_->maximumRunningVelocity_)
 		{
 			owner_->body_->ApplyForce(b2Vec2(owner_->runningForce_ * timeSinceLastFrame,0), owner_->body_->GetPosition());
@@ -231,17 +264,22 @@ void ParkerStateOnGround::Jump()
 //
 void ParkerStateOnGround::UpdateAnimation()
 {
-	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame() / 1000;
+	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
-	double maxVel = 0;
+	b2Vec2 lv = owner_->body_->GetLinearVelocity();
+	
+	if(owner_->elevator_ != NULL)
+	{
+		lv -= owner_->elevator_->GetLinearVelocity();
+	}
 
-	if(abs(owner_->body_->GetLinearVelocity().x)  < .1)
+	if(abs(lv.x)  < .1)
 	{
 		owner_->animationState_->setTimePosition(0.8);
 	}
 	else
 	{
-		double ratio = owner_->maximumRunningVelocity_ / owner_->body_->GetLinearVelocity().x;
+		double ratio = owner_->maximumRunningVelocity_ / lv.x;
 
 		owner_->animationState_->addTime(timeSinceLastFrame / abs(ratio));
 	}

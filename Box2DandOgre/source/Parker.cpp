@@ -8,6 +8,7 @@
 CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager)
 :Character(sceneManager)
 {
+	parkerId_ = objectId_;
 	stateMachine_ = new FSMStateMachine<CharacterParker>(this);
 
 	onGroundState_ = new ParkerStateOnGround(this);
@@ -15,6 +16,8 @@ CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager)
 
 	stateMachine_->SetCurrentState(onGroundState_);
 	stateMachine_->ChangeState(onGroundState_);
+
+	elevator_ = NULL;
 }
 
 //=============================================================================
@@ -66,7 +69,7 @@ void CharacterParker::InitVariables()
 void CharacterParker::CreatePhysics()
 {
 	b2BodyDef bd;
-	bd.position.Set(0, 2);
+	bd.position.Set(0, 5);
 	bd.fixedRotation = true;
 	bd.type = b2_dynamicBody;
 	body_ = world_->CreateBody(&bd);
@@ -262,13 +265,19 @@ bool CharacterParker::ReadXMLConfig()
 void CharacterParker::ApplyWalkingFriction(double timeSinceLastFrame)
 {
 
+	
 	b2Vec2 frictionVector(0,0);
 	b2Vec2 lv = body_->GetLinearVelocity();
+	
+	if(elevator_ != NULL)
+	{
+		lv -= elevator_->GetLinearVelocity();
+	}
 
 	// Set the velocity of the character to 0 if the velocity is less than 0.1.
 	if(lv.x < 0.1 && lv.x > -0.1)
 	{
-		body_->SetLinearVelocity(b2Vec2(0.0f,body_->GetLinearVelocity().y));
+		//body_->SetLinearVelocity(b2Vec2(0.0f,body_->GetLinearVelocity().y));
 	}
 	else
 	{
@@ -285,6 +294,7 @@ void CharacterParker::ApplyWalkingFriction(double timeSinceLastFrame)
 
 		body_->ApplyForce(frictionVector, body_->GetPosition());
 	}
+	
 }
 
 
@@ -307,5 +317,5 @@ void CharacterParker::UpdateAnimation(double timeSinceLastFrame)
 	//if(!animationBlender_->complete)
 	//animationBlender_->addTime(timeSinceLastFrame / 80);
 
-	animationState_->addTime(timeSinceLastFrame);
+	//animationState_->addTime(timeSinceLastFrame);
 }

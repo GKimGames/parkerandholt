@@ -21,6 +21,7 @@
 
 #include <Box2D/Box2D.h>
 #include "BetaGUI.h"
+#include "GameObject.h"
 
 #define GAMEFRAMEWORK GameFramework::getSingletonPtr()
 
@@ -54,7 +55,7 @@ public:
 	void SetWorld(b2World* world){world_ = world;};
 	b2World* GetWorld(){return world_;};
 	
-	double GetTimeSinceLastFrame(){ return timeSinceLastFrame_; }
+	const double GetTimeSinceLastFrame(){ return timeSinceLastFrame_; }
 	void SetTimeSinceLastFrame(double timeSinceLastFrame){ timeSinceLastFrame_ = timeSinceLastFrame; }
 
 	Ogre::Root*					root_;

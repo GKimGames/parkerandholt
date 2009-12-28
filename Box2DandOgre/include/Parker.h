@@ -83,6 +83,7 @@ private:
 
 	/// Applies "friction" to the character if they are on a surface.
 	void ApplyWalkingFriction(double timeSinceLastFrame);
+	b2Body* elevator_;
 
 	FSMStateMachine<CharacterParker>*	stateMachine_;
 
@@ -90,6 +91,7 @@ private:
 	ParkerStateInAir*		inAirState_;
 
 	b2Fixture*			feetSensor_;
+
 	// These sensors are used to tell where things are in front of Parker
 	// Such as if something is only shin high, thigh high, or up to the torso.
 	// Used to check if something above the character is within a grabbable reach.

@@ -22,6 +22,8 @@
 #include "MousePicking.h"
 
 #include "Platform.h"
+#include "MovingPlatform.h"
+
 #include "LedgeSensor.h"
 #include "HoltBox.h"
 
