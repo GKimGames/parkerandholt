@@ -24,6 +24,9 @@ struct ContactPoint
 	b2PointState state;
 };
 
+/// The default value of friction for all Box2D objects in the game.
+static double DEFAULT_FRICTION = 0.4;
+
 /// This extends GameObjectOgre and adds a Box2D component.
 class GameObjectOgreBox2D  : public GameObjectOgre
 {

@@ -84,7 +84,7 @@ void CharacterParker::CreatePhysics()
 	// This effectively makes the mass of the body the correct amount
 	// by setting the density to the appropriate amount.
 	fd.density = (boundingBoxWidth_ * boundingBoxHeight_) * mass_;
-	fd.friction = 0.3f;
+	fd.friction = DEFAULT_FRICTION;
 	fd.restitution = restitution_;
 	fd.filter.maskBits = 0x0001;
 	fd.filter.categoryBits = 0x0100;
