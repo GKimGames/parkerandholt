@@ -110,6 +110,7 @@ void AppStateManager::start(AppState* state)
 			// start timer
 			QueryPerformanceCounter(&t1);
 
+			// Prevent large timesteps.
 			if(timeSinceLastFrame > .0250)
 			{
 				timeSinceLastFrame = .0250;

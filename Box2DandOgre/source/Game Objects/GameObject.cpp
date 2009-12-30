@@ -26,7 +26,8 @@ GameObject::GameObject()
 	staticObjectId_++;
 	objectId_ = staticObjectId_;
 
+	initialized_ = false;
+	
+
 	objectList.insert(std::make_pair(objectId_,this));
-
-
 }

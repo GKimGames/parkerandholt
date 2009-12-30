@@ -21,8 +21,8 @@ class MovingPlatform : public GameObjectOgreBox2D
 
 public:
 
-	MovingPlatform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2, b2Vec2 start, b2Vec2 emd, double speed);
-	MovingPlatform(Ogre::SceneManager* sceneManager, Ogre::Entity entity, b2Vec2 start, b2Vec2 emd, double speed);
+	MovingPlatform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2, b2Vec2 start, b2Vec2 end, double speed);
+	MovingPlatform(Ogre::SceneManager* sceneManager, Ogre::Entity entity, b2Vec2 start, b2Vec2 end, double speed);
 	
 	~MovingPlatform();
 
@@ -33,10 +33,13 @@ public:
 	/// Collided fixture is the fixture that hit this Object's body.
 	virtual void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 	{
-		GameObject* go = (GameObject*) collidedFixture->GetBody()->GetUserData();
-		if(go->GetGameObjectType() == GOType_Character_Parker)
+		if(collidedFixture->GetUserData() != 0)
 		{
-			parkerCount_++;
+			GameObject* go = (GameObject*) collidedFixture->GetBody()->GetUserData();
+			if(go->GetGameObjectType() == GOType_Character_Parker)
+			{
+				parkerCount_++;
+			}
 		}
 		
 	}
@@ -47,10 +50,13 @@ public:
 	/// Collided fixture is the fixture that hit this Object's body.
 	virtual void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 	{
-		GameObject* go = (GameObject*) collidedFixture->GetBody()->GetUserData();
-		if(go->GetGameObjectType() == GOType_Character_Parker)
+		if(collidedFixture->GetUserData() != 0)
 		{
-			parkerCount_--;
+			GameObject* go = (GameObject*) collidedFixture->GetBody()->GetUserData();
+			if(go->GetGameObjectType() == GOType_Character_Parker)
+			{
+				parkerCount_--;
+			}
 		}
 	}
 

@@ -1,20 +1,17 @@
 #include "LedgeSensor.h"
 
 
-LedgeSensor::LedgeSensor(b2Vec2 position)
+LedgeSensor::LedgeSensor() : GameObjectSensor(NO_MESSAGE)
 {
-	position_ = position;
-
 	world_ = GameFramework::getSingletonPtr()->GetWorld();
 	
 	// Create body and fixture
 	b2BodyDef bd;
-	bd.position = position_;
 	bd.type = b2_staticBody;
 	body_= world_->CreateBody(&bd);
 	
 	// This is the sensor
-	b2CircleShape	circleDef;
+	b2CircleShape circleDef;
 	circleDef.m_radius = 0.38608f;
 
 	b2FixtureDef fd;
@@ -27,4 +24,14 @@ LedgeSensor::LedgeSensor(b2Vec2 position)
 
 	gameObjectType_ = GOType_LedgeSensor;
 
+}
+
+/// Called when two fixtures begin to touch.
+/// Sends out the signal OnTouch to its subscribers
+void LedgeSensor::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+{
+	if(ignoreSensors_ && collidedFixture->IsSensor())
+	{
+		return;
+	}
 }

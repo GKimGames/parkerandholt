@@ -15,7 +15,6 @@ HoltBox::HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center)
 	entityName += Ogre::StringConverter::toString(objectId_);
 
 	entity_ = sceneManager_->createEntity(entityName, "cube.1m.mesh");
-	//entity_ = sceneManager_->createEntity(entityName, "Cube.002.mesh");
 
 	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
 	sceneNode_->attachObject(entity_);
@@ -71,7 +70,9 @@ bool HoltBox::CreateBox2DBox()
 
 		b2FixtureDef fd;
 		fd.shape = &sd;
+		//fd.density = 10.0;
 		fd.density = 10.0;
+		fd.friction = 0.8;
 
 		body_->CreateFixture(&fd);
 
