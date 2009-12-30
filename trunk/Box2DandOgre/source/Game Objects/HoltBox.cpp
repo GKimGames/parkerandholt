@@ -70,9 +70,8 @@ bool HoltBox::CreateBox2DBox()
 
 		b2FixtureDef fd;
 		fd.shape = &sd;
-		//fd.density = 10.0;
 		fd.density = 10.0;
-		fd.friction = 0.8;
+		fd.friction = DEFAULT_FRICTION;
 
 		body_->CreateFixture(&fd);
 

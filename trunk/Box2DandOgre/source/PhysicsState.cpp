@@ -159,6 +159,8 @@ void PhysicsState::createPhysics()
 	bb->Initialize();
 
 	new MovingPlatform(sceneManager_, b2Vec2(10.0f, 1.0f), b2Vec2(0.0f, 1.0f), b2Vec2(5.0f, 1.0f), b2Vec2(0.0f, 5.0f), 2);
+
+	new PressureSwitch(sceneManager_);
 	//bb->GetBody()->SetTimeScale(0.5f);
 
 	/*

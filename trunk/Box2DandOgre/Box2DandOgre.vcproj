@@ -450,6 +450,10 @@
 					RelativePath=".\include\GameObject\Platform.h"
 					>
 				</File>
+				<File
+					RelativePath=".\include\PressureSwitch.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

@@ -73,6 +73,7 @@ Platform::Platform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2)
 
 	b2FixtureDef fd;
 	fd.shape = &ed;
+	fd.friction = DEFAULT_FRICTION;
 
 	body_->CreateFixture(&fd);
 
