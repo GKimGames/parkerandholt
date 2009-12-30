@@ -99,7 +99,7 @@ void MovingPlatform::CreatePhysics()
 	bd.fixedRotation = true;
 
 	bd.position = startVec_;
-	bd.type = b2_dynamicBody;
+	bd.type = b2_kinematicBody; 
 	body_= world_->CreateBody(&bd);
 
 	b2PolygonShape ed;
@@ -111,20 +111,6 @@ void MovingPlatform::CreatePhysics()
 	body_->SetUserData(this);
 	body_->CreateFixture(&fd);
 
-	b2FixtureDef fd2;
-	fd2.shape = &ed;
-	bd.position = startVec_;
-	bd.type = b2_kinematicBody; 
-	bd.fixedRotation = true;
-	kBody_ = world_->CreateBody(&bd);
-
-	kBody_->CreateFixture(&fd2);
-	kBody_->SetUserData(this);
-
-	b2RevoluteJointDef jointDef;
-	jointDef.Initialize(body_, kBody_, body_->GetWorldCenter());
-	jointDef.collideConnected = true;
-	world_->CreateJoint(&jointDef);
 }
 
 bool MovingPlatform::Update(double timeSinceLastFrame)
@@ -158,7 +144,7 @@ bool MovingPlatform::Update(double timeSinceLastFrame)
 			}
 		}
 
-		kBody_->SetLinearVelocity(vel);
+		body_->SetLinearVelocity(vel);
 		
 		sceneNode_->setPosition(Ogre::Real(v.x),Ogre::Real(v.y),0);
 

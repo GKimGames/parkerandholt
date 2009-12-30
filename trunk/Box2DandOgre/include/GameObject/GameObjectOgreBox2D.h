@@ -30,15 +30,16 @@ class GameObjectOgreBox2D  : public GameObjectOgre
 public:
 
 	/// Constructor grabs the reference from the OgreFramework of the b2World.
-	GameObjectOgreBox2D()
+	GameObjectOgreBox2D(b2Body* body = 0, Ogre::Entity* entity = 0)
 	{
 		// There is only ever one world at a time and all objects get the
 		// current world from the GameFramework singleton.
 		world_ = GameFramework::getSingletonPtr()->GetWorld();
 
-		initialized_ = false;
-		
+		entity_ = entity;
+		body_ = body;
 	}
+
 
 	virtual ~GameObjectOgreBox2D()
 	{
@@ -62,20 +63,27 @@ public:
 	/// By default this does nothing.
 	virtual void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture){}
 
-
 	/// Returns the b2Body for this GameObjectOgreBox2D.
 	virtual b2Body* GetBody()
 	{
 		return body_;
-	};
-
-
+	}
 
 	/// Returns the body's position.
 	virtual b2Vec2 GetBodyPosition()
 	{
 		return body_->GetPosition();
-	};
+	}
+
+	void SetBodyPosition(b2Vec2 pos)
+	{
+		body_->SetTransform(pos, body_->GetAngle());
+	}
+
+	void SetBodyAngle(float32 angle)
+	{
+		body_->SetTransform(body_->GetPosition(), angle);
+	}
 
 
 	virtual bool Update(double timeSinceLastFrame)
@@ -105,7 +113,6 @@ public:
 			sceneNode_->rotate(Ogre::Vector3::UNIT_Z, Ogre::Radian(body_->GetAngle()));
 
 			prevAngle = body_->GetAngle();
-
 		}
 
 		return true;
