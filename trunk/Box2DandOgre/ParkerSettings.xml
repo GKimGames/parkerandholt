@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Character>
+  <!-- Since the ninja mesh is being rotated 90 degrees around the Y axis-->
+  <!-- the x axis is now the z axis and we translate along that-->
+  <MeshInfo>
+    <Mesh name="ninja.mesh" translateX="-0.36" translateY="0" translateZ="0" rotateY="90"/>
+  </MeshInfo>
+  <ShapeInfo>
+    <Size width="0.3" height="1.884" scaleX="0.010" scaleY="0.010" scaleZ="0.010"/>
+    <ShapeDef   mass="50.0"
+                friction="50"
+                restitution="0.1"
+                linearDamping="0.00"
+                />
+  </ShapeInfo>
+  <!-- MoveInfo stores all the information on forces that move the character-->
+  <MovementInfo>
+    <WalkingInfo 	walkingForce=""     	maximumVelocity="2" />
+    <RunningInfo 	runningForce="60000"    	maximumVelocity="6" />
+    <JumpingInfo 	jumpingForce="250"      		jumpingAfterForce="120" />
+	<WallJumpInfo	jumpingForce="360"/>
+    <AirInfo     		airForce="10000"         		maximumVelocity="6"  />
+  </MovementInfo>
+</Character>
