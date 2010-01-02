@@ -16,19 +16,12 @@
 #include <set>
 
 #include "OgreSingleton.h"
-#include "Message.h"
 #include "GameObject.h"
+#include "Message.h"
+#include "HelperFunctions.h"
 
 #define Dispatch KGBMessageDispatcher::getSingletonPtr()
-
-/// An Enum for Messages.
-enum KGBMessageType
-{
-	NO_MESSAGE,
-	CHARACTER_MOVE_LEFT,
-	CHARACTER_MOVE_RIGHT,
-	CHARACTER_JUMP
-}; 
+typedef unsigned int GameObjectId;
 
 /// Send the message immediately with no delay.
 const double SEND_IMMEDIATELY = 0.0;
@@ -36,18 +29,29 @@ const double SEND_IMMEDIATELY = 0.0;
 /// Send the message to all Entitys.
 const unsigned int SEND_TO_ALL = 0;
 
+///// An Enum for Messages.
+//enum KGBMessageType
+//{
+//	MESSAGE_NULL,
+//	NO_MESSAGE,
+//	CHARACTER_MOVE_LEFT,
+//	CHARACTER_MOVE_RIGHT,
+//	CHARACTER_JUMP,
+//	GAME_SENSOR_ON,
+//	GAME_SENSOR_OFF
+//}; 
 
 class KGBMessageDispatcher : public Ogre::Singleton<KGBMessageDispatcher>
 {
 public:
 
-	KGBMessageDispatcher(){}
+	KGBMessageDispatcher();
 
 	// Send a message to either all or one other Entity 
 	void DispatchMessage(double			pDelay,
-						 int			pSender,
-						 int			pReceiver,
-						 int			pMessageType,
+						 GameObjectId	pSender,
+						 GameObjectId	pReceiver,
+						 KGBMessageType	pMessageType,
 						 boost::any*	pUserData);
 
 	// Call this to send out delayed messages
@@ -55,28 +59,37 @@ public:
 
 	void ClearDelayedMessages(){ messageQueue_.clear(); }
 
+	void MessageLoggingOn()  { logMessages_ = true; }
+	void MessageLoggingOff() { logMessages_ = false; }
+
+	Ogre::String MessageToString(KGBMessageType message);
+	Ogre::String GetObjectName(GameObjectId id);
+
 private:  
 
 	// This method discharges the message to all Entitys
 	void DischargeToAll(const KGBMessage& pMsg);
 
-	//a std::set is used as the container for the delayed messages
-	//because of the benefit of automatic sorting and avoidance
-	//of duplicates. Messages are sorted by their dispatch time.
+	// A std::set is used as the container for the delayed messages
+	// because of the benefit of automatic sorting and avoidance
+	// of duplicates. Messages are sorted by their dispatch time.
 	std::set<KGBMessage> messageQueue_;
 
 	// This method is utilized by DispatchMessage or DispatchDelayedMessages to
 	// send messages to either all or one Entity.
 	void Discharge(const KGBMessage& pMsg);
 
-	
+	// This method is utilized by DispatchMessage or DispatchDelayedMessages to
+	// send messages to either all or one Entity. This fucntion logs the
+	// message.
+	void DischargeWithLog(const KGBMessage& pMsg);
 
 	//copy ctor and assignment should be private
 	KGBMessageDispatcher(const KGBMessageDispatcher&);
 	KGBMessageDispatcher& operator=(const KGBMessageDispatcher&);
 
+	bool logMessages_;
+
 };
-
-
 
 #endif

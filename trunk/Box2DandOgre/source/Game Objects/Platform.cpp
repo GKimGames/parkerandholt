@@ -26,7 +26,7 @@ Platform::Platform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2)
 	plane->d = 0; 
 	plane->normal = Vector3(0.0, 1.0, 0.0);
 
-	float lengthOfPlane =  sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
+	float lengthOfPlane = sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
 	
 	Ogre::MeshManager::getSingleton().createPlane(planeMeshName, 
 		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
@@ -74,6 +74,7 @@ Platform::Platform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2)
 	b2FixtureDef fd;
 	fd.shape = &ed;
 	fd.friction = DEFAULT_FRICTION;
+	fd.filter.groupIndex = STATIC_MAP_GROUP;
 
 	body_->CreateFixture(&fd);
 

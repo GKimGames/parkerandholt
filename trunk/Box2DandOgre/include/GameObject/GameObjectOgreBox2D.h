@@ -22,10 +22,12 @@ struct ContactPoint
 	b2Vec2 normal;
 	b2Vec2 position;
 	b2PointState state;
+	b2Contact* contact;
 };
 
 /// The default value of friction for all Box2D objects in the game.
-static double DEFAULT_FRICTION = 0.4;
+const static double DEFAULT_FRICTION = 0.4;
+const static signed short STATIC_MAP_GROUP = -10;
 
 /// This extends GameObjectOgre and adds a Box2D component.
 class GameObjectOgreBox2D  : public GameObjectOgre
@@ -33,6 +35,8 @@ class GameObjectOgreBox2D  : public GameObjectOgre
 public:
 
 	/// Constructor grabs the reference from the OgreFramework of the b2World.
+	/// The object is not initialized until Initialize is called and will only
+	/// be initialized if the body doesn't equal 0.
 	GameObjectOgreBox2D(b2Body* body = 0, Ogre::Entity* entity = 0)
 	{
 		// There is only ever one world at a time and all objects get the
@@ -46,12 +50,21 @@ public:
 
 	virtual ~GameObjectOgreBox2D()
 	{
-		if(body_)
+		if(body_ != 0)
 		{
 			world_->DestroyBody(body_);
 		}
 	}
 
+	virtual bool Initialize()
+	{
+		if(body_ != 0)
+		{
+			initialized_ = true;
+		}
+
+		return initialized_;
+	}
 
 	/// Called when two fixtures begin to touch.
 	/// Contact fixture is the fixture in this Object's body.

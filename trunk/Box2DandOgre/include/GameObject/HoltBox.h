@@ -45,6 +45,7 @@ public:
 	/// This tries to create a box at position_, returns false if theres other
 	/// Box2D shapes there.
 	bool CreateBox2DBox();
+
 	
 
 protected:

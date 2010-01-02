@@ -1,5 +1,5 @@
 /*=============================================================================
--------------------------------------------------------------------------------
+
   Character.h
 
   Author: Matt King
@@ -8,17 +8,6 @@
 
 #ifndef CHARACTER_H
 #define CHARACTER_H
-
-#define OGRE_LOG(t) GameFramework::getSingletonPtr()->log_->logMessage(t)
-
-#define DEBUGGING 1
-
-#if DEBUGGING
-#define DLOG(X) OutputDebugString(X); OutputDebugString("\n") 
-#else
-#define DLOG(X) 
-#endif
-
 
 #include "AppState.hpp"
 

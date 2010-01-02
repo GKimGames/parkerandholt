@@ -355,6 +355,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\HelperFunctions.h"
+					>
+				</File>
+				<File
 					RelativePath=".\source\OgreApplication.h"
 					>
 				</File>
@@ -419,6 +423,10 @@
 				Name="Game Objects"
 				>
 				<File
+					RelativePath=".\include\GameConstants.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\GameObject\GameObject.h"
 					>
 				</File>
@@ -452,6 +460,10 @@
 				</File>
 				<File
 					RelativePath=".\include\PressureSwitch.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Switch.h"
 					>
 				</File>
 			</Filter>

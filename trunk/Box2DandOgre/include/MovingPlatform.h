@@ -41,6 +41,7 @@ public:
 				parkerCount_++;
 			}
 		}
+
 		
 	}
 
@@ -57,6 +58,12 @@ public:
 			{
 				parkerCount_--;
 			}
+		}
+
+		
+		if(contact->contact->IsTouching())
+		{
+			DEBUG_LOGC("Its touching and leaving the platform");
 		}
 	}
 

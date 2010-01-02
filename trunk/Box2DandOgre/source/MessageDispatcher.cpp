@@ -15,8 +15,20 @@ using std::cout;
 using std::set;
 
 template<> KGBMessageDispatcher* Ogre::Singleton<KGBMessageDispatcher>::ms_Singleton = 0;
+
+
 //=============================================================================
-//	Discharge
+//						Constructor
+//
+/// Logging of messages is by default false.
+KGBMessageDispatcher::KGBMessageDispatcher()
+{
+	logMessages_ = true;
+}
+
+
+//=============================================================================
+//						Discharge
 ///
 ///	Discharges a message to the Entitys.
 void KGBMessageDispatcher::Discharge(const KGBMessage& pMsg)
@@ -28,23 +40,69 @@ void KGBMessageDispatcher::Discharge(const KGBMessage& pMsg)
 	}
 	else
 	{
+
 		GameObject* object = GameObject::GetObjectById(pMsg.receiver);
 		
 		if(object)
 		{
 			object->HandleMessage(pMsg);
 		}
+
+	}
+}
+
+//=============================================================================
+//						Discharge
+///
+///	Discharges a message to the Entitys.
+void KGBMessageDispatcher::DischargeWithLog(const KGBMessage& pMsg)
+{
+
+	bool messageOk = false;
+
+
+	Ogre::String s = "\nInstant KGBMessage sent to: ";
+
+	if(pMsg.receiver == SEND_TO_ALL)
+	{
+		s += "ALL_OBJECTS";
+		s += " from ";
+		s += GetObjectName(pMsg.sender);
+		
+		DischargeToAll(pMsg);
+	}
+	else
+	{
+		// Get the receiver and sender.
+		s += GetObjectName(pMsg.receiver);
+		s += " from ";
+		s += GetObjectName(pMsg.sender);
+
+		GameObject* object = GameObject::GetObjectById(pMsg.receiver);
+		
+		if(object)
+		{
+			messageOk = object->HandleMessage(pMsg);
+		}
+
+		// Did the message get handled?
+		if(messageOk)
+		{
+			s += Ogre::String(": Message Handled");
+		}
 		else
 		{
 			// KGBMessage could not be handled
-			cout << "Message not handled";
+			s += Ogre::String(": Message failed");
 		}
 	}
+
+	DEBUG_LOG(s);
 }
 
 
 //=============================================================================
-//	DischargeToAll
+//						DischargeToAll
 //
 /// Dispatch a message to all objects
 void KGBMessageDispatcher::DischargeToAll(const KGBMessage& pMsg)
@@ -61,18 +119,17 @@ void KGBMessageDispatcher::DischargeToAll(const KGBMessage& pMsg)
 }
 
 //=============================================================================
-//	Dispatch Message
+//						Dispatch Message
 //
 /// Given a message, a receiver, a sender and any time delay , this function
 /// routes the message to the correct agent (if no delay) or stores
 /// in the message queue to be dispatched at the correct time
 void KGBMessageDispatcher:: DispatchMessage(double			pDelay,
-											int				pSender,
-											int				pReceiver,
-											int				pMessageType,
+											GameObjectId	pSender,
+											GameObjectId	pReceiver,
+											KGBMessageType	pMessageType,
 											boost::any*		pUserData)
 {
-
 
 	// Create the KGBMessage
 	KGBMessage message(0, pSender, pReceiver, pMessageType, pUserData);
@@ -81,14 +138,17 @@ void KGBMessageDispatcher:: DispatchMessage(double			pDelay,
 	if (pDelay <= SEND_IMMEDIATELY)                                                        
 	{
 
-		// Discharge the message
-		Discharge(message);
-
-		/*
-		cout << "\nInstant KGBMessage dispatched at time: " << GameFramework::getSingletonPtr()->timer_->getMillisecondsCPU()
-		<< " by " << GetNameOfEntity(pSender->ID()) << " for " << GetNameOfEntity(pReceiver->ID()) 
-		<< ". Msg is "<< MsgToStr(msg);
-		*/
+		if(logMessages_ == false)
+		{
+			// Discharge the message
+			Discharge(message);
+		}
+		else
+		{
+			// Discharge the message with logging
+			DischargeWithLog(message);
+		}
+		
 	}
 	// Else calculate the time when the KGBMessage should be dispatched
 	else
@@ -98,20 +158,25 @@ void KGBMessageDispatcher:: DispatchMessage(double			pDelay,
 		message.dispatchTime = CurrentTime + pDelay;
 
 		// Insert the message into the queue
-		messageQueue_.insert(message);   
+		messageQueue_.insert(message);  
 
-		/*
-		cout	<< "\nDelayed KGBMessage from " << GetNameOfEntity(pSender->ID()) << " recorded at time " 
-		<< Clock->GetCurrentTime() << " for " << GetNameOfEntity(pReceiver->ID())
-		<< ". Msg is "<< MsgToStr(msg);
-		*/
+		if(logMessages_ == true)
+		{
+			Ogre::String s = "Delayed Message - To ";
+			// Get the receiver and sender.
+			s += GetObjectName(message.receiver);
+			s += " from ";
+			s += GetObjectName(message.sender);
 
+			DEBUG_LOG(s);
+		}
 	}
 }
 
 
+
 //=============================================================================
-//	DispatchDelayedMessages
+//						DispatchDelayedMessages
 //
 /// This function dispatches any KGBMessages with a timestamp that has
 /// expired. Any dispatched KGBMessages are removed from the queue
@@ -121,9 +186,9 @@ void KGBMessageDispatcher::DispatchDelayedMessages()
 	// Get current time
 	double CurrentTime = GameFramework::getSingletonPtr()->timer_->getMillisecondsCPU();
 
-	//now peek at the queue to see if any KGBMessages need dispatching.
-	//remove all KGBMessages from the front of the queue that have gone
-	//past their sell by date
+	// Now peek at the queue to see if any KGBMessages need dispatching.
+	// Remove all KGBMessages from the front of the queue that have gone
+	// past their sell by date
 	while( !messageQueue_.empty() &&
 		(  messageQueue_.begin()->dispatchTime < CurrentTime) && 
 		(  messageQueue_.begin()->dispatchTime > 0) )
@@ -136,6 +201,56 @@ void KGBMessageDispatcher::DispatchDelayedMessages()
 		// Remove it from the queue
 		messageQueue_.erase(messageQueue_.begin());
 	}
+}
+
+//=============================================================================
+//						GetObjectName
+//
+/// This returns a the objects name from its GameObjectId.
+Ogre::String KGBMessageDispatcher::GetObjectName(GameObjectId id)
+{
+	if(id == SEND_TO_ALL)
+	{
+		// All objects are the receiver
+		return Ogre::String("ALL_OBJECTS");
+	}
+	GameObject* go = GameObject::GetObjectById(id);
+	if(go)
+	{
+		return go->GetName();
+	}
+
+	// We didn't find the object.
+	return Ogre::String("UNABLE_TO_FIND_OBJECT");
+
+}
+
+
+
+//=============================================================================
+//						MessageToString
+//
+/// This returns a KGBMessageType as an Ogre::String
+Ogre::String KGBMessageDispatcher::MessageToString(KGBMessageType message)
+{
+
+	switch(message)
+	{
+	case CHARACTER_MOVE_LEFT:
+		{
+			return Ogre::String("CHARACTER_MOVE_LEFT");
+		}
+	case CHARACTER_MOVE_RIGHT:
+		{
+			return Ogre::String("CHARACTER_MOVE_RIGHT");
+		}
+	case CHARACTER_JUMP:
+		{
+			return Ogre::String("CHARACTER_JUMP");
+		}
+	}
+
+	return Ogre::String("Unrecognized message type");
 }
 
 

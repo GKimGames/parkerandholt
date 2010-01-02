@@ -22,6 +22,7 @@
 #include <Box2D/Box2D.h>
 #include "BetaGUI.h"
 #include "GameObject.h"
+#include "OgreB2DebugDraw.h"
 
 #define GAMEFRAMEWORK GameFramework::getSingletonPtr()
 
@@ -52,8 +53,20 @@ public:
 	bool MousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id); 
 	bool MouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id);
 
-	void SetWorld(b2World* world){world_ = world;};
-	b2World* GetWorld(){return world_;};
+	void SetWorld(b2World* world){world_ = world;}
+	b2World* GetWorld(){return world_;}
+
+	void SetDebugDraw(OgreB2DebugDraw* draw)
+	{  
+		debugDraw_ = draw;
+	}
+	
+	OgreB2DebugDraw* GetDebugDraw()
+	{
+		return debugDraw_; 
+	}
+
+	
 	
 	const double GetTimeSinceLastFrame(){ return timeSinceLastFrame_; }
 	void SetTimeSinceLastFrame(double timeSinceLastFrame){ timeSinceLastFrame_ = timeSinceLastFrame; }
@@ -69,10 +82,11 @@ public:
 	OIS::Mouse*					mouse_;
 
 	b2World*					world_;
+	OgreB2DebugDraw* debugDraw_;
 
 
 private:
-
+	
 	GameFramework(const GameFramework&);
 	GameFramework& operator= (const GameFramework&);
 
