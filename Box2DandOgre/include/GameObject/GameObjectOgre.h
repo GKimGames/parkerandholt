@@ -10,6 +10,8 @@
 #define GAME_OBJECT_OGRE_H
 
 #include "GameObject.h"
+#include "MessageDispatcher.h"
+#include "Message.h"
 
 
 /// GameObjectOgre extends GameObject

@@ -86,11 +86,10 @@ public:
 
 	void CreateBox();
 
-
 protected:
 	
 
-
+	GameObject* gameObject_;
 	CharacterParker* parker_;
 
 	b2World* world;

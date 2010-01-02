@@ -186,9 +186,7 @@ bool Character::ReadXMLConfig()
 	shapeDefNode->QueryDoubleAttribute("linearDamping", &linearDamping_);
 
 
-	// Testing printing debug
-	Ogre::String s = Ogre::StringConverter::toString(Ogre::Real(capsuleRadius_));
-	DLOG(s.c_str());
+
 
 	// Get the walking and running information
 	TiXmlElement* movementNode = hRoot.FirstChild( "MovementInfo" ).FirstChildElement( "WalkingInfo" ).Element();

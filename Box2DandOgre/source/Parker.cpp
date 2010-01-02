@@ -18,6 +18,8 @@ CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager)
 	stateMachine_->ChangeState(onGroundState_);
 
 	elevator_ = NULL;
+
+	objectName_ = "Parker";
 }
 
 //=============================================================================
@@ -69,7 +71,7 @@ void CharacterParker::InitVariables()
 void CharacterParker::CreatePhysics()
 {
 	b2BodyDef bd;
-	bd.position.Set(0, 5);
+	bd.position.Set(-5, 5);
 	bd.fixedRotation = true;
 	bd.type = b2_dynamicBody;
 	body_ = world_->CreateBody(&bd);
@@ -77,7 +79,16 @@ void CharacterParker::CreatePhysics()
 	b2PolygonShape bodyShapeDef;
 
 	// The extents are the half-widths of the box.
+	/*
+	b2Vec2 bodyVecs[4];
+	bodyVecs[0].Set(-boundingBoxWidth_/2, -boundingBoxHeight_/4);
+	bodyVecs[1].Set(boundingBoxWidth_/2, -boundingBoxHeight_/4);
+	bodyVecs[2].Set(boundingBoxWidth_/2, boundingBoxHeight_/2);
+	bodyVecs[3].Set(-boundingBoxWidth_/2, boundingBoxHeight_/2);
+	bodyShapeDef.Set(bodyVecs,4);
+	*/
 	bodyShapeDef.SetAsBox(boundingBoxWidth_/2, boundingBoxHeight_/2);
+	
 
 	b2FixtureDef fd;
 	fd.shape = &bodyShapeDef;
@@ -108,6 +119,7 @@ void CharacterParker::CreatePhysics()
 	feetSensor_ = body_->CreateFixture(&fd);
 
 	// Create the definition of the polygon for the wall jump sensor
+	
 	b2PolygonShape wallJumpSensor_Def;
 
 	wallJumpSensor_Def.m_vertexCount = 4;
@@ -122,6 +134,7 @@ void CharacterParker::CreatePhysics()
 	fd.userData = &gameObjectType_;
 
 	wallJumpSensor_ = body_->CreateFixture(&fd);
+	
 
 	// Create the definition of the polygon for the shin sensor
 	b2PolygonShape shinSensor_Def;
@@ -155,8 +168,8 @@ void CharacterParker::CreatePhysics()
 	fd.shape = &torsoSensor_Def;
 	fd.userData = &gameObjectType_;
 	torsoSensor_ = body_->CreateFixture(&fd);
-
-	body_->SetUserData(this);
+	
+	body_->SetUserData(this); 
 }
 
 

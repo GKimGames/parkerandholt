@@ -14,11 +14,13 @@
 #include <vector>
 
 #include "GameFramework.h"
-#include "MessageDispatcher.h"
 #include "Message.h"
 
+
 class GameObject;
-typedef std::map<int, GameObject*> GameObjectMap;
+
+typedef unsigned int GameObjectId;
+typedef std::map<GameObjectId, GameObject*> GameObjectMap;
 
 /// This will identify what type of GameObject an Object is.
 /// This is useful due to Box2D having all contact callbacks go through a single
@@ -39,12 +41,13 @@ enum GameObjectType
 };
 
 /// Objects represents the base class for anything that is in the game.
-///	It has a unique ID number.
+///	It has a unique ID number and a name.
 /// All Objects are added to the objectList and are updated using this
 /// list.
 /// All Objects also have a GameObjectType.
 class GameObject 
 {
+	
 public:
 
 	/// List of all Objetcts created. It uses their objectId.
@@ -62,11 +65,16 @@ public:
 	}
 
 	/// Returns an Object from its objectId
-	static GameObject* GetObjectById(unsigned int objectId)
+	static GameObject* GetObjectById(GameObjectId objectId)
 	{
 		// Find the Object
 		GameObjectMap::const_iterator object = objectList.find(objectId);
-
+		
+		if(object == objectList.end())
+		{
+			return 0;
+		}
+		
 		return object->second;
 	}
 
@@ -84,7 +92,7 @@ public:
 	}
 
 	/// All Objects must update.
-	virtual bool Update(double timeSinceLastFrame)=0;
+	virtual bool Update(double timeSinceLastFrame){return true;}
 
 	/// Get the GameObjectType
 	GameObjectType GetGameObjectType() const
@@ -93,7 +101,7 @@ public:
 	};
 
 	/// Returns this object's objectId_
-	unsigned int GetId() const
+	GameObjectId GetId() const
 	{ 
 		return objectId_;
 	};
@@ -118,32 +126,44 @@ public:
 		return initialized_;
 	}
 
-	unsigned int GetParkerId()
+	void SetName(Ogre::String s)
+	{
+		objectName_ = s;
+	}
+
+	Ogre::String GetName()
+	{
+		return objectName_;
+	}
+
+	static GameObjectId GetParkerId()
 	{
 		return parkerId_;
 	}
 
-	unsigned int GetHoltId()
+	static GameObjectId GetHoltId()
 	{
 		return holtId_;
 	}
+
+
 
 protected:
 
 	GameObjectType			gameObjectType_;	//< \brief GameObjectType of the object.
 
-	unsigned int			objectId_;			//< \brief Unique Id for the object
-
+	GameObjectId			objectId_;			//< \brief Unique Id for the object.
+	Ogre::String			objectName_;		//< \brief A name for the object.
 	bool					initialized_;
 
-	static unsigned int		parkerId_;			//< \brief these are stored here to make easy access to parker and holt
-	static unsigned int		holtId_;
+	static GameObjectId		parkerId_;			//< \brief these are stored here to make easy access to parker and holt
+	static GameObjectId		holtId_;
 
 private:
 
 	/// This is the static int that is increased every time an object is
 	/// so that all objects can have a unique id.
-	static unsigned int		staticObjectId_;	
+	static GameObjectId		staticObjectId_;	
 
 
 };

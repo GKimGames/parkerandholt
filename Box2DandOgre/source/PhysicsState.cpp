@@ -16,6 +16,8 @@ PhysicsState::PhysicsState()
 
 void PhysicsState::enter()
 {
+	gameObject_ = new GameObject();
+	gameObject_->SetName("PhysicsState");
 
 	GameFramework::getSingletonPtr()->log_->logMessage("Entering PhysicsState...");
 
@@ -161,18 +163,7 @@ void PhysicsState::createPhysics()
 	new MovingPlatform(sceneManager_, b2Vec2(10.0f, 1.0f), b2Vec2(0.0f, 1.0f), b2Vec2(5.0f, 1.0f), b2Vec2(0.0f, 5.0f), 2);
 
 	new PressureSwitch(sceneManager_);
-	//bb->GetBody()->SetTimeScale(0.5f);
 
-	/*
-	LedgeSensor* ls = new LedgeSensor(b2Vec2(30.0f, 6.4f));
-
-	ls->OnContact(boost::bind(&Character::Jump, myCharacter_));
-
-	LedgeSensor* ls2 = new LedgeSensor(b2Vec2(-5.0f, 1.0f));
-
-	ls2->OnContact(boost::bind(&PhysicsState::CreateBox, this));
-	*/
-	//Dispatch->DispatchMessage(3000,0,myCharacter_->GetId(),1,NULL);
 
 #if DEBUG_DRAW_ON
 	debugDraw_ = new OgreB2DebugDraw(sceneManager_, "debugDraw", 0);
@@ -183,6 +174,7 @@ void PhysicsState::createPhysics()
 		);
 
 	world->SetDebugDraw(debugDraw_);
+	GAMEFRAMEWORK->SetDebugDraw(debugDraw_);
 	debugDrawOn_ = true;
 
 #endif
@@ -256,7 +248,7 @@ void PhysicsState::createScene()
 
 bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 {
-	if(keyEventRef.key == OIS::KeyCode::KC_P)
+	if(keyEventRef.key == OIS::KC_P)
 	{
 		pause_ = true;
 	}
@@ -357,7 +349,6 @@ void PhysicsState::getInput()
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_A))
 		{
 			m_TranslateVector.x = -m_MoveScale;
-
 		}
 
 		// Turn Debug Draw off
@@ -393,22 +384,27 @@ void PhysicsState::getInput()
 
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_LEFT))
 		{
-			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, parker_->GetId(), CHARACTER_MOVE_LEFT, NULL);
+			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, gameObject_->GetId(), parker_->GetId(), CHARACTER_MOVE_LEFT, NULL);
 		}
 
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_RIGHT))
 		{
-			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, parker_->GetId(), CHARACTER_MOVE_RIGHT, NULL);
+			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, gameObject_->GetId(), parker_->GetId(), CHARACTER_MOVE_RIGHT, NULL);
 		}
 
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_UP))
 		{
-			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, parker_->GetId(), CHARACTER_JUMP, NULL);
+			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, gameObject_->GetId(), parker_->GetId(), CHARACTER_JUMP, NULL);
 		}
 
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_DOWN))
 		{
 			camera_->pitch(-m_RotScale);
+		}
+
+		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_Y))
+		{
+			parker_->SetBodyPosition(b2Vec2(0, 10));
 		}
 
 		/*
@@ -511,13 +507,8 @@ void PhysicsState::BeginContact(b2Contact* contact)
 	ContactPoint* c = new ContactPoint();
 	c->fixtureA = contact->GetFixtureA();
 	c->fixtureB = contact->GetFixtureB();
-
+	c->contact = contact;
 	beginContactList_.push_back(c);
-
-	/*
-	b2Contact* c = new b2Contact(contact->GetFixtureA(), contact->GetFixtureB());
-	beginContactList_.push_back(c);
-	*/
 }
 
 /// Called when two fixtures cease to touch.
@@ -530,13 +521,8 @@ void PhysicsState::EndContact(b2Contact* contact)
 	ContactPoint* c = new ContactPoint();
 	c->fixtureA = contact->GetFixtureA();
 	c->fixtureB = contact->GetFixtureB();
-
+	c->contact = contact;
 	endContactList_.push_back(c);
-
-	/*
-	b2Contact* c = new b2Contact(contact->GetFixtureA(), contact->GetFixtureB());
-	beginContactList_.push_back(c);
-	*/
 }
 
 void PhysicsState::ProcessContacts()

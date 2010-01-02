@@ -80,7 +80,6 @@ void AppStateManager::start(AppState* state)
 	LARGE_INTEGER frequency;        // ticks per second
 	LARGE_INTEGER t1, t2;           // ticks
 	t1.QuadPart = t2.QuadPart = 0;
-	double elapsedTime;
 
 	// get ticks per second
 	QueryPerformanceFrequency(&frequency);
