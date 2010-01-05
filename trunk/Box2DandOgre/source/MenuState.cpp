@@ -28,11 +28,13 @@ void MenuState::enter()
 	
 	betaGUI_->createMousePointer(Vector2(32,32), "bgui.pointer");
 	
+	/*
 	BetaGUI::Window* window = betaGUI_->createWindow(Vector4(100,100,300,100), "bgui.window", BetaGUI::RESIZE_AND_MOVE, "Parker and Holt");
 	
 	enterGameButton_ = window->createButton(Vector4(112,50,104,24), "bgui.button", "Game", BetaGUI::Callback(this));
 	enterMapEditorButton_ = window->createButton(Vector4(4,50,104,24), "bgui.button", "Map Editor", BetaGUI::Callback(this));
-	
+	*/
+
 	m_bQuit = false;
 	
 	createScene();
@@ -54,6 +56,9 @@ void MenuState::resume()
 	GameFramework::getSingletonPtr()->log_->logMessage("Resuming MenuState...");
 	GameFramework::getSingletonPtr()->viewport_->setCamera(m_pCamera);
 
+	betaGUI_ = new BetaGUI::GUI("MgOpen", 16);
+	
+	betaGUI_->createMousePointer(Vector2(32,32), "bgui.pointer");
 
 	m_bQuit = false;
 }
@@ -83,20 +88,6 @@ bool MenuState::keyPressed(const OIS::KeyEvent &keyEventRef)
 	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_ESCAPE))
 	{
 		m_bQuit = true;
-		return true;
-	}
-
-	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_RETURN))
-	{
-		this->pushAppState(findByName("PhysicsState"));
-		delete betaGUI_;
-		return true;
-	}
-
-	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_RSHIFT))
-	{
-		this->pushAppState(findByName("MapEditorState"));
-		delete betaGUI_;
 		return true;
 	}
 
@@ -152,13 +143,33 @@ bool MenuState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 	return true;
 }
 
+void MenuState::getInput()
+{
+	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_RETURN))
+	{
+		delete betaGUI_;
+		this->pushAppState(findByName("PhysicsState"));
+		return;
+	}
 
-void MenuState::update(double timeSinceLastFrame)
+	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_RSHIFT))
+	{
+		delete betaGUI_;
+		this->pushAppState(findByName("MapEditorState"));
+		return;
+	}
+}
+
+bool MenuState::update(double timeSinceLastFrame)
 {
 	if(m_bQuit == true)
 	{
 		this->popAppState();
-		return;
+		return false;
 	}
+
+	getInput();
+
+	return true;
 }
 

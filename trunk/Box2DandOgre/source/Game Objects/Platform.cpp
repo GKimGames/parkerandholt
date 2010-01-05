@@ -54,7 +54,6 @@ Platform::Platform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2)
 
 	Ogre::SceneNode* planeNode = sceneManager_->getRootSceneNode()->createChildSceneNode();
 	planeNode->attachObject(planeEnt);
-
 	
 	// Rotate the node to fit the points
 	planeNode->roll(Ogre::Radian(atan2(p2.y - p1.y, p2.x - p1.x)));

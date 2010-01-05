@@ -23,8 +23,8 @@ public:
 	bool mouseMoved(const OIS::MouseEvent &evt);
 	bool mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id); 
 	bool mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id);
-
-	void update(double timeSinceLastFrame);
+	void getInput();
+	bool update(double timeSinceLastFrame);
 	
 	void onButtonPress(BetaGUI::Button *ref)
 	{      

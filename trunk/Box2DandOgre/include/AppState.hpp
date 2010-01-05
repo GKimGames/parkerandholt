@@ -41,7 +41,7 @@ public:
 	virtual void exit(void) = 0;
 	virtual bool pause(void){return false;}
 	virtual void resume(void){};
-	virtual void update(double timeSinceLastFrame) = 0;
+	virtual bool update(double timeSinceLastFrame) = 0;
 
 protected:
 	AppState(void){};

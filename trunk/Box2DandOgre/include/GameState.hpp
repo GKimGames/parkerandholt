@@ -47,7 +47,7 @@ public:
 
 	void onLeftPressed(const OIS::MouseEvent &evt);
 
-	void update(double timeSinceLastFrame);
+	bool update(double timeSinceLastFrame);
 
 	void setBufferedMode();
 	void setUnbufferedMode();

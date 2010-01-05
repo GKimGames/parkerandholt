@@ -193,8 +193,8 @@ bool Box2DXMLLoader::Getb2FixtureDefAttributes(b2FixtureDef* fixtureDef, TiXmlEl
 						px += stringI;
 						py += stringI;
 
-						element->QueryFloatAttribute("px", &bodyVecs[i].y);
-						element->QueryFloatAttribute("px", &bodyVecs[i].y);
+						element->QueryFloatAttribute(px.c_str(), &bodyVecs[i].x);
+						element->QueryFloatAttribute(py.c_str(), &bodyVecs[i].y);
 					}
 					polyDef->Set(bodyVecs, pointCount);
 					fixtureDef->shape = polyDef;

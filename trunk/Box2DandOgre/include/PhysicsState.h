@@ -71,7 +71,7 @@ public:
 	bool mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
 
 
-	void update(double timeSinceLastFrame);
+	bool update(double timeSinceLastFrame);
 
 	void setBufferedMode();
 	void setUnbufferedMode();
