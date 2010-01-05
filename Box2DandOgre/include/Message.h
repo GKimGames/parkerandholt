@@ -15,6 +15,7 @@ All objects have the method HandleMessage
 #include <boost/any.hpp>
 #include <iostream>
 #include <math.h>
+#include "Ogre.h"
 
 typedef unsigned int GameObjectId;
 
@@ -101,5 +102,64 @@ inline bool operator < (const KGBMessage& t1, const KGBMessage& t2)
 	}
 }
 
+
+
+//=============================================================================
+//						StringToMessage
+//
+/// This returns an Ogre::Stringas a KGBMessageType
+static KGBMessageType StringToMessage(const Ogre::String str)
+{
+	if(str.compare("CHARACTER_MOVE_LEFT") == 0)
+	{
+		return CHARACTER_MOVE_LEFT;
+	}
+	else if(str.compare("CHARACTER_MOVE_RIGHT") == 0)
+	{
+		return CHARACTER_MOVE_RIGHT;
+	}
+	else if(str.compare("CHARACTER_JUMP") == 0)
+	{
+		return CHARACTER_JUMP;
+	}
+
+	return NO_MESSAGE;
+
+}
+
+
+//=============================================================================
+//						MessageToString
+//
+/// This returns a KGBMessageType as an Ogre::String
+static Ogre::String MessageToString(KGBMessageType message)
+{
+
+	switch(message)
+	{
+	case CHARACTER_MOVE_LEFT:
+		{
+			return Ogre::String("CHARACTER_MOVE_LEFT");
+		}
+	case CHARACTER_MOVE_RIGHT:
+		{
+			return Ogre::String("CHARACTER_MOVE_RIGHT");
+		}
+	case CHARACTER_JUMP:
+		{
+			return Ogre::String("CHARACTER_JUMP");
+		}
+	case GAME_SENSOR_ON:
+		{
+			return Ogre::String("GAME_SENSOR_ON");
+		}
+	case GAME_SENSOR_OFF:
+		{
+			return Ogre::String("GAME_SENSOR_OFF");
+		}
+	}
+
+	return Ogre::String("Unrecognized message type");
+}
 
 #endif

@@ -1,6 +1,4 @@
 #include "Parker.h"
-#include "ParkerStateOnGround.h"
-#include "ParkerStateInAir.h"
 
 //=============================================================================
 //								Constructor
@@ -74,7 +72,7 @@ void CharacterParker::CreatePhysics()
 	bd.position.Set(-5, 5);
 	bd.fixedRotation = true;
 	bd.type = b2_dynamicBody;
-	body_ = world_->CreateBody(&bd);
+	//body_ = world_->CreateBody(&bd);
 
 	b2PolygonShape bodyShapeDef;
 
@@ -88,7 +86,6 @@ void CharacterParker::CreatePhysics()
 	bodyShapeDef.Set(bodyVecs,4);
 	*/
 	bodyShapeDef.SetAsBox(boundingBoxWidth_/2, boundingBoxHeight_/2);
-	
 
 	b2FixtureDef fd;
 	fd.shape = &bodyShapeDef;
@@ -100,10 +97,11 @@ void CharacterParker::CreatePhysics()
 	fd.filter.maskBits = 0x0001;
 	fd.filter.categoryBits = 0x0100;
 
-	b2Fixture* f = body_->CreateFixture(&fd);
+	//body_->CreateFixture(&fd);
 
 	//body_->SetLinearDamping(linearDamping_);
 
+	/*
 	// Create the sensor for the feet
 	b2PolygonShape feetSensor_Def;
 	feetSensor_Def.m_vertexCount = 4;
@@ -117,6 +115,7 @@ void CharacterParker::CreatePhysics()
 	fd.userData = &gameObjectType_;
 
 	feetSensor_ = body_->CreateFixture(&fd);
+	*/
 
 	// Create the definition of the polygon for the wall jump sensor
 	
@@ -133,7 +132,7 @@ void CharacterParker::CreatePhysics()
 	fd.isSensor = true;
 	fd.userData = &gameObjectType_;
 
-	wallJumpSensor_ = body_->CreateFixture(&fd);
+	//wallJumpSensor_ = body_->CreateFixture(&fd);
 	
 
 	// Create the definition of the polygon for the shin sensor
@@ -170,6 +169,7 @@ void CharacterParker::CreatePhysics()
 	torsoSensor_ = body_->CreateFixture(&fd);
 	
 	body_->SetUserData(this); 
+
 }
 
 
@@ -221,7 +221,7 @@ bool CharacterParker::ReadXMLConfig()
 		return false;
 
 	hRoot = TiXmlHandle(pElem);
-
+	
 	TiXmlElement* meshNode = hRoot.FirstChild( "MeshInfo" ).FirstChild().Element();
 	meshName_ = meshNode->Attribute("name");
 	meshNode->QueryDoubleAttribute("translateX", &translateX);
@@ -266,6 +266,43 @@ bool CharacterParker::ReadXMLConfig()
 	// The force Parker can jump off the wall with
 	TiXmlElement* wallJumpNode = hRoot.FirstChild( "MovementInfo" ).FirstChildElement( "WallJumpInfo" ).Element();
 	wallJumpNode->QueryDoubleAttribute("jumpingForce", &wallJumpForce_);
+
+	TiXmlElement* element = hRoot.FirstChild( "Body" ).FirstChildElement( "BodyDef" ).Element();
+	TiXmlElement* fixtureElement = hRoot.FirstChild( "Body" ).FirstChildElement( "Fixture" ).Element();
+	TiXmlElement* fixtureElement2 = hRoot.FirstChild( "Body" ).FirstChildElement( "Fixture2" ).Element();
+	TiXmlElement* bodys = hRoot.FirstChildElement( "Bodys" ).ToElement();
+	
+	bodys = bodys->FirstChildElement();
+	
+	while(bodys != 0)
+	{
+		b2Body* b = 0;
+		Box2DXMLLoader::Createb2Body(b, world_, bodys);
+		bodys = bodys->NextSiblingElement();
+	}
+	
+	b2BodyDef bd;
+	Box2DXMLLoader::Getb2BodyDefAttributes(&bd, element);
+	body_ = world_->CreateBody(&bd);
+
+	b2FixtureDef fd;
+	Box2DXMLLoader::Getb2FixtureDefAttributes(&fd, fixtureElement);
+
+	// This effectively makes the mass of the body the correct amount
+	// by setting the density to the appropriate amount.
+	fd.density = (boundingBoxWidth_ * boundingBoxHeight_) * mass_;
+	fd.friction = DEFAULT_FRICTION;
+	fd.restitution = restitution_;
+	fd.filter.maskBits = 0x0001;
+	fd.filter.categoryBits = 0x0100;
+
+	body_->CreateFixture(&fd);
+
+	// Create the sensor for the feet
+	b2PolygonShape feetSensor_Def;
+	Box2DXMLLoader::Getb2FixtureDefAttributes(&fd, fixtureElement2);
+	fd.userData = &gameObjectType_;
+	feetSensor_ = body_->CreateFixture(&fd);
 
 	return true;
 }

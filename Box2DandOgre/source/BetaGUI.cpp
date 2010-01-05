@@ -75,11 +75,9 @@ namespace BetaGUI {
 
 		if (material!="")
 		{
-			MaterialPtr material = (MaterialPtr) Ogre::MaterialManager::getSingletonPtr()->getByName(name);
-			
-			if(material.isNull() == false)
+			//if(material.isNull() == false)
 			{
-				e->setMaterialName(name);
+				e->setMaterialName(material);
 			}
 		}
 		

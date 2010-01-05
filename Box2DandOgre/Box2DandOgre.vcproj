@@ -65,7 +65,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="OgreMain_d.lib OIS_d.lib CEGUIBase_d.lib OgreGUIRenderer_d.lib tinyxml.lib box2d_d.lib libboost_system-vc90-mt-gd-1_40.lib"
+				AdditionalDependencies="OgreMain_d.lib OIS_d.lib CEGUIBase_d.lib OgreGUIRenderer_d.lib tinyxmld_STL.lib box2d_d.lib libboost_system-vc90-mt-gd-1_40.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\Box2DG\Box2D\Build\VC8\Box2D\Debug;..\..\OgreSDK\lib;..\..\boost\stage\lib"
@@ -157,7 +157,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="OgreMain.lib OIS.lib CEGUIBase.lib OgreGUIRenderer.lib tinyxml.lib libboost_system-vc90-mt-1_40.lib box2d.lib"
+				AdditionalDependencies="OgreMain.lib OIS.lib CEGUIBase.lib OgreGUIRenderer.lib tinyxml_STL.lib libboost_system-vc90-mt-1_40.lib box2d.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\boost\lib;..\..\boost\stage\lib;..\..\OgreSDK\lib;..\..\Box2DG\Box2D\Build\VC8\Box2D\Release"
@@ -207,6 +207,10 @@
 			</File>
 			<File
 				RelativePath=".\source\BetaGUI.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\source\Box2DXMLLoader.cpp"
 				>
 			</File>
 			<File
@@ -277,6 +281,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\source\MapEditorState.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\source\MenuState.cpp"
 					>
 				</File>
@@ -308,6 +316,22 @@
 					RelativePath=".\source\Game Objects\Platform.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\source\PressureSwitch.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Ogre Snippets"
+				>
+				<File
+					RelativePath=".\source\DynamicLines.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\source\DynamicRenderable.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -321,6 +345,10 @@
 			</File>
 			<File
 				RelativePath=".\include\BetaGUI.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\Box2DXMLLoader.h"
 				>
 			</File>
 			<File
@@ -411,6 +439,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\MapEditorState.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\MenuState.hpp"
 					>
 				</File>
@@ -467,12 +499,52 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Ogre Snippets"
+				>
+				<File
+					RelativePath=".\include\DynamicLines.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\DynamicRenderable.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+		</Filter>
+		<Filter
+			Name="TinyXML"
+			>
+			<File
+				RelativePath=".\TinyXML\tinystr.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\TinyXML\tinystr.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TinyXML\tinyxml.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\TinyXML\tinyxml.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TinyXML\tinyxmlerror.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\TinyXML\tinyxmlparser.cpp"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

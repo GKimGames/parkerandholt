@@ -29,14 +29,22 @@ public:
 	void onButtonPress(BetaGUI::Button *ref)
 	{      
 		if (ref == enterGameButton_)
+		{
 			this->pushAppState(findByName("PhysicsState"));
+			delete betaGUI_;
+		}
+
+		if (ref == enterMapEditorButton_)
+		{
+			this->pushAppState(findByName("MapEditorState"));
+			delete betaGUI_;
+		}
 	}
 
 private:
 
 	BetaGUI::Button* enterGameButton_;
-
-	
+	BetaGUI::Button* enterMapEditorButton_;
 	bool m_bQuit;
 };
 

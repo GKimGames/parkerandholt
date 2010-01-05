@@ -10,8 +10,8 @@
 #define GAME_OBJECT_OGRE_BOX2D_H
 
 #include <Box2D/Box2D.h>
-
 #include "GameObjectOgre.h"
+#include "OgreB2DebugDraw.h"
 
 
 /// Structure to represent a contact point.
@@ -96,6 +96,8 @@ public:
 		body_->SetTransform(pos, body_->GetAngle());
 	}
 
+
+
 	void SetBodyAngle(float32 angle)
 	{
 		body_->SetTransform(body_->GetPosition(), angle);
@@ -129,6 +131,7 @@ public:
 			sceneNode_->rotate(Ogre::Vector3::UNIT_Z, Ogre::Radian(body_->GetAngle()));
 
 			prevAngle = body_->GetAngle();
+			
 		}
 
 		return true;

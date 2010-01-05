@@ -116,8 +116,9 @@ void AppStateManager::start(AppState* state)
 			}
 			
 			timeAccum += timeSinceLastFrame;
+			GAMEFRAMEWORK->SetRealTimeSinceLastFrame(timeSinceLastFrame);
 			
-			// if the timeAccum is corrupted and somehow is below 0
+			// if the timeAccum is corrupted and somehow is below -0.1
 			// we will set it back to zero
 			if(timeAccum < -0.1)
 			{

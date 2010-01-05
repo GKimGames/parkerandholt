@@ -10,6 +10,7 @@
 
 #include <OgreMeshManager.h>
 #include <OgreMovablePlane.h>
+#include "OgrePlatform.h"
 
 #include "GameFramework.h"
 
