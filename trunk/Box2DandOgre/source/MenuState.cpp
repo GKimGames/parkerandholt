@@ -25,14 +25,14 @@ void MenuState::enter()
 	GameFramework::getSingletonPtr()->mouse_->setEventCallback(this);
 
 	betaGUI_ = new BetaGUI::GUI("MgOpen", 16);
-	betaGUI_->createMousePointer(Vector2(32,32), "bgui.pointer");
-
-	BetaGUI::Window* window = betaGUI_->createWindow(Vector4(100,100,300,100), "bgui.window", BetaGUI::RESIZE_AND_MOVE, "window");
 	
-	window->createStaticText(Vector4(4,22,198,40), "Type in a number and I'll double it!");
-	enterGameButton_ = window->createButton(Vector4(108,50,104,24), "bgui.button", "Go on then!", BetaGUI::Callback(this));
-	BetaGUI::TextInput* mAmount = window->createTextInput(Vector4(4,50,104,24), "bgui.textinput", "1", 3);
-
+	betaGUI_->createMousePointer(Vector2(32,32), "bgui.pointer");
+	
+	BetaGUI::Window* window = betaGUI_->createWindow(Vector4(100,100,300,100), "bgui.window", BetaGUI::RESIZE_AND_MOVE, "Parker and Holt");
+	
+	enterGameButton_ = window->createButton(Vector4(112,50,104,24), "bgui.button", "Game", BetaGUI::Callback(this));
+	enterMapEditorButton_ = window->createButton(Vector4(4,50,104,24), "bgui.button", "Map Editor", BetaGUI::Callback(this));
+	
 	m_bQuit = false;
 	
 	createScene();
@@ -89,6 +89,14 @@ bool MenuState::keyPressed(const OIS::KeyEvent &keyEventRef)
 	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_RETURN))
 	{
 		this->pushAppState(findByName("PhysicsState"));
+		delete betaGUI_;
+		return true;
+	}
+
+	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_RSHIFT))
+	{
+		this->pushAppState(findByName("MapEditorState"));
+		delete betaGUI_;
 		return true;
 	}
 

@@ -26,28 +26,19 @@ typedef unsigned int GameObjectId;
 /// Send the message immediately with no delay.
 const double SEND_IMMEDIATELY = 0.0;
 
-/// Send the message to all Entitys.
+/// Send the message to all Objects.
 const unsigned int SEND_TO_ALL = 0;
 
-///// An Enum for Messages.
-//enum KGBMessageType
-//{
-//	MESSAGE_NULL,
-//	NO_MESSAGE,
-//	CHARACTER_MOVE_LEFT,
-//	CHARACTER_MOVE_RIGHT,
-//	CHARACTER_JUMP,
-//	GAME_SENSOR_ON,
-//	GAME_SENSOR_OFF
-//}; 
 
 class KGBMessageDispatcher : public Ogre::Singleton<KGBMessageDispatcher>
 {
 public:
 
+
+
 	KGBMessageDispatcher();
 
-	// Send a message to either all or one other Entity 
+	// Send a message to either all or one other Object 
 	void DispatchMessage(double			pDelay,
 						 GameObjectId	pSender,
 						 GameObjectId	pReceiver,
@@ -62,7 +53,6 @@ public:
 	void MessageLoggingOn()  { logMessages_ = true; }
 	void MessageLoggingOff() { logMessages_ = false; }
 
-	Ogre::String MessageToString(KGBMessageType message);
 	Ogre::String GetObjectName(GameObjectId id);
 
 private:  
@@ -80,7 +70,7 @@ private:
 	void Discharge(const KGBMessage& pMsg);
 
 	// This method is utilized by DispatchMessage or DispatchDelayedMessages to
-	// send messages to either all or one Entity. This fucntion logs the
+	// send messages to either all or one Entity. This function logs the
 	// message.
 	void DischargeWithLog(const KGBMessage& pMsg);
 

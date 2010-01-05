@@ -14,6 +14,7 @@
 #include "MenuState.hpp"
 #include "GameState.hpp"
 #include "PhysicsState.h"
+#include "MapEditorState.h"
 #include "MessageDispatcher.h"
 
 

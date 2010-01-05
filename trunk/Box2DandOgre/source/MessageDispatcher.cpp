@@ -61,15 +61,17 @@ void KGBMessageDispatcher::DischargeWithLog(const KGBMessage& pMsg)
 	bool messageOk = false;
 
 
-	Ogre::String s = "\nInstant KGBMessage sent to: ";
-
+	Ogre::String s = "Message: ";
+	s += MessageToString(pMsg.messageType);
+	s += " to ";
 	if(pMsg.receiver == SEND_TO_ALL)
 	{
 		s += "ALL_OBJECTS";
 		s += " from ";
 		s += GetObjectName(pMsg.sender);
-		
+
 		DischargeToAll(pMsg);
+
 	}
 	else
 	{
@@ -167,7 +169,8 @@ void KGBMessageDispatcher:: DispatchMessage(double			pDelay,
 			s += GetObjectName(message.receiver);
 			s += " from ";
 			s += GetObjectName(message.sender);
-
+			s += ". Message: ";
+			s += MessageToString(message.messageType);
 			DEBUG_LOG(s);
 		}
 	}
@@ -227,31 +230,6 @@ Ogre::String KGBMessageDispatcher::GetObjectName(GameObjectId id)
 
 
 
-//=============================================================================
-//						MessageToString
-//
-/// This returns a KGBMessageType as an Ogre::String
-Ogre::String KGBMessageDispatcher::MessageToString(KGBMessageType message)
-{
-
-	switch(message)
-	{
-	case CHARACTER_MOVE_LEFT:
-		{
-			return Ogre::String("CHARACTER_MOVE_LEFT");
-		}
-	case CHARACTER_MOVE_RIGHT:
-		{
-			return Ogre::String("CHARACTER_MOVE_RIGHT");
-		}
-	case CHARACTER_JUMP:
-		{
-			return Ogre::String("CHARACTER_JUMP");
-		}
-	}
-
-	return Ogre::String("Unrecognized message type");
-}
 
 
 

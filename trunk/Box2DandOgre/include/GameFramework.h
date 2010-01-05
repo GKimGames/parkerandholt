@@ -71,6 +71,9 @@ public:
 	const double GetTimeSinceLastFrame(){ return timeSinceLastFrame_; }
 	void SetTimeSinceLastFrame(double timeSinceLastFrame){ timeSinceLastFrame_ = timeSinceLastFrame; }
 
+	const double GetRealTimeSinceLastFrame(){ return realTimeSinceLastFrame_ ; }
+	void SetRealTimeSinceLastFrame(double timeSinceLastFrame){ realTimeSinceLastFrame_ = timeSinceLastFrame; }
+
 	Ogre::Root*					root_;
 	Ogre::RenderWindow*			renderWindow_;
 	Ogre::Viewport*				viewport_;
@@ -94,6 +97,7 @@ private:
 	Ogre::Overlay*			infoOverlay_;
 	int						numScreenShots_;
 	double					timeSinceLastFrame_;
+	double					realTimeSinceLastFrame_;
 };
 
 

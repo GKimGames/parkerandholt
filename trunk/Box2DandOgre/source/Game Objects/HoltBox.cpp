@@ -23,7 +23,7 @@ HoltBox::HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center)
 	
 	boxWidth_ = 0.6;
 
-	ModifyBoxWidth(0.1);
+	ModifyBoxWidth(-0.1);
 
 	CreateBox2DBox();
 	

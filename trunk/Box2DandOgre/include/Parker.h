@@ -14,6 +14,8 @@
 #include "ParkerStateInAir.h"
 #include "PhysicsState.h"
 
+#include "Box2DXMLLoader.h"
+
 /// Parkers class
 class CharacterParker : public Character, public b2RayCastCallback
 {
