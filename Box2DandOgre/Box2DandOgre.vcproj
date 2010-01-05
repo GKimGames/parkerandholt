@@ -98,7 +98,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Copying exe to samples bin directory ..."
-				CommandLine="copy &quot;$(OutDir)\$(TargetFileName)&quot; &quot;..\..\OgreSDK\Bin\$(ConfigurationName)&quot;"
+				CommandLine="copyDebug.bat"
 			/>
 		</Configuration>
 		<Configuration
