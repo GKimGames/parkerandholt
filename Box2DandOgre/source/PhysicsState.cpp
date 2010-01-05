@@ -429,20 +429,20 @@ void PhysicsState::getInput()
 
 
 /// Main Update looped for a level
-void PhysicsState::update(double timeSinceLastFrame)
+bool PhysicsState::update(double timeSinceLastFrame)
 {
 	static double time = 0;
 
 	if(m_bQuit == true)
 	{
 		this->popAppState();
-		return;
+		return false;
 	}
 
 	if(pause_ == true)
 	{
 		pause();
-		return;
+		return false;
 	}
 
 	time += timeSinceLastFrame;
@@ -484,7 +484,7 @@ void PhysicsState::update(double timeSinceLastFrame)
 		
 	}
 
-	
+	return true;
 
 }
 

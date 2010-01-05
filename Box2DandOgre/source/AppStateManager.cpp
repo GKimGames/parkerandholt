@@ -131,14 +131,15 @@ void AppStateManager::start(AppState* state)
 				GAMEFRAMEWORK->keyboard_->capture();
 				GAMEFRAMEWORK->mouse_->capture();
 
-				m_ActiveStateStack.back()->update(timeStep);
+				if(m_ActiveStateStack.back()->update(timeStep))
+				{
+					Dispatch->DispatchDelayedMessages();
 
-				Dispatch->DispatchDelayedMessages();
+					GAMEFRAMEWORK->UpdateOgre(timeStep);
+					GAMEFRAMEWORK->root_->renderOneFrame();
 
-				GAMEFRAMEWORK->UpdateOgre(timeStep);
-				GAMEFRAMEWORK->root_->renderOneFrame();
-
-				timeAccum -= timeStep;
+					timeAccum -= timeStep;
+				}
 			}
 			
 			/*

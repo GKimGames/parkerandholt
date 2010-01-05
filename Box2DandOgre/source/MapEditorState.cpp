@@ -17,7 +17,8 @@ void MapEditorState::enter()
 	GAMEFRAMEWORK->log_->logMessage("Entering MapEditorState...");
 	
 	// Load XML 
-	TiXmlDocument configXML_( "..\\MapEditorSettings.xml" );
+	//TiXmlDocument configXML_( "..\\MapEditorSettings.xml" );
+	TiXmlDocument configXML_( "Z:\\Parker and Holt\\OgreSDK\\bin\\MapEditorSettings.xml");
 	configXML_.LoadFile();
 	TiXmlHandle hDoc(&configXML_);
 
@@ -116,6 +117,9 @@ void MapEditorState::enter()
 	dynamicLines_->update();
 	linesNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode("lines");
 	linesNode_->attachObject(dynamicLines_);
+
+	betaGUI_ = new BetaGUI::GUI("MgOpen", 16);
+	betaGUI_->createMousePointer(Vector2(32,32), "bgui.pointer");
 }
 
 
@@ -153,6 +157,7 @@ void MapEditorState::exit()
 
 	GameObject::objectList.clear();
 	
+	delete betaGUI_;
 
 	if(sceneManager_)
 	{
@@ -309,14 +314,17 @@ bool MapEditorState::keyReleased(const OIS::KeyEvent &keyEventRef)
 
 	if(keyEventRef.key == OIS::KC_EQUALS || keyEventRef.key == OIS::KC_ADD)
 	{
-		linesNodeScale_++;
+		linesNodeScale_ = linesNodeScale_ << 1;
 		linesNode_->setScale(linesNodeScale_,linesNodeScale_,linesNodeScale_);
 	}
 
 	if(keyEventRef.key == OIS::KC_MINUS || keyEventRef.key == OIS::KC_SUBTRACT)
 	{
-		linesNodeScale_--;
-		linesNode_->setScale(linesNodeScale_,linesNodeScale_,linesNodeScale_);
+		if(linesNodeScale_ != 1)
+		{
+			linesNodeScale_ = linesNodeScale_ >> 1;
+			linesNode_->setScale(linesNodeScale_,linesNodeScale_,linesNodeScale_);
+		}
 	}
 
 	return true;
@@ -326,8 +334,19 @@ bool MapEditorState::keyReleased(const OIS::KeyEvent &keyEventRef)
 
 bool MapEditorState::mouseMoved(const OIS::MouseEvent &evt)
 {
+	static int x = 0;
+	static int y = 0;
 
-	//myPicking_->MouseMoved(evt);
+	const OIS::MouseState ms = GameFramework::getSingletonPtr()->mouse_->getMouseState();
+
+	// Mouse injection must be absolute position than relative.
+	x += ms.X.rel;
+	y += ms.Y.rel;
+
+	if (ms.buttons == 1)
+		betaGUI_->injectMouse(x,y, true);  // LMB is down.
+	else
+		betaGUI_->injectMouse(x,y, false); // LMB is not down.
 
 	return true;
 }
@@ -335,7 +354,6 @@ bool MapEditorState::mouseMoved(const OIS::MouseEvent &evt)
 
 bool MapEditorState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
-	//myPicking_->MousePressed(evt, id);
 
 	return true;
 }
@@ -344,7 +362,6 @@ bool MapEditorState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID
 
 bool MapEditorState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
-	//myPicking_->MouseReleased(evt, id);
 
 	return true;
 }
@@ -421,14 +438,14 @@ void MapEditorState::getInput()
 
 
 /// Main Update looped for a level
-void MapEditorState::update(double timeSinceLastFrame)
+bool MapEditorState::update(double timeSinceLastFrame)
 {
 	static double time = 0;
 
 	if(pause_ == true)
 	{
 		pause();
-		return;
+		return false;
 	}
 
 	time += timeSinceLastFrame;
@@ -446,6 +463,8 @@ void MapEditorState::update(double timeSinceLastFrame)
 	}
 
 	GameObject::UpdateObjectList(timeStep);	
+
+	return true;
 }
 
 void MapEditorState::setBufferedMode()
@@ -473,4 +492,3 @@ void MapEditorState::EndContact(b2Contact* contact)
 {
 	
 }
-

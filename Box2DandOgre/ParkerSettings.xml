@@ -21,4 +21,22 @@
 	<WallJumpInfo	jumpingForce="360"/>
     <AirInfo     		airForce="10000"         		maximumVelocity="6"  />
   </MovementInfo>
+  <Bodys>
+    <Body>
+      <BodyDef bodyType="dynamicBody" positionY="10"/>
+      <Fixture shape="box" boxWidth="3" boxHeight="3" density="15"/>
+    </Body>
+    <Body>
+      <BodyDef bodyType="dynamicBody" positionX="3" positionY="10"/>
+      <Fixture shape="box" boxWidth="3" boxHeight="3" density="15"/>
+    </Body>
+    <Body>
+      <BodyDef bodyType="dynamicBody" positionX="-3" positionY="10"/>
+      <Fixture shape="circle" radius="1.5" density="15"/>
+    </Body>
+    <Body>
+      <BodyDef bodyType="dynamicBody" positionX="-3" positionY="10"/>
+      <Fixture shape="polygon" pointCount="3" px0="0" py0="0" px1="2" py1="0" px2="1" py2="2" density="15"/>
+    </Body>
+  </Bodys>
 </Character>

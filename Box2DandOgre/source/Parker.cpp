@@ -72,19 +72,19 @@ void CharacterParker::CreatePhysics()
 	bd.position.Set(-5, 5);
 	bd.fixedRotation = true;
 	bd.type = b2_dynamicBody;
-	//body_ = world_->CreateBody(&bd);
+	body_ = world_->CreateBody(&bd);
 
 	b2PolygonShape bodyShapeDef;
 
 	// The extents are the half-widths of the box.
-	/*
+	
 	b2Vec2 bodyVecs[4];
 	bodyVecs[0].Set(-boundingBoxWidth_/2, -boundingBoxHeight_/4);
 	bodyVecs[1].Set(boundingBoxWidth_/2, -boundingBoxHeight_/4);
 	bodyVecs[2].Set(boundingBoxWidth_/2, boundingBoxHeight_/2);
 	bodyVecs[3].Set(-boundingBoxWidth_/2, boundingBoxHeight_/2);
 	bodyShapeDef.Set(bodyVecs,4);
-	*/
+	
 	bodyShapeDef.SetAsBox(boundingBoxWidth_/2, boundingBoxHeight_/2);
 
 	b2FixtureDef fd;
@@ -97,11 +97,11 @@ void CharacterParker::CreatePhysics()
 	fd.filter.maskBits = 0x0001;
 	fd.filter.categoryBits = 0x0100;
 
-	//body_->CreateFixture(&fd);
+	body_->CreateFixture(&fd);
 
 	//body_->SetLinearDamping(linearDamping_);
 
-	/*
+	
 	// Create the sensor for the feet
 	b2PolygonShape feetSensor_Def;
 	feetSensor_Def.m_vertexCount = 4;
@@ -115,7 +115,7 @@ void CharacterParker::CreatePhysics()
 	fd.userData = &gameObjectType_;
 
 	feetSensor_ = body_->CreateFixture(&fd);
-	*/
+	
 
 	// Create the definition of the polygon for the wall jump sensor
 	
@@ -207,7 +207,7 @@ void CharacterParker::CreateGraphics()
 /// Read the XML config file for Parker.
 bool CharacterParker::ReadXMLConfig()
 {
-	TiXmlDocument configXML_( "..\\ParkerSettings.xml" );
+	TiXmlDocument configXML_( "Z:\\Parker and Holt\\OgreSDK\\bin\\ParkerSettings.xml" );
 	configXML_.LoadFile();
 	TiXmlHandle hDoc(&configXML_);
 
@@ -267,9 +267,6 @@ bool CharacterParker::ReadXMLConfig()
 	TiXmlElement* wallJumpNode = hRoot.FirstChild( "MovementInfo" ).FirstChildElement( "WallJumpInfo" ).Element();
 	wallJumpNode->QueryDoubleAttribute("jumpingForce", &wallJumpForce_);
 
-	TiXmlElement* element = hRoot.FirstChild( "Body" ).FirstChildElement( "BodyDef" ).Element();
-	TiXmlElement* fixtureElement = hRoot.FirstChild( "Body" ).FirstChildElement( "Fixture" ).Element();
-	TiXmlElement* fixtureElement2 = hRoot.FirstChild( "Body" ).FirstChildElement( "Fixture2" ).Element();
 	TiXmlElement* bodys = hRoot.FirstChildElement( "Bodys" ).ToElement();
 	
 	bodys = bodys->FirstChildElement();
@@ -280,29 +277,7 @@ bool CharacterParker::ReadXMLConfig()
 		Box2DXMLLoader::Createb2Body(b, world_, bodys);
 		bodys = bodys->NextSiblingElement();
 	}
-	
-	b2BodyDef bd;
-	Box2DXMLLoader::Getb2BodyDefAttributes(&bd, element);
-	body_ = world_->CreateBody(&bd);
 
-	b2FixtureDef fd;
-	Box2DXMLLoader::Getb2FixtureDefAttributes(&fd, fixtureElement);
-
-	// This effectively makes the mass of the body the correct amount
-	// by setting the density to the appropriate amount.
-	fd.density = (boundingBoxWidth_ * boundingBoxHeight_) * mass_;
-	fd.friction = DEFAULT_FRICTION;
-	fd.restitution = restitution_;
-	fd.filter.maskBits = 0x0001;
-	fd.filter.categoryBits = 0x0100;
-
-	body_->CreateFixture(&fd);
-
-	// Create the sensor for the feet
-	b2PolygonShape feetSensor_Def;
-	Box2DXMLLoader::Getb2FixtureDefAttributes(&fd, fixtureElement2);
-	fd.userData = &gameObjectType_;
-	feetSensor_ = body_->CreateFixture(&fd);
 
 	return true;
 }

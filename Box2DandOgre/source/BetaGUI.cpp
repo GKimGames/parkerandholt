@@ -22,6 +22,12 @@ namespace BetaGUI {
 		for(uint i=0;i < WN.size();i++)
 			delete WN[i];
 		WN.clear();
+
+		OverlayManager::getSingleton().destroy("BetaGUI");
+		OverlayManager::getSingleton().destroy("BetaGUI.MP");		
+		OverlayManager::getSingleton().destroyOverlayElement(mMP);
+
+
 	}
 	
 	bool GUI::injectMouse(uint x, uint y, bool LMB) {
