@@ -29,6 +29,7 @@ public:
 
 private:
 	AppStateManager*	appStateManager_;
+	bool				initialized_;
 };
 
 

@@ -1,24 +1,32 @@
 #include "MapEditorState.h"
+#include "MyGUI.h"
+#include "GameObjectFactory.h"
+#include <direct.h> 
 
 using namespace Ogre;
 
+//=============================================================================
+//							MapEditorState
+//
 MapEditorState::MapEditorState()
 {
-	m_MoveSpeed		= 0.1;
+	m_MoveSpeed		= 1.0;
 	currentObject_	= 0;
 }
 
-
+//=============================================================================
+//							enter
+//
 void MapEditorState::enter()
 {
-	gameObject_ = new GameObject();
-	gameObject_->SetName("MapEditorState");
 
 	GAMEFRAMEWORK->log_->logMessage("Entering MapEditorState...");
-	
+	char CurrentPath[_MAX_PATH];
+	_getcwd(CurrentPath, _MAX_PATH);
+
+ 
 	// Load XML 
-	//TiXmlDocument configXML_( "..\\MapEditorSettings.xml" );
-	TiXmlDocument configXML_( "Z:\\Parker and Holt\\OgreSDK\\bin\\MapEditorSettings.xml");
+	TiXmlDocument configXML_( "..\\MapEditorSettings.xml");
 	configXML_.LoadFile();
 	TiXmlHandle hDoc(&configXML_);
 
@@ -33,7 +41,7 @@ void MapEditorState::enter()
 
 	hRoot = TiXmlHandle(pElem);
 	
-	TiXmlElement* cameraElement = hRoot.FirstChild( "Camera" ).FirstChild().Element();
+	TiXmlElement* cameraElement = hRoot.FirstChild( "Camera" ).FirstChild( "InitialPosition").Element();
 	Vector3 camPos;
 	double x,y,z = 0;
 
@@ -44,8 +52,17 @@ void MapEditorState::enter()
 		cameraElement->QueryDoubleAttribute("z", &z);
 	}
 
+	//gameObject_ = new GameObject();
+	//gameObject_->SetName("MapEditorState");
+
+	TiXmlElement* objectElement = hRoot.FirstChild( "GameObject" ).Element();
+	gameObject_ = GAMEFRAMEWORK->gameObjectFactory->CreateGameObject("GameObject", objectElement);
+	
 	sceneManager_ = GAMEFRAMEWORK->root_->createSceneManager(ST_GENERIC, "MapEditorSceneMgr");
-	sceneManager_->setAmbientLight(Ogre::ColourValue(0.7, 0.7, 0.7));		
+	sceneManager_->setAmbientLight(Ogre::ColourValue(0.7, 0.7, 0.7));	
+
+	GAMEFRAMEWORK->gameObjectFactory->sceneManager = sceneManager_;
+	GAMEFRAMEWORK->sceneManager = sceneManager_;
 
 	camera_ = sceneManager_->createCamera("MapEditorCamera");
 	camera_->setPosition(Vector3(x, y, z));
@@ -118,12 +135,19 @@ void MapEditorState::enter()
 	linesNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode("lines");
 	linesNode_->attachObject(dynamicLines_);
 
-	betaGUI_ = new BetaGUI::GUI("MgOpen", 16);
-	betaGUI_->createMousePointer(Vector2(32,32), "bgui.pointer");
+
+	myGUI_ = new MyGUI::Gui();
+	myGUI_->initialise(GAMEFRAMEWORK->renderWindow_);
+	
+	MyGUI::ButtonPtr button = myGUI_->createWidget<MyGUI::Button>("Button", 10, 10, 300, 26, MyGUI::Align::Default, "Main");
+	button->setCaption("exit");
+
 }
 
 
-
+//=============================================================================
+//							pause
+//
 bool MapEditorState::pause()
 {
 	GAMEFRAMEWORK->log_->logMessage("Pausing MapEditorState...");
@@ -133,7 +157,9 @@ bool MapEditorState::pause()
 	return true;
 }
 
-
+//=============================================================================
+//							resume
+//
 void MapEditorState::resume()
 {
 	GAMEFRAMEWORK->log_->logMessage("Resuming MapEditorState...");
@@ -145,9 +171,14 @@ void MapEditorState::resume()
 }
 
 
-
+//=============================================================================
+//							exit
+//
 void MapEditorState::exit()
 {
+
+	myGUI_->shutdown();
+	delete myGUI_;
 
 	delete world;
 
@@ -156,8 +187,7 @@ void MapEditorState::exit()
 	sceneManager_->destroyCamera(camera_);
 
 	GameObject::objectList.clear();
-	
-	delete betaGUI_;
+
 
 	if(sceneManager_)
 	{
@@ -167,7 +197,9 @@ void MapEditorState::exit()
 }
 
 
-
+//=============================================================================
+//							createPhysics
+//
 void MapEditorState::createPhysics()
 {
 	// Define the size of the world. Simulation will still work
@@ -223,9 +255,32 @@ void MapEditorState::createPhysics()
 	world->Step(timeStep,10,10);
 	//myPicking_ = new MousePicking(sceneManager_, world, camera_, pickingPlane);
 
+	TiXmlDocument configXML_( "..\\MapEditorSettings.xml");
+	configXML_.LoadFile();
+	TiXmlHandle hDoc(&configXML_);
+
+	TiXmlElement* pElem;
+	TiXmlHandle hRoot(0);
+
+	pElem = hDoc.FirstChildElement().Element();
+
+	// The XML file didn't load, we can't do anything.
+	if (!pElem) 
+		return;
+
+	hRoot = TiXmlHandle(pElem);
+
+	TiXmlElement* platformElement = hRoot.FirstChild( "Platform" ).Element();
+	GAMEFRAMEWORK->gameObjectFactory->CreateGameObject("Platform", platformElement);
+
+	TiXmlElement* objectOgreElement = hRoot.FirstChild( "ObjectOgre" ).Element();
+	GAMEFRAMEWORK->gameObjectFactory->CreateGameObject("ObjectOgre", objectOgreElement);
+
 }
 
-
+//=============================================================================
+//							CreateBox
+//
 void MapEditorState::CreateBox()
 {
 	HoltBox* bb = new HoltBox(sceneManager_, b2Vec2(-0.0f, 15.0f));
@@ -236,7 +291,9 @@ void MapEditorState::CreateBox()
 	}
 }
 
-
+//=============================================================================
+//							createScene
+//
 void MapEditorState::createScene()
 {
 
@@ -287,9 +344,13 @@ void MapEditorState::createScene()
 }
 
 
-
+//=============================================================================
+//							keyPressed
+//
 bool MapEditorState::keyPressed(const OIS::KeyEvent &keyEventRef)
 {
+	myGUI_->injectKeyPress(keyEventRef);
+	
 	if(keyEventRef.key == OIS::KC_P)
 	{
 		pause_ = true;
@@ -302,15 +363,22 @@ bool MapEditorState::keyPressed(const OIS::KeyEvent &keyEventRef)
 		return true;
 	}
 
+	
 
+	GameFramework::getSingletonPtr()->KeyPressed(keyEventRef);
 
 	return true;
 }
 
-
+//=============================================================================
+//							keyReleased
+//
 bool MapEditorState::keyReleased(const OIS::KeyEvent &keyEventRef)
 {
 	GAMEFRAMEWORK->KeyReleased(keyEventRef);
+
+	myGUI_->injectKeyPress(keyEventRef);
+	
 
 	if(keyEventRef.key == OIS::KC_EQUALS || keyEventRef.key == OIS::KC_ADD)
 	{
@@ -331,7 +399,9 @@ bool MapEditorState::keyReleased(const OIS::KeyEvent &keyEventRef)
 }
 
 
-
+//=============================================================================
+//							mouseMoved
+//
 bool MapEditorState::mouseMoved(const OIS::MouseEvent &evt)
 {
 	static int x = 0;
@@ -339,38 +409,36 @@ bool MapEditorState::mouseMoved(const OIS::MouseEvent &evt)
 
 	const OIS::MouseState ms = GameFramework::getSingletonPtr()->mouse_->getMouseState();
 
-	// Mouse injection must be absolute position than relative.
-	x += ms.X.rel;
-	y += ms.Y.rel;
-
-	if (ms.buttons == 1)
-		betaGUI_->injectMouse(x,y, true);  // LMB is down.
-	else
-		betaGUI_->injectMouse(x,y, false); // LMB is not down.
+	myGUI_->injectMouseMove(evt);
 
 	return true;
 }
 
-
+//=============================================================================
+//							mousePressed
+//
 bool MapEditorState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
 
+	myGUI_->injectMousePress(evt,id);
+	
 	return true;
 }
 
 
-
+//=============================================================================
+//							mouseReleased
+//
 bool MapEditorState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
+	myGUI_->injectMouseRelease(evt,id);
 
 	return true;
 }
 
-
-
-
-
-
+//=============================================================================
+//							moveCamera
+//
 void MapEditorState::moveCamera()
 {
 	if(GAMEFRAMEWORK->keyboard_->isKeyDown(OIS::KC_LSHIFT)) 
@@ -380,7 +448,9 @@ void MapEditorState::moveCamera()
 }
 
 
-
+//=============================================================================
+//							getInput
+//
 void MapEditorState::getInput()
 {
 
@@ -437,6 +507,9 @@ void MapEditorState::getInput()
 }
 
 
+//=============================================================================
+//							update
+//
 /// Main Update looped for a level
 bool MapEditorState::update(double timeSinceLastFrame)
 {
@@ -475,6 +548,10 @@ void MapEditorState::setUnbufferedMode()
 {
 }
 
+
+//=============================================================================
+//							BeginContact
+//
 /// Called when two fixtures begin to touch.
 /// This calls the BeginContact method of an GameObjectOgreBox2D if the user data 
 /// for one the touching fixtures is there. The called BeginContact method passes
@@ -484,6 +561,9 @@ void MapEditorState::BeginContact(b2Contact* contact)
 
 }
 
+//=============================================================================
+//							EndContact
+//
 /// Called when two fixtures cease to touch.
 /// This calls the EndContact method of an GameObjectOgreBox2D if the user data 
 /// for one the touching fixtures is there. The called EndContact method passes

@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\boost\boost;..\..\boost;..\..\Box2DG\Box2D;include\GameObject;include;..\..\OgreSDK\include;..\..\OgreSDK\include\TinyXML;..\..\OgreSDK\include\CEGUI;..\..\OgreSDK\include\OIS;..\..\OgreSDK\samples\include"
+				AdditionalIncludeDirectories="..\..\MyGUI2.2.3_source\MyGUIEngine\include;..\..\boost\boost;..\..\boost;..\..\Box2DG\Box2D;include\GameObject;include;..\..\OgreSDK\include;..\..\OgreSDK\include\TinyXML;..\..\OgreSDK\include\CEGUI;..\..\OgreSDK\include\OIS;..\..\OgreSDK\samples\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
@@ -65,10 +65,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="OgreMain_d.lib OIS_d.lib CEGUIBase_d.lib OgreGUIRenderer_d.lib tinyxmld_STL.lib box2d_d.lib libboost_system-vc90-mt-gd-1_40.lib"
+				AdditionalDependencies="OgreMain_d.lib OIS_d.lib CEGUIBase_d.lib OgreGUIRenderer_d.lib tinyxmld_STL.lib MyGUI_d.lib box2d_d.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\Box2DG\Box2D\Build\VC8\Box2D\Debug;..\..\OgreSDK\lib;..\..\boost\stage\lib"
+				AdditionalLibraryDirectories="..\..\MyGUI2.2.3_source\MyGUIEngine\lib\Debug\;..\..\Box2DG\Box2D\Build\VC8\Box2D\Debug;..\..\OgreSDK\lib;..\..\boost\stage\lib"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
@@ -131,7 +131,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\..\boost\boost;include\GameObject;include;..\..\Box2DG\Box2D;..\..\OgreSDK\include;..\..\OgreSDK\include\TinyXML;..\..\OgreSDK\include\CEGUI;..\..\OgreSDK\include\OIS;..\..\OgreSDK\samples\include;..\..\boost"
+				AdditionalIncludeDirectories="..\..\boost\boost;include\GameObject;include;..\..\Box2DG\Box2D;..\..\OgreSDK\include;..\..\OgreSDK\include\TinyXML;..\..\OgreSDK\include\CEGUI;..\..\OgreSDK\include\OIS;..\..\OgreSDK\samples\include;..\..\boost;..\..\MyGUI2.2.3_source\MyGUIEngine\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -157,10 +157,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="OgreMain.lib OIS.lib CEGUIBase.lib OgreGUIRenderer.lib tinyxml_STL.lib libboost_system-vc90-mt-1_40.lib box2d.lib"
+				AdditionalDependencies="OgreMain.lib OIS.lib CEGUIBase.lib OgreGUIRenderer.lib tinyxml_STL.lib box2d.lib MyGUI.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\boost\lib;..\..\boost\stage\lib;..\..\OgreSDK\lib;..\..\Box2DG\Box2D\Build\VC8\Box2D\Release"
+				AdditionalLibraryDirectories="..\..\MyGUI2.2.3_source\MyGUIEngine\lib\Release;..\..\boost\lib;..\..\boost\stage\lib;..\..\OgreSDK\lib;..\..\Box2DG\Box2D\Build\VC8\Box2D\Release"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -206,10 +206,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\source\BetaGUI.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\source\Box2DXMLLoader.cpp"
 				>
 			</File>
@@ -227,6 +223,10 @@
 			</File>
 			<File
 				RelativePath=".\source\OgreGpuCommandBufferFlush.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\sour\OgreXMLLoader.cpp"
 				>
 			</File>
 			<Filter
@@ -268,6 +268,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\source\ParkerStateLedgeGrab.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\source\ParkerStateOnGround.cpp"
 						>
 					</File>
@@ -298,6 +302,18 @@
 				>
 				<File
 					RelativePath=".\source\Game Objects\GameObject.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\source\GameObjectFactory.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\source\GameObjectOgre.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\source\GameObjectOgreBox2D.cpp"
 					>
 				</File>
 				<File
@@ -344,10 +360,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\BetaGUI.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\Box2DXMLLoader.h"
 				>
 			</File>
@@ -361,6 +373,10 @@
 			</File>
 			<File
 				RelativePath=".\include\OgreGpuCommandBufferFlush.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\OgreXMLLoader.h"
 				>
 			</File>
 			<Filter
@@ -384,6 +400,10 @@
 				</File>
 				<File
 					RelativePath=".\include\HelperFunctions.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\ManualObjectHelper.h"
 					>
 				</File>
 				<File
@@ -419,6 +439,10 @@
 					</File>
 					<File
 						RelativePath=".\include\ParkerStateInAir.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\ParkerStateLedgeGrab.h"
 						>
 					</File>
 					<File
@@ -463,6 +487,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\GameObjectFactory.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\GameObject\GameObjectOgre.h"
 					>
 				</File>
@@ -498,6 +526,22 @@
 					RelativePath=".\include\Switch.h"
 					>
 				</File>
+				<Filter
+					Name="Object Creators"
+					>
+					<File
+						RelativePath=".\include\GameObjectCreator.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\ObjectOgreCreator.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\PlatformCreator.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="Ogre Snippets"
@@ -543,6 +587,26 @@
 			</File>
 			<File
 				RelativePath=".\TinyXML\tinyxmlparser.cpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="XML Configs"
+			>
+			<File
+				RelativePath=".\Boxes.xml"
+				>
+			</File>
+			<File
+				RelativePath=".\CharacterSettings.xml"
+				>
+			</File>
+			<File
+				RelativePath=".\MapEditorSettings.xml"
+				>
+			</File>
+			<File
+				RelativePath=".\ParkerSettings.xml"
 				>
 			</File>
 		</Filter>

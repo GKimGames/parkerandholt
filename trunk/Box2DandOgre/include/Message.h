@@ -28,7 +28,8 @@ enum KGBMessageType
 	CHARACTER_MOVE_RIGHT,
 	CHARACTER_JUMP,
 	GAME_SENSOR_ON,
-	GAME_SENSOR_OFF
+	GAME_SENSOR_OFF,
+	STUPID_MESSAGE
 }; 
 
 struct KGBMessage
@@ -48,7 +49,7 @@ struct KGBMessage
 	double		dispatchTime;
 
 	/// Any extra message data.
-	boost::any*	messageData;
+	boost::any	messageData;
 
 
 	KGBMessage():dispatchTime(-1),
@@ -62,7 +63,7 @@ struct KGBMessage
 		unsigned int	pSender,
 		unsigned int	pReceiver,
 		KGBMessageType	pMessageType,
-		boost::any*  pInfo = NULL):
+		boost::any  pInfo = NULL):
 		
 		dispatchTime(pTime),
 		sender(pSender),

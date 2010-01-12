@@ -1,6 +1,8 @@
+
+
 /*=============================================================================
 
-	ParkerStateInAir.cpp
+	ParkerStateLedgeGrab.cpp
 
 	Author: Matt King
 
@@ -8,12 +10,12 @@
 
 =============================================================================*/
 
-#include "ParkerStateInAir.h"
+#include "ParkerStateLedgeGrab.h"
 
 //=============================================================================
 //								Constructor
 //
-ParkerStateInAir::ParkerStateInAir(CharacterParker* parker):
+ParkerStateLedgeGrab::ParkerStateLedgeGrab(CharacterParker* parker):
 FSMState(parker)
 {
 }
@@ -21,15 +23,18 @@ FSMState(parker)
 //=============================================================================
 //								Enter
 //
-void ParkerStateInAir::Enter()
+void ParkerStateLedgeGrab::Enter()
 {
+	//b2RevoluteJointDef jdef;
+	//jdef.bodyA = owner_->body_;
+	//owner_->world_->CreateJoint();
 
 }
 
 //=============================================================================
 //								Update
 //
-bool ParkerStateInAir::Update()
+bool ParkerStateLedgeGrab::Update()
 {
 	static Ogre::Vector3 direction;
 	
@@ -67,7 +72,7 @@ bool ParkerStateInAir::Update()
 //=============================================================================
 //								HandleMessage
 //
-bool ParkerStateInAir::HandleMessage(const KGBMessage message)
+bool ParkerStateLedgeGrab::HandleMessage(const KGBMessage message)
 {
 
 	switch(message.messageType)
@@ -84,7 +89,6 @@ bool ParkerStateInAir::HandleMessage(const KGBMessage message)
 			}
 		case CHARACTER_JUMP:
 			{
-				Jump();
 				return true;
 			}
 	}
@@ -95,7 +99,7 @@ bool ParkerStateInAir::HandleMessage(const KGBMessage message)
 //=============================================================================
 //								Exit
 //
-void ParkerStateInAir::Exit()
+void ParkerStateLedgeGrab::Exit()
 {
 
 }
@@ -104,7 +108,7 @@ void ParkerStateInAir::Exit()
 //								BeginContact
 //
 /// Called when two fixtures begin to touch.
-void ParkerStateInAir::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+void ParkerStateLedgeGrab::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
 	if(!collidedFixture->IsSensor())
 	{
@@ -121,7 +125,7 @@ void ParkerStateInAir::BeginContact(ContactPoint* contact, b2Fixture* contactFix
 //								EndContact
 //
 /// Called when two fixtures cease to touch.
-void ParkerStateInAir::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+void ParkerStateLedgeGrab::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
 
 }
@@ -130,7 +134,7 @@ void ParkerStateInAir::EndContact(ContactPoint* contact, b2Fixture* contactFixtu
 //								MoveLeft
 //
 ///
-void ParkerStateInAir::MoveLeft()
+void ParkerStateLedgeGrab::MoveLeft()
 {
 
 	double timeSinceLastFrame = GameFramework::getSingletonPtr()->GetTimeSinceLastFrame();
@@ -146,7 +150,7 @@ void ParkerStateInAir::MoveLeft()
 //								MoveRight
 //
 /// 
-void ParkerStateInAir::MoveRight()
+void ParkerStateLedgeGrab::MoveRight()
 {
 	double timeSinceLastFrame = GameFramework::getSingletonPtr()->GetTimeSinceLastFrame();
 
@@ -159,102 +163,39 @@ void ParkerStateInAir::MoveRight()
 
 
 //=============================================================================
-//								Jump
+//								Climb
 ///
-/// Calling jump while the character is in the air will add slightly more
-/// height to the jump.
-void ParkerStateInAir::Jump()
+/// Getting a jump message while the character is grabbing a ledge will make
+/// him climb.
+void ParkerStateLedgeGrab::Climb()
 {
 
 	double timeLeft = (owner_->animationState_->getLength() - owner_->animationState_->getTimePosition()) / owner_->animationState_->getLength();
 	owner_->body_->ApplyForce(b2Vec2(0,owner_->jumpingAfterForce_ * timeLeft), owner_->body_->GetPosition());
 
-	
-	b2ContactEdge* contacts = owner_->body_->GetContactList();
-	bool shinHitRight = false, torsoHitRight = false;
-	bool shinHitLeft = false, torsoHitLeft = false;
-
-	while(contacts != 0 && !shinHitRight && !torsoHitRight && !shinHitLeft && !torsoHitLeft)
-	{
-		if(contacts->contact->GetFixtureA() == owner_->shinSensorRight_)
-		{
-			shinHitRight = true;
-		}
-		else if (contacts->contact->GetFixtureA() == owner_->torsoSensorRight_)
-		{
-			torsoHitRight = true;
-		}
-
-		if(contacts->contact->GetFixtureB() == owner_->shinSensorRight_)
-		{
-			shinHitRight = true;
-		}
-		else if (contacts->contact->GetFixtureB() == owner_->torsoSensorRight_)
-		{
-			torsoHitRight = true;
-		}
-
-
-		if(contacts->contact->GetFixtureA() == owner_->shinSensorLeft_)
-		{
-			shinHitLeft = true;
-		}
-		else if (contacts->contact->GetFixtureA() == owner_->torsoSensorLeft_)
-		{
-			torsoHitLeft = true;
-		}
-
-		if(contacts->contact->GetFixtureB() == owner_->shinSensorLeft_)
-		{
-			shinHitLeft = true;
-		}
-		else if (contacts->contact->GetFixtureB() == owner_->torsoSensorLeft_)
-		{
-			torsoHitLeft = true;
-		}
-
-		contacts = contacts->next;
-
-	}
-	
-
 	// Code to wall jump
-	
-	if(shinHitRight && torsoHitRight)
+	/*
+	if(torsoSensorHitCount_ > 0 && justWallJumped_ == false)
 	{
-		owner_->body_->SetLinearVelocity(b2Vec2(0,owner_->body_->GetLinearVelocity().y)); 
-		owner_->body_->ApplyImpulse(b2Vec2(-owner_->jumpingForce_/2,owner_->jumpingForce_), owner_->body_->GetPosition());
-		//justWallJumped_ = true;
+		body_->SetLinearVelocity(b2Vec2(0,body_->GetLinearVelocity().y)); 
+		body_->ApplyImpulse(b2Vec2(-jumpingForce_/2,jumpingForce_), body_->GetPosition());
+		justWallJumped_ = true;
 
-		owner_->animationState_->setEnabled(false);
-		owner_->animationState_ = owner_->entity_->getAnimationState("JumpNoHeight");
-		owner_->animationState_->setTimePosition(Ogre::Real(0));
-		owner_->animationState_->setLoop(false);
-		owner_->animationState_->setEnabled(true);
+		animationState_->setEnabled(false);
+		animationState_ = entity_->getAnimationState("JumpNoHeight");
+		animationState_->setTimePosition(Ogre::Real(0));
+		animationState_->setLoop(false);
+		animationState_->setEnabled(true);
 	}
-	else if(shinHitLeft && torsoHitLeft)
-	{
-		owner_->body_->SetLinearVelocity(b2Vec2(0,owner_->body_->GetLinearVelocity().y)); 
-		owner_->body_->ApplyImpulse(b2Vec2(owner_->jumpingForce_/2,owner_->jumpingForce_), owner_->body_->GetPosition());
-		//justWallJumped_ = true;
-
-		owner_->animationState_->setEnabled(false);
-		owner_->animationState_ = owner_->entity_->getAnimationState("JumpNoHeight");
-		owner_->animationState_->setTimePosition(Ogre::Real(0));
-		owner_->animationState_->setLoop(false);
-		owner_->animationState_->setEnabled(true);
-	}
-	
+	*/
 
 }
 
 //=============================================================================
 //								UpdateAnimation
-void ParkerStateInAir::UpdateAnimation()
+void ParkerStateLedgeGrab::UpdateAnimation()
 {
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
 	owner_->animationState_->addTime(timeSinceLastFrame);
 }
-
-

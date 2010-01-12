@@ -1,3 +1,11 @@
+/*=============================================================================
+
+	GameFramework.h
+
+	Author: Matt King
+
+=============================================================================*/
+
 #ifndef GAME_FRAMEWORK_H
 #define GAME_FRAMEWORK_H
 
@@ -20,11 +28,13 @@
 #include <OISMouse.h>
 
 #include <Box2D/Box2D.h>
-#include "BetaGUI.h"
-#include "GameObject.h"
 #include "OgreB2DebugDraw.h"
 
+
+
 #define GAMEFRAMEWORK GameFramework::getSingletonPtr()
+
+class GameObjectFactory;
 
 /// GameFramework srarts up Ogre and loads resource to be used as well as
 /// storing the current states b2World reference
@@ -65,8 +75,6 @@ public:
 	{
 		return debugDraw_; 
 	}
-
-	
 	
 	const double GetTimeSinceLastFrame(){ return timeSinceLastFrame_; }
 	void SetTimeSinceLastFrame(double timeSinceLastFrame){ timeSinceLastFrame_ = timeSinceLastFrame; }
@@ -85,13 +93,20 @@ public:
 	OIS::Mouse*					mouse_;
 
 	b2World*					world_;
+
 	OgreB2DebugDraw* debugDraw_;
+
+	GameObjectFactory* gameObjectFactory;
+
+	Ogre::SceneManager* sceneManager;
 
 
 private:
 	
+	
 	GameFramework(const GameFramework&);
 	GameFramework& operator= (const GameFramework&);
+	
 
 	Ogre::Overlay*			debugOverlay_;
 	Ogre::Overlay*			infoOverlay_;

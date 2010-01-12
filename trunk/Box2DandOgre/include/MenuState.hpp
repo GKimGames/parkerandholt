@@ -6,7 +6,7 @@
 #include "AppState.hpp"
 #include "GameFramework.h"
 
-class MenuState : public AppState, public BetaGUI::BetaGUIListener
+class MenuState : public AppState
 {
 public:
 	DECLARE_APPSTATE_CLASS(MenuState)
@@ -26,25 +26,9 @@ public:
 	void getInput();
 	bool update(double timeSinceLastFrame);
 	
-	void onButtonPress(BetaGUI::Button *ref)
-	{      
-		if (ref == enterGameButton_)
-		{
-			this->pushAppState(findByName("PhysicsState"));
-			delete betaGUI_;
-		}
 
-		if (ref == enterMapEditorButton_)
-		{
-			this->pushAppState(findByName("MapEditorState"));
-			delete betaGUI_;
-		}
-	}
 
 private:
-
-	BetaGUI::Button* enterGameButton_;
-	BetaGUI::Button* enterMapEditorButton_;
 	bool m_bQuit;
 };
 

@@ -13,7 +13,7 @@
 #include <tinyxml.h>
 #include <Box2D/Box2D.h>
 #include "Ogre.h"
-#include "GameObjectOgreBox2D.h"
+
 
 typedef std::map<Ogre::String, b2Body*> BodyMap;
 typedef std::map<Ogre::String, b2Fixture*> FixtureMap;
@@ -77,10 +77,11 @@ public:
 	static std::vector<b2Shape*> shapeVector;
 	// These methods can be called anywhere
 	static bool Createb2Body(b2Body* body, b2World* world, TiXmlElement* element);
+	static b2Body* Createb2Body(b2World* world, TiXmlElement* element);
 	static bool Getb2BodyDefAttributes(b2BodyDef* bodyDef, TiXmlElement* element);
 	static bool Getb2FixtureDefAttributes(b2FixtureDef* fixtureDef, TiXmlElement* element);
 	static void ClearShapeVector();
-
+	static void GetB2Vec2(TiXmlElement* element, const char* name, b2Vec2* vector);
 
 	// You must actually instantiate the class to use these methods as they use Id's
 	bool Getb2PrismaticJointdefAttributes(b2PrismaticJointDef* jointDef, TiXmlElement* element);

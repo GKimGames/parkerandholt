@@ -7,6 +7,8 @@
 =============================================================================*/
 
 #include "Box2DXMLLoader.h"
+#include "GameObjectOgreBox2D.h"
+#include "HelperFunctions.h"
 
 std::vector<b2Shape*> Box2DXMLLoader::shapeVector;
 
@@ -73,9 +75,67 @@ bool Box2DXMLLoader::Createb2Body(b2Body* body, b2World* world, TiXmlElement* el
 	return false;
 }
 
+
+//=============================================================================
+//								Createb2Body
+//
+b2Body* Box2DXMLLoader::Createb2Body(b2World* world, TiXmlElement* element)
+{
+	b2Body* body = 0;
+
+	if(element->NoChildren())
+	{
+		// The element has no children and can't possibly define a body
+		return body;
+	}
+	else
+	{
+		// We first look for the b2BodyDef for the body as the body must be
+		// created before everything else.
+		TiXmlElement* bodyDefNode = element->FirstChildElement("BodyDef");
+
+		b2BodyDef bodyDef;
+		Getb2BodyDefAttributes(&bodyDef, bodyDefNode);
+
+		body = world->CreateBody(&bodyDef);
+
+		TiXmlElement* fixtureDefNode;
+
+		// The bodydefNode doesn't have to exist for the body to be created correctly
+		// So we need to check that it existed to get the sibling elements.
+		if(bodyDefNode)
+		{
+			fixtureDefNode = bodyDefNode->NextSiblingElement();
+		}
+		else
+		{
+			fixtureDefNode = element->FirstChildElement();
+		}
+
+
+		b2FixtureDef fixtureDef;
+		
+		while(fixtureDefNode != 0)
+		{
+			if(Getb2FixtureDefAttributes(&fixtureDef,fixtureDefNode));
+			{
+				body->CreateFixture(&fixtureDef);
+			}
+
+			fixtureDefNode = fixtureDefNode->NextSiblingElement();
+		}
+
+		return body;
+	}
+
+	return body;
+}
+
+
 //=============================================================================
 //								Getb2BodyDefAttributes
 //
+///
 bool Box2DXMLLoader::Getb2BodyDefAttributes(b2BodyDef* bodyDef, TiXmlElement* element)
 {
 	if(element != 0)
@@ -88,10 +148,10 @@ bool Box2DXMLLoader::Getb2BodyDefAttributes(b2BodyDef* bodyDef, TiXmlElement* el
 		element->QueryBoolAttribute("awake", &bodyDef->awake);
 		element->QueryBoolAttribute("active", &bodyDef->active);
 		element->QueryFloatAttribute("linearDamping", &bodyDef->linearDamping);
-		element->QueryFloatAttribute("linearVelocityX", &bodyDef->linearVelocity.x);
-		element->QueryFloatAttribute("linearVelocityY", &bodyDef->linearVelocity.y);
-		element->QueryFloatAttribute("positionX", &bodyDef->position.x);
-		element->QueryFloatAttribute("positionY", &bodyDef->position.y);
+
+		GetB2Vec2(element, "linearVelocity", &bodyDef->linearVelocity);
+
+		GetB2Vec2(element, "position", &bodyDef->position);
 
 		std::string str;
 		element->QueryValueAttribute("bodyType", &str);
@@ -108,6 +168,7 @@ bool Box2DXMLLoader::Getb2BodyDefAttributes(b2BodyDef* bodyDef, TiXmlElement* el
 		return true;
 	}
 	
+	DEBUG_LOGC("Fixture Get Body Def Error: Element is 0.");
 	return false;
 }
 
@@ -133,13 +194,14 @@ bool Box2DXMLLoader::Getb2FixtureDefAttributes(b2FixtureDef* fixtureDef, TiXmlEl
 				shapeVector.push_back(polyDef);
 				delete circleDef;
 
-				float boxWidth = 1.0, boxHeight = 1.0, x = 0.0f, y = 0.0f, angle = 0.0f;
+				float boxWidth = 1.0, boxHeight = 1.0, angle = 0.0f;
 				element->QueryFloatAttribute("boxWidth", &boxWidth);
 				element->QueryFloatAttribute("boxHeight", &boxHeight);
-				element->QueryFloatAttribute("centerY", &y);
-				element->QueryFloatAttribute("angle", &y);
+				b2Vec2 point;
+				GetB2Vec2(element, "center",&point);
+				element->QueryFloatAttribute("angle", &angle);
 
-				polyDef->SetAsBox(boxWidth/2, boxHeight/2, b2Vec2(x,y),angle);
+				polyDef->SetAsBox(boxWidth/2, boxHeight/2, point,angle);
 
 				fixtureDef->shape = polyDef;
 			}
@@ -150,12 +212,12 @@ bool Box2DXMLLoader::Getb2FixtureDefAttributes(b2FixtureDef* fixtureDef, TiXmlEl
 
 				float x1 = 0.0f, y1 = 0.0f,x2 = 0.0f, y2 = 0.0f;
 
-				element->QueryFloatAttribute("px1", &x1);
-				element->QueryFloatAttribute("py1", &y1);
-				element->QueryFloatAttribute("px2", &x2);
-				element->QueryFloatAttribute("py2", &y2);
+				b2Vec2 point1, point2;
+				
+				GetB2Vec2(element, "point1", &point1);
+				GetB2Vec2(element, "point2", &point2);
 
-				polyDef->SetAsEdge(b2Vec2(x1,y1),b2Vec2(x2,y2));
+				polyDef->SetAsEdge(point1,point2);
 
 				fixtureDef->shape = polyDef;
 			}
@@ -165,8 +227,8 @@ bool Box2DXMLLoader::Getb2FixtureDefAttributes(b2FixtureDef* fixtureDef, TiXmlEl
 				delete polyDef;
 
 				element->QueryFloatAttribute("radius", &circleDef->m_radius);
-				element->QueryFloatAttribute("centerX", &circleDef->m_p.x);
-				element->QueryFloatAttribute("centerY", &circleDef->m_p.y);
+
+				GetB2Vec2(element, "center", &circleDef->m_p);
 
 				fixtureDef->shape = circleDef;
 
@@ -187,25 +249,29 @@ bool Box2DXMLLoader::Getb2FixtureDefAttributes(b2FixtureDef* fixtureDef, TiXmlEl
 					{
 						std::string stringI = Ogre::StringConverter::toString(i);
 
-						std::string px = "px";
-						std::string py = "py";
+						std::string point = "point";
+						point += stringI;
+						
+						b2Vec2 center;
+						GetB2Vec2(element, point.c_str(), &center);
+						bodyVecs[i].Set(center.x, center.y);
 
-						px += stringI;
-						py += stringI;
-
-						element->QueryFloatAttribute(px.c_str(), &bodyVecs[i].x);
-						element->QueryFloatAttribute(py.c_str(), &bodyVecs[i].y);
 					}
+
 					polyDef->Set(bodyVecs, pointCount);
 					fixtureDef->shape = polyDef;
+
 				}
 				else
 				{
+					;
+					DEBUG_LOGC("Fixture Creation Error: No point count set while creating polygon.");
 					return false;
 				}
 			}
 			else
 			{
+				DEBUG_LOGC("Fixture Creation Error: No shape type defined.");
 				return false;
 			}
 		}
@@ -233,9 +299,14 @@ bool Box2DXMLLoader::Getb2FixtureDefAttributes(b2FixtureDef* fixtureDef, TiXmlEl
 
 		return true;
 	}
+
+	DEBUG_LOGC("Fixture Creation Error: Element is 0.");
+
 	return false;
 	
 }
+
+
 
 // b2PrismaticJoint
 // String	Id
@@ -265,5 +336,44 @@ bool Box2DXMLLoader::Getb2PrismaticJointdefAttributes(b2PrismaticJointDef* joint
 		return false;
 	}
 	return true;
+}
+
+
+
+//=============================================================================
+//								Getb2Vec2
+//
+void Box2DXMLLoader::GetB2Vec2(TiXmlElement* element, const char* name, b2Vec2* vector)
+{
+	
+	if(element != 0)
+	{
+		if(name != 0)
+		{
+			const char* str1 = element->Attribute(name);
+			
+			if(str1 != 0)
+			{
+				Ogre::String str = Ogre::String(str1);
+				Ogre::Vector2 v = Ogre::StringConverter::parseVector2(str);
+				vector->x = v.x;
+				vector->y = v.y;
+			}
+			else
+			{
+				vector->x = 0;
+				vector->y = 0;
+				DEBUG_LOG("GetB2Vec2 Error: Attribute name not found");
+			}
+		}
+		else
+		{
+			DEBUG_LOG("GetB2Vec2 Error: Attribute name is zero");
+		}
+	}
+	else
+	{
+		DEBUG_LOG("GetB2Vec2 Error: Element is zero");
+	}
 }
 

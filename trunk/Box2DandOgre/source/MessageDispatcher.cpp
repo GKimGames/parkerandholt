@@ -9,6 +9,9 @@
 =============================================================================*/
 
 #include "MessageDispatcher.h"
+#include "GameFramework.h"
+#include "GameObject.h"
+#include "HelperFunctions.h"
 #include <iostream>
 
 using std::cout;
@@ -107,7 +110,7 @@ void KGBMessageDispatcher::DischargeWithLog(const KGBMessage& pMsg)
 //						DischargeToAll
 //
 /// Dispatch a message to all objects
-void KGBMessageDispatcher::DischargeToAll(const KGBMessage& pMsg)
+void KGBMessageDispatcher::DischargeToAll(const KGBMessage pMsg)
 {
 	
 	GameObjectMap::iterator it;
@@ -126,11 +129,11 @@ void KGBMessageDispatcher::DischargeToAll(const KGBMessage& pMsg)
 /// Given a message, a receiver, a sender and any time delay , this function
 /// routes the message to the correct agent (if no delay) or stores
 /// in the message queue to be dispatched at the correct time
-void KGBMessageDispatcher:: DispatchMessage(double			pDelay,
+void KGBMessageDispatcher::DispatchMessage(double			pDelay,
 											GameObjectId	pSender,
 											GameObjectId	pReceiver,
 											KGBMessageType	pMessageType,
-											boost::any*		pUserData)
+											boost::any		pUserData)
 {
 
 	// Create the KGBMessage

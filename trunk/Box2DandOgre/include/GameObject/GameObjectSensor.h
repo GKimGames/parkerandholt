@@ -78,7 +78,7 @@ public:
 	}
 
 	/// Send out a message to all the Objects in messageList_.
-	virtual void SendOnMessageToList(boost::any* pUserData = 0)
+	virtual void SendOnMessageToList(boost::any pUserData = 0)
 	{
 		SensorMap::iterator it;
 
@@ -92,7 +92,7 @@ public:
 	}
 
 	/// Send out a message to all the Objects in messageList_.
-	virtual void SendOffMessageToList(boost::any* pUserData = 0)
+	virtual void SendOffMessageToList(boost::any pUserData = 0)
 	{
 		SensorMap::iterator it;
 
@@ -106,7 +106,7 @@ public:
 	}
 
 	/// Send out a message to all the Objects in messageList_.
-	virtual void SendToMessageList(KGBMessageType message, boost::any* pUserData = 0)
+	virtual void SendToMessageList(KGBMessageType message, boost::any pUserData = 0)
 	{
 		SensorMap::iterator it;
 

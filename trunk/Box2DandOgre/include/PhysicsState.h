@@ -34,15 +34,15 @@
 
 #include "GameFramework.h"
 #include "MessageDispatcher.h"
-
+#include "PressureSwitch.h"
 #include "Parker.h"
 
-#include "PressureSwitch.h"
+#include "MyGUI.h"
 
 #define DEBUG_DRAW_ON 1
 
 
-class PhysicsState : public AppState, public b2ContactListener
+class PhysicsState : public AppState, public b2ContactListener, public b2DestructionListener
 {
 
 typedef std::vector<ContactPoint*> ContactList;
@@ -82,12 +82,28 @@ public:
 	/// Called when two fixtures cease to touch.
 	void EndContact(b2Contact* contact);
 
+	/// Called when any joint is about to be destroyed due
+	/// to the destruction of one of its attached bodies.
+	void SayGoodbye(b2Joint* joint);
+
+	/// Called when any fixture is about to be destroyed due
+	/// to the destruction of its parent body.
+	void SayGoodbye(b2Fixture* fixture);
+
 	void ProcessContacts();
 
 	void CreateBox();
 
+	void MakeExit(MyGUI::WidgetPtr _widget)
+	{
+		m_bQuit = true;
+	}
+
 protected:
-	
+
+	/// My GUI Stuff
+	MyGUI::Gui* myGUI;
+	// End
 
 	GameObject* gameObject_;
 	CharacterParker* parker_;

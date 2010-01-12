@@ -31,8 +31,7 @@ void ParkerStateOnGround::Enter()
 	isJumping_ = false;
 	moveLeftDown_ = false;
 	moveRightDown_ = false;
-	
-	feetContactCount_ = 0;
+
 	jumpTimer_ = owner_->timeBetweenJump_;
 
 	if(owner_->initialized_)
@@ -101,7 +100,8 @@ bool ParkerStateOnGround::Update()
 //
 bool ParkerStateOnGround::HandleMessage(const KGBMessage message)
 {
-
+	std::string* gameObject = 0;
+	
 	switch(message.messageType)
 	{
 		case CHARACTER_MOVE_LEFT:
@@ -118,6 +118,10 @@ bool ParkerStateOnGround::HandleMessage(const KGBMessage message)
 			{
 				Jump();
 				return true;
+			}
+		case STUPID_MESSAGE:
+			{
+				gameObject = any_cast<std::string*>(message.messageData);
 			}
 	}
 
