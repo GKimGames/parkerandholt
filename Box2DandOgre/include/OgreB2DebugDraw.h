@@ -25,10 +25,17 @@
 
 #include <Ogre.h>
 #include <Box2D\Box2D.h>
+#include "DynamicLines.h"
 
 class OgreB2DebugDraw : public b2DebugDraw
 {
 public:
+	enum GeometryLines 
+	{
+		POLYGON_LINES,
+		CIRCLE_LINES,
+	};
+
     OgreB2DebugDraw(Ogre::SceneManager* scene, const char* material, float fillAlpha = 0.2f, Ogre::uint8 renderQueueGroup = Ogre::RENDER_QUEUE_9);
     ~OgreB2DebugDraw();
 
@@ -74,6 +81,8 @@ public:
     /// Method called by the b2World for XForms.
    void DrawTransform(const b2Transform& xf);
 
+   DynamicLines* dynamicLines_;
+
 private:
     /// ManualObject which holds all the shapes each frame
     Ogre::ManualObject  *m_shapes;
@@ -101,6 +110,9 @@ private:
     /// @warning Must be called between ManualObject::begin and ManualObject::end
     Ogre::ManualObject* BuildSegment(Ogre::ManualObject* man, const b2Vec2& p1,
                                      const b2Vec2& p2, const b2Color& color, float alpha = 1.0f);
+
+	DynamicLines*	 lines[2];
+	Ogre::SceneNode* linesNode_;
 };
 
 #endif //_OGRE_B2_DEBUGDRAW_H

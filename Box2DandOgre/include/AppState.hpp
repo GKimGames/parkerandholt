@@ -60,8 +60,6 @@ protected:
 	Ogre::Camera*			camera_;
 	Ogre::SceneManager*		sceneManager_;
 
-	BetaGUI::GUI*			betaGUI_;
-
 };
 
 //|||||||||||||||||||||||||||||||||||||||||||||||

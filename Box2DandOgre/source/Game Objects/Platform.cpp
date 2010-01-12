@@ -4,14 +4,30 @@ using namespace Ogre;
 
 Platform::Platform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2)
 {
-	gameObjectType_ = GOType_Platform;
 	sceneManager_ = sceneManager;
 
-	if(p1.x > p2.x)
+	point1.x = p1.x;
+	point1.y = p1.y;
+	point2.x = p2.x;
+	point2.y = p2.y;
+	
+	Initialize();
+}
+
+Platform::Platform()
+{
+	// do nothing
+}
+
+bool Platform::Initialize()
+{
+	gameObjectType_ = GOType_Platform;
+
+	if(point1.x > point2.x)
 	{
-		b2Vec2 holder = p2;
-		p2 = p1;
-		p1 = holder;
+		b2Vec2 holder = point2;
+		point2 = point1;
+		point1 = holder;
 	}
 
 	Ogre::String planeName = "PlatformPlane";
@@ -26,7 +42,84 @@ Platform::Platform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2)
 	plane->d = 0; 
 	plane->normal = Vector3(0.0, 1.0, 0.0);
 
-	float lengthOfPlane = sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
+	float lengthOfPlane = sqrt((point2.x - point1.x) * (point2.x - point1.x) + (point2.y - point1.y) * (point2.y - point1.y));
+	
+	Ogre::MeshManager::getSingleton().createPlane(planeMeshName, 
+		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+		*plane,
+		lengthOfPlane,  // X Length
+		15,				// Z Length
+		3 * lengthOfPlane / 15, 5,			// Segments x ,y
+		true,
+		1, 
+		3 * lengthOfPlane / 15,		// Tile x
+		1,							// Tile y
+		Vector3::UNIT_Z);
+	
+
+	// Create background material
+	MaterialPtr material = MaterialManager::getSingleton().create("Background", "General");
+	material->getTechnique(0)->getPass(0)->createTextureUnitState("road.png");
+	material->getTechnique(0)->getPass(0)->setLightingEnabled(true);
+	//material->getTechnique(0)->getPass(0)->setDepthCheckEnabled(false);
+	//material->getTechnique(0)->getPass(0)->setDepthWriteEnabled(false);
+	// Temporary
+
+	Ogre::Entity* planeEnt = sceneManager_->createEntity(planeEntityName , planeMeshName);
+	planeEnt->setMaterial(material);
+
+	Ogre::SceneNode* planeNode = sceneManager_->getRootSceneNode()->createChildSceneNode();
+	planeNode->attachObject(planeEnt);
+	
+	// Rotate the node to fit the points
+	planeNode->roll(Ogre::Radian(atan2(point2.y - point1.y, point2.x - point1.x)));
+	
+	// Center the node on the midpoint of the two points
+	planeNode->setPosition(Real(point1.x + point2.x) / 2.0, Real(point1.y + point2.y) / 2.0, 0.0);
+
+	// Create body and fixture
+	b2BodyDef bd;
+	bd.position.Set(0.0f, 0.0f);
+	bd.type = b2_staticBody;
+	body_= world_->CreateBody(&bd);
+
+	b2PolygonShape ed;
+	ed.SetAsEdge(point1,point2);
+
+	b2FixtureDef fd;
+	fd.shape = &ed;
+	fd.friction = DEFAULT_FRICTION;
+	fd.filter.groupIndex = STATIC_MAP_GROUP;
+
+	body_->CreateFixture(&fd);
+
+	return true;
+}
+
+bool Platform::Initialize(Ogre::String materialName)
+{
+	gameObjectType_ = GOType_Platform;
+
+	if(point1.x > point2.x)
+	{
+		b2Vec2 holder = point2;
+		point2 = point1;
+		point1 = holder;
+	}
+
+	Ogre::String planeName = "PlatformPlane";
+	Ogre::String planeMeshName = "PlatformPlaneMesh";
+	Ogre::String planeEntityName = "PlatformPlaneEntity";
+
+	planeName += Ogre::StringConverter::toString(objectId_);
+	planeMeshName += Ogre::StringConverter::toString(objectId_);
+	planeEntityName += Ogre::StringConverter::toString(objectId_);
+
+	plane = new MovablePlane(planeName);
+	plane->d = 0; 
+	plane->normal = Vector3(0.0, 1.0, 0.0);
+
+	float lengthOfPlane = sqrt((point2.x - point1.x) * (point2.x - point1.x) + (point2.y - point1.y) * (point2.y - point1.y));
 	
 	Ogre::MeshManager::getSingleton().createPlane(planeMeshName, 
 		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
@@ -40,26 +133,17 @@ Platform::Platform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2)
 		1,							// Tile y
 		Vector3::UNIT_Z);
 	
-
-	// Create background material
-	MaterialPtr material = MaterialManager::getSingleton().create("Background", "General");
-	material->getTechnique(0)->getPass(0)->createTextureUnitState("roadtexture.jpg");
-	material->getTechnique(0)->getPass(0)->setLightingEnabled(true);
-	//material->getTechnique(0)->getPass(0)->setDepthCheckEnabled(false);
-	//material->getTechnique(0)->getPass(0)->setDepthWriteEnabled(false);
-	// Temporary
-
 	Ogre::Entity* planeEnt = sceneManager_->createEntity(planeEntityName , planeMeshName);
-	planeEnt->setMaterial(material);
+	planeEnt->setMaterial(MaterialManager::getSingleton().getByName(materialName));
 
 	Ogre::SceneNode* planeNode = sceneManager_->getRootSceneNode()->createChildSceneNode();
 	planeNode->attachObject(planeEnt);
 	
 	// Rotate the node to fit the points
-	planeNode->roll(Ogre::Radian(atan2(p2.y - p1.y, p2.x - p1.x)));
+	planeNode->roll(Ogre::Radian(atan2(point2.y - point1.y, point2.x - point1.x)));
 	
 	// Center the node on the midpoint of the two points
-	planeNode->setPosition(Real(p1.x + p2.x) / 2.0, Real(p1.y + p2.y) / 2.0, 0.0);
+	planeNode->setPosition(Real(point1.x + point2.x) / 2.0, Real(point1.y + point2.y) / 2.0, 0.0);
 
 	// Create body and fixture
 	b2BodyDef bd;
@@ -68,7 +152,7 @@ Platform::Platform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2)
 	body_= world_->CreateBody(&bd);
 
 	b2PolygonShape ed;
-	ed.SetAsEdge(p1,p2);
+	ed.SetAsEdge(point1,point2);
 
 	b2FixtureDef fd;
 	fd.shape = &ed;
@@ -77,6 +161,7 @@ Platform::Platform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2)
 
 	body_->CreateFixture(&fd);
 
+	return true;
 }
 
 Platform::~Platform()

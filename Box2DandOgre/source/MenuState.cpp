@@ -24,17 +24,6 @@ void MenuState::enter()
 	GameFramework::getSingletonPtr()->keyboard_->setEventCallback(this);
 	GameFramework::getSingletonPtr()->mouse_->setEventCallback(this);
 
-	betaGUI_ = new BetaGUI::GUI("MgOpen", 16);
-	
-	betaGUI_->createMousePointer(Vector2(32,32), "bgui.pointer");
-	
-	/*
-	BetaGUI::Window* window = betaGUI_->createWindow(Vector4(100,100,300,100), "bgui.window", BetaGUI::RESIZE_AND_MOVE, "Parker and Holt");
-	
-	enterGameButton_ = window->createButton(Vector4(112,50,104,24), "bgui.button", "Game", BetaGUI::Callback(this));
-	enterMapEditorButton_ = window->createButton(Vector4(4,50,104,24), "bgui.button", "Map Editor", BetaGUI::Callback(this));
-	*/
-
 	m_bQuit = false;
 	
 	createScene();
@@ -56,10 +45,6 @@ void MenuState::resume()
 	GameFramework::getSingletonPtr()->log_->logMessage("Resuming MenuState...");
 	GameFramework::getSingletonPtr()->viewport_->setCamera(m_pCamera);
 
-	betaGUI_ = new BetaGUI::GUI("MgOpen", 16);
-	
-	betaGUI_->createMousePointer(Vector2(32,32), "bgui.pointer");
-
 	m_bQuit = false;
 }
 
@@ -67,6 +52,31 @@ void MenuState::resume()
 
 void MenuState::createScene()
 {
+
+	Ogre::StringVector sv = Ogre::ResourceGroupManager::getSingletonPtr()->getResourceGroups();
+	
+
+	for(int i = 0; i < sv.size(); i++)
+	{
+		Ogre::FileInfoListPtr resources = Ogre::ResourceGroupManager::getSingletonPtr()->listResourceFileInfo(sv[i]);
+		Ogre::StringVectorPtr sv2 = Ogre::ResourceGroupManager::getSingletonPtr()->findResourceNames(sv[i], Ogre::String("*.mesh"));
+		
+		Ogre::StringVector::iterator it2 = sv2->begin();
+		for(it2; it2 != (*sv2).end(); it2++)
+		{
+			Ogre::String sv3 = (*it2);
+		}
+		
+		Ogre::FileInfoList::iterator it;
+		it = resources->begin();
+		
+		for(it; it != resources->end(); it++)
+		{
+			Ogre::FileInfo fi = (*it);
+		}
+	}
+	
+
 }
 
 
@@ -74,8 +84,6 @@ void MenuState::createScene()
 void MenuState::exit()
 {
 	GameFramework::getSingletonPtr()->log_->logMessage("Leaving MenuState...");
-
-	delete betaGUI_;
 
 	m_pSceneMgr->destroyCamera(m_pCamera);
 	if(m_pSceneMgr)
@@ -115,15 +123,6 @@ bool MenuState::mouseMoved(const OIS::MouseEvent &evt)
 
 	const OIS::MouseState ms = GameFramework::getSingletonPtr()->mouse_->getMouseState();
 
-	// Mouse injection must be absolute position than relative.
-	x += ms.X.rel;
-	y += ms.Y.rel;
-
-	if (ms.buttons == 1)
-		betaGUI_->injectMouse(x,y, true);  // LMB is down.
-	else
-		betaGUI_->injectMouse(x,y, false); // LMB is not down.
-
 	return true;
 }
 
@@ -147,14 +146,12 @@ void MenuState::getInput()
 {
 	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_RETURN))
 	{
-		delete betaGUI_;
 		this->pushAppState(findByName("PhysicsState"));
 		return;
 	}
 
 	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_RSHIFT))
 	{
-		delete betaGUI_;
 		this->pushAppState(findByName("MapEditorState"));
 		return;
 	}

@@ -117,56 +117,47 @@ void CharacterParker::CreatePhysics()
 	feetSensor_ = body_->CreateFixture(&fd);
 	
 
-	// Create the definition of the polygon for the wall jump sensor
-	
-	b2PolygonShape wallJumpSensor_Def;
-
-	wallJumpSensor_Def.m_vertexCount = 4;
-
-	wallJumpSensor_Def.m_vertices[0].Set(boundingBoxWidth_/2 + 0.1, -boundingBoxHeight_/2);
-	wallJumpSensor_Def.m_vertices[1].Set(boundingBoxWidth_/2 + 0.1, boundingBoxHeight_/2);
-	wallJumpSensor_Def.m_vertices[2].Set(boundingBoxWidth_/2 - 0.1, boundingBoxHeight_/2);
-	wallJumpSensor_Def.m_vertices[3].Set(boundingBoxWidth_/2 - 0.1, -boundingBoxHeight_/2);
-
-	fd.shape = &wallJumpSensor_Def;
-	fd.isSensor = true;
-	fd.userData = &gameObjectType_;
-
-	//wallJumpSensor_ = body_->CreateFixture(&fd);
-	
-
 	// Create the definition of the polygon for the shin sensor
-	b2PolygonShape shinSensor_Def;
+	b2PolygonShape shinSensorRight_Def;
 
-	shinSensor_Def.m_vertexCount = 4;
-	shinSensor_Def.SetAsBox(0.1,boundingBoxHeight_/6,b2Vec2(boundingBoxWidth_/2 + 0.1, -boundingBoxHeight_/6),0); 
+	shinSensorRight_Def.m_vertexCount = 4;
+	shinSensorRight_Def.SetAsBox(0.1,boundingBoxHeight_/6,b2Vec2(boundingBoxWidth_/2 + 0.11, -boundingBoxHeight_/6),0); 
 
-	fd.shape = &shinSensor_Def;
+	fd.shape = &shinSensorRight_Def;
 	fd.isSensor = true;
 	fd.userData = &gameObjectType_;
 
-	shinSensor_ = body_->CreateFixture(&fd);
-
-
-	// Create the definition of the polygon for the thigh sensor
-	b2PolygonShape thighSensor_Def;
-	thighSensor_Def.m_vertexCount = 4;
-	thighSensor_Def.SetAsBox(0.1,boundingBoxHeight_/16,b2Vec2(boundingBoxWidth_/2 + 0.1, -boundingBoxHeight_/16),0); 
-
-	fd.shape = &thighSensor_Def;
-	fd.isSensor = true;
-	fd.userData = &gameObjectType_;
-
-	shinSensor_ = body_->CreateFixture(&fd);
+	shinSensorRight_ = body_->CreateFixture(&fd);
 
 	// Create the definition of the polygon for the torso sensor
-	b2PolygonShape torsoSensor_Def;
-	torsoSensor_Def.m_vertexCount = 4;
-	torsoSensor_Def.SetAsBox(0.1,boundingBoxHeight_/6,b2Vec2(boundingBoxWidth_/2 + 0.1, boundingBoxHeight_/6),0); 
+	b2PolygonShape torsoSensorRight_Def;
+	torsoSensorRight_Def.m_vertexCount = 4;
+	torsoSensorRight_Def.SetAsBox(0.1,boundingBoxHeight_/6,b2Vec2(boundingBoxWidth_/2 + .11, boundingBoxHeight_/2 - boundingBoxHeight_/6),0); 
 
-	fd.shape = &torsoSensor_Def;
+	fd.shape = &torsoSensorRight_Def;
 	fd.userData = &gameObjectType_;
-	torsoSensor_ = body_->CreateFixture(&fd);
+	torsoSensorRight_ = body_->CreateFixture(&fd);
+
+	// Create the definition of the polygon for the shin sensor
+	b2PolygonShape shinSensorLeft_Def;
+
+	shinSensorLeft_Def.m_vertexCount = 4;
+	shinSensorLeft_Def.SetAsBox(0.1,boundingBoxHeight_/6,b2Vec2(-boundingBoxWidth_/2 - 0.11, -boundingBoxHeight_/6),0); 
+
+	fd.shape = &shinSensorLeft_Def;
+	fd.isSensor = true;
+	fd.userData = &gameObjectType_;
+
+	shinSensorLeft_ = body_->CreateFixture(&fd);
+
+	// Create the definition of the polygon for the torso sensor
+	b2PolygonShape torsoSensorLeft_Def;
+	torsoSensorLeft_Def.m_vertexCount = 4;
+	torsoSensorLeft_Def.SetAsBox(0.1,boundingBoxHeight_/6,b2Vec2(-boundingBoxWidth_/2 - .11, boundingBoxHeight_/2 - boundingBoxHeight_/6),0); 
+
+	fd.shape = &torsoSensorLeft_Def;
+	fd.userData = &gameObjectType_;
+	torsoSensorLeft_ = body_->CreateFixture(&fd);
 	
 	body_->SetUserData(this); 
 
@@ -194,11 +185,12 @@ void CharacterParker::CreateGraphics()
 	// Attach Parker's mesh to the node
 	bodyNode_->attachObject(entity_);
 
+
 	// Scale the bodyNode to the apppropriate size.
 	bodyNode_->scale(scaleX_,scaleY_,scaleZ_);
 	bodyNode_->translate(translateX,translateY,translateZ);
 	bodyNode_->rotate(Ogre::Vector3::UNIT_Y,Ogre::Degree(rotateY));
-	bodyNode_->setInitialState();
+	sceneNode_->showBoundingBox(true);
 }
 
 //=============================================================================
@@ -207,7 +199,7 @@ void CharacterParker::CreateGraphics()
 /// Read the XML config file for Parker.
 bool CharacterParker::ReadXMLConfig()
 {
-	TiXmlDocument configXML_( "Z:\\Parker and Holt\\OgreSDK\\bin\\ParkerSettings.xml" );
+	TiXmlDocument configXML_( "..\\ParkerSettings.xml" );
 	configXML_.LoadFile();
 	TiXmlHandle hDoc(&configXML_);
 
@@ -221,9 +213,11 @@ bool CharacterParker::ReadXMLConfig()
 		return false;
 
 	hRoot = TiXmlHandle(pElem);
-	
 	TiXmlElement* meshNode = hRoot.FirstChild( "MeshInfo" ).FirstChild().Element();
-	meshName_ = meshNode->Attribute("name");
+	std::string str("name");
+	str = *meshNode->Attribute(str);
+	const char* c = str.c_str();
+	meshName_ = Ogre::String(c);
 	meshNode->QueryDoubleAttribute("translateX", &translateX);
 	meshNode->QueryDoubleAttribute("translateY", &translateY);
 	meshNode->QueryDoubleAttribute("translateZ", &translateZ);
@@ -271,13 +265,19 @@ bool CharacterParker::ReadXMLConfig()
 	
 	bodys = bodys->FirstChildElement();
 	
+	/*
 	while(bodys != 0)
 	{
 		b2Body* b = 0;
-		Box2DXMLLoader::Createb2Body(b, world_, bodys);
-		bodys = bodys->NextSiblingElement();
-	}
+		b = Box2DXMLLoader::Createb2Body(world_, bodys);
+		GameObjectOgreBox2D* goob = new GameObjectOgreBox2D(b);
 
+		goob->InitializeDebugDraw(Ogre::ColourValue(.7,1,.2,1));
+
+		bodys = bodys->NextSiblingElement();
+		
+	}
+	*/
 
 	return true;
 }

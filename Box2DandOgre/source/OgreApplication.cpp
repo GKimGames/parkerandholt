@@ -12,6 +12,7 @@
 
 KGBOgreApplication::KGBOgreApplication()
 {
+	initialized_ = false;
 }
 
 
@@ -21,7 +22,7 @@ KGBOgreApplication::~KGBOgreApplication()
 	delete GameFramework::getSingletonPtr();
 	delete KGBMessageDispatcher::getSingletonPtr();
 
-	if(appStateManager_)
+	if(initialized_)
 	{
 		delete appStateManager_;
 	}
@@ -34,7 +35,6 @@ void KGBOgreApplication::Start()
 
 	new GameFramework();
 	new KGBMessageDispatcher();
-	
 
 	bool initialized = GameFramework::getSingletonPtr()->InitOgre("Parker And Holt", 0, 0);
 	

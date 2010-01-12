@@ -125,21 +125,23 @@ void AppStateManager::start(AppState* state)
 				timeAccum = 0;
 			}
 			
-			while(timeAccum >= timeStep)
+			while(timeAccum >= timeStep && m_bShutdown == false)
 			{
 
 				GAMEFRAMEWORK->keyboard_->capture();
 				GAMEFRAMEWORK->mouse_->capture();
 
-				if(m_ActiveStateStack.back()->update(timeStep))
+				if(m_ActiveStateStack.back()->update(timeStep) && m_bShutdown == false)
 				{
-					Dispatch->DispatchDelayedMessages();
+						Dispatch->DispatchDelayedMessages();
 
-					GAMEFRAMEWORK->UpdateOgre(timeStep);
-					GAMEFRAMEWORK->root_->renderOneFrame();
+						GAMEFRAMEWORK->UpdateOgre(timeStep);
+						GAMEFRAMEWORK->root_->renderOneFrame();
 
-					timeAccum -= timeStep;
+						timeAccum -= timeStep;
+					
 				}
+
 			}
 			
 			/*

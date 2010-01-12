@@ -6,6 +6,9 @@ using namespace Ogre;
 
 class LedgeSensor;
 
+//=============================================================================
+//							Constructor
+//
 PhysicsState::PhysicsState()
 {
 	m_MoveSpeed			= 0.1;
@@ -13,11 +16,12 @@ PhysicsState::PhysicsState()
 	m_pCurrentObject	= 0;
 }
 
-
+//=============================================================================
+//							enter
+//
 void PhysicsState::enter()
 {
-	gameObject_ = new GameObject();
-	gameObject_->SetName("PhysicsState");
+	gameObject_ = new GameObject("PhysicsState");
 
 	GameFramework::getSingletonPtr()->log_->logMessage("Entering PhysicsState...");
 
@@ -49,7 +53,9 @@ void PhysicsState::enter()
 	GetPrivateProfileStringA("Settings", "TimeStep", "0.016666666666667", buffer, 256, settingsFile.c_str());
 	timeStep = atof(buffer);
 
-	sceneManager_ = GameFramework::getSingletonPtr()->root_->createSceneManager(ST_GENERIC, "GameSceneMgr");
+	sceneManager_ = GAMEFRAMEWORK->root_->createSceneManager(ST_GENERIC, "PhysicsSceneMgr");
+	GAMEFRAMEWORK->sceneManager = sceneManager_;
+
 	sceneManager_->setAmbientLight(Ogre::ColourValue(0.7, 0.7, 0.7));		
 
 	camera_ = sceneManager_->createCamera("GameCamera");
@@ -73,10 +79,15 @@ void PhysicsState::enter()
 
 	createScene();
 
+	CompositorManager::getSingleton().addCompositor(GAMEFRAMEWORK->viewport_, "B&W");
+	CompositorManager::getSingleton().setCompositorEnabled(GAMEFRAMEWORK->viewport_, "B&W",true);
+
 }
 
 
-
+//=============================================================================
+//							pause
+//
 bool PhysicsState::pause()
 {
 	GameFramework::getSingletonPtr()->log_->logMessage("Pausing PhysicsState...");
@@ -86,7 +97,9 @@ bool PhysicsState::pause()
 	return true;
 }
 
-
+//=============================================================================
+//							resume
+//
 void PhysicsState::resume()
 {
 	GameFramework::getSingletonPtr()->log_->logMessage("Resuming PhysicsState...");
@@ -98,7 +111,9 @@ void PhysicsState::resume()
 }
 
 
-
+//=============================================================================
+//							exit
+//
 void PhysicsState::exit()
 {
 
@@ -110,6 +125,8 @@ void PhysicsState::exit()
 
 	GameObject::objectList.clear();
 	
+	myGUI->shutdown();
+	delete myGUI;
 
 	if(sceneManager_)
 	{
@@ -119,7 +136,9 @@ void PhysicsState::exit()
 }
 
 
-
+//=============================================================================
+//							createPhysics
+//
 void PhysicsState::createPhysics()
 {
 	// Define the size of the world. Simulation will still work
@@ -147,21 +166,21 @@ void PhysicsState::createPhysics()
 	new Platform(sceneManager_, b2Vec2(30.0f, 6.4f),   b2Vec2(35.0f, 6.4f));
 	new Platform(sceneManager_, b2Vec2(22.0f, 7.5f),   b2Vec2(27.0f, 7.5f));
 
-
-
-
 	// Create myCharacter
 	//myCharacter_ = new Character(sceneManager_);
 	//myCharacter_->Initialize();
 	
 	parker_  = new CharacterParker(sceneManager_);
 	parker_->Initialize();
+	parker_->InitializeDebugDraw();
 
-	HoltBox* bb = new HoltBox(sceneManager_, b2Vec2(8.0f, 10.0f));
-	bb->Initialize();
+	for(int i = 0; i < 15;i++)
+	{
+		HoltBox* bb = new HoltBox(sceneManager_, b2Vec2(8.0f, 10.0f));
+		bb->Initialize();
+	}
 
 	new MovingPlatform(sceneManager_, b2Vec2(10.0f, 1.0f), b2Vec2(0.0f, 1.0f), b2Vec2(5.0f, 1.0f), b2Vec2(0.0f, 5.0f), 2);
-
 	new PressureSwitch(sceneManager_);
 
 
@@ -183,7 +202,9 @@ void PhysicsState::createPhysics()
 
 }
 
-
+//=============================================================================
+//							CreateBox
+//
 void PhysicsState::CreateBox()
 {
 	HoltBox* bb = new HoltBox(sceneManager_, b2Vec2(-0.0f, 15.0f));
@@ -194,7 +215,9 @@ void PhysicsState::CreateBox()
 	}
 }
 
-
+//=============================================================================
+//							createScene
+//
 void PhysicsState::createScene()
 {
 
@@ -203,7 +226,25 @@ void PhysicsState::createScene()
 	float mCurvature = 1;
 	float mTiling = 15;
 	//sceneManager_->setSkyDome(true, "Examples/CloudySky", mCurvature, mTiling);
-	sceneManager_->createLight("Light")->setPosition(0,75,0);
+	Ogre::Light* light = sceneManager_->createLight("Light");
+	
+	light->setType(Light::LT_SPOTLIGHT);
+	light->setPosition(0,25,0);
+	light->setDirection(0,-1,0);
+	light->setSpotlightRange(Degree(35), Degree(50));
+
+	sceneManager_->setAmbientLight(ColourValue(0.05, 0.05, 0.05));
+	//sceneManager_->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
+	myGUI = new MyGUI::Gui();
+	myGUI->initialise(GAMEFRAMEWORK->renderWindow_);
+	
+	MyGUI::ButtonPtr button = myGUI->createWidget<MyGUI::Button>("Button", 10, 10, 300, 26, MyGUI::Align::Default, "Main");
+	button->setCaption("exit");
+
+	//button->eventMouseButtonClick = MyGUI::newDelegate(this, &CLASS_NAME::METHOD_NAME);
+	//button->eventMouseButtonClick = MyGUI::newDelegate(this, &PhysicsState::MakeExit);
+
+
 
 	/*
 	//=============================================================
@@ -239,13 +280,68 @@ void PhysicsState::createScene()
 	// Create background
 	//============================================================
 	*/
+	
+	
+	// Create background rectangle covering the whole screen
+	Rectangle2D* rect = new Rectangle2D(true);
+	rect->setCorners(-1.0, 1.0, 1.0, -1.0);
+	rect->setMaterial("Matt/Skyline");
+
+	// Render the background before everything else
+	rect->setRenderQueueGroup(RENDER_QUEUE_BACKGROUND);
+
+	// Use infinite AAB to always stay visible
+	AxisAlignedBox aabInf;
+	aabInf.setInfinite();
+	rect->setBoundingBox(aabInf);
+
+	// Attach background to the scene
+	SceneNode* node = sceneManager_->getRootSceneNode()->createChildSceneNode("BackgroundNode");
+	node->attachObject(rect);
+	
+
+	// Example of background scrolling
+	//===================================================================
+
+	
+	Ogre::MovablePlane* plane = new MovablePlane("MyPlane");
+	plane->d = 0; 
+	plane->normal = Vector3(0.0, 1.0, 0.0);
+
+	Ogre::MeshManager::getSingleton().createPlane("HeySteve", 
+		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+		*plane,
+		1000,			// X Length
+		1000,			// Z Length
+		5, 5,			// Segments x ,y
+		true,
+		1, 
+		1,				// Tile x
+		1,				// Tile y
+		Vector3::UNIT_Z);
+
+	Ogre::Entity* planeEnt = sceneManager_->createEntity("butts" , "HeySteve");
+	planeEnt->setMaterial(MaterialManager::getSingleton().getByName("Matt/Black"));
+
+	Ogre::SceneNode* planeNode = sceneManager_->getRootSceneNode()->createChildSceneNode();
+	planeNode->attachObject(planeEnt);
+	
+	planeNode->setPosition(0.0,-0.01,500.0);
+
+	Ogre::SceneNode* buildingNode = sceneManager_->getRootSceneNode()->createChildSceneNode();
+	Ogre::Entity* entity = sceneManager_->createEntity("ABuilding", Ogre::SceneManager::PT_CUBE);
+	entity->setMaterialName("Matt/Black");
+	buildingNode->attachObject(entity);
+	buildingNode->setPosition(0.0,-0.01,0);
 
 	createPhysics();
 	
 }
 
 
-
+//=============================================================================
+//							keyPressed
+//
 bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 {
 	if(keyEventRef.key == OIS::KC_P)
@@ -260,26 +356,38 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 		return true;
 	}
 
-	if(!m_bChatMode || (m_bChatMode && !GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_O)))
-		GameFramework::getSingletonPtr()->KeyPressed(keyEventRef);
+
+	GameFramework::getSingletonPtr()->KeyPressed(keyEventRef);
 
 
 	return true;
 }
 
-
+//=============================================================================
+//							keyReleased
+//
 bool PhysicsState::keyReleased(const OIS::KeyEvent &keyEventRef)
 {
 	GameFramework::getSingletonPtr()->KeyReleased(keyEventRef);
 
+#if DEBUG_DRAW_ON
+	if(keyEventRef.key == OIS::KC_C)
+	{
+		debugDraw_->SetFlags(debugDraw_->GetFlags() ^ b2DebugDraw::e_shapeBit);
+	}
+#endif 
+
 	return true;
 }
 
 
-
+//=============================================================================
+//							mouseMoved
+//
 bool PhysicsState::mouseMoved(const OIS::MouseEvent &evt)
 {
 
+	myGUI->injectMouseMove(evt);
 	//myPicking_->MouseMoved(evt);
 
 	if(m_bRMouseDown)
@@ -291,9 +399,12 @@ bool PhysicsState::mouseMoved(const OIS::MouseEvent &evt)
 	return true;
 }
 
-
+//=============================================================================
+//							mousePressed
+//
 bool PhysicsState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
+	myGUI->injectMousePress(evt, id);
 	//myPicking_->MousePressed(evt, id);
 
 	if(id == OIS::MB_Left)
@@ -309,11 +420,13 @@ bool PhysicsState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID i
 }
 
 
-
+//=============================================================================
+//							mouseReleased
+//
 bool PhysicsState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
 	//myPicking_->MouseReleased(evt, id);
-
+	myGUI->injectMouseRelease(evt, id);
 	if(id == OIS::MB_Left)
 	{
 		m_bLMouseDown = false;
@@ -328,9 +441,9 @@ bool PhysicsState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID 
 
 
 
-
-
-
+//=============================================================================
+//							moveCamera
+//
 void PhysicsState::moveCamera()
 {
 	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_LSHIFT)) 
@@ -340,7 +453,9 @@ void PhysicsState::moveCamera()
 }
 
 
-
+//=============================================================================
+//							getInput
+//
 void PhysicsState::getInput()
 {
 	if(m_bChatMode == false)
@@ -350,22 +465,19 @@ void PhysicsState::getInput()
 		{
 			m_TranslateVector.x = -m_MoveScale;
 		}
-
+#if DEBUG_DRAW_ON
 		// Turn Debug Draw off
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_Z))
 		{
-#if DEBUG_DRAW_ON
 			debugDrawOn_ = false;
-#endif
 		}
 
 		// Turn Debug Draw on
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_X))
 		{
-#if DEBUG_DRAW_ON
 			debugDrawOn_ = true;
-#endif
 		}
+#endif
 
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_D))
 		{
@@ -427,7 +539,9 @@ void PhysicsState::getInput()
 	}
 }
 
-
+//=============================================================================
+//							update
+//
 /// Main Update looped for a level
 bool PhysicsState::update(double timeSinceLastFrame)
 {
@@ -479,7 +593,7 @@ bool PhysicsState::update(double timeSinceLastFrame)
 
 		GameObject::UpdateObjectList(timeStep);
 
-		camera_->setPosition(parker_->GetBodyPosition().x,parker_->GetBodyPosition().y + 7,camera_->getPosition().z);
+		camera_->setPosition(parker_->GetBodyPosition().x,parker_->GetBodyPosition().y + 3,camera_->getPosition().z);
 		camera_->lookAt(parker_->GetBodyPosition().x,parker_->GetBodyPosition().y,0);
 		
 	}
@@ -496,6 +610,9 @@ void PhysicsState::setUnbufferedMode()
 {
 }
 
+//=============================================================================
+//							BeginContact
+//
 /// Called when two fixtures begin to touch.
 /// This calls the BeginContact method of an GameObjectOgreBox2D if the user data 
 /// for one the touching fixtures is there. The called BeginContact method passes
@@ -511,6 +628,9 @@ void PhysicsState::BeginContact(b2Contact* contact)
 	beginContactList_.push_back(c);
 }
 
+//=============================================================================
+//							EndContact
+//
 /// Called when two fixtures cease to touch.
 /// This calls the EndContact method of an GameObjectOgreBox2D if the user data 
 /// for one the touching fixtures is there. The called EndContact method passes
@@ -525,6 +645,9 @@ void PhysicsState::EndContact(b2Contact* contact)
 	endContactList_.push_back(c);
 }
 
+//=============================================================================
+//							ProcessContacts
+//
 void PhysicsState::ProcessContacts()
 {
 
@@ -605,4 +728,24 @@ void PhysicsState::ProcessContacts()
 
 	endContactList_.clear();
 	beginContactList_.clear();
+}
+
+
+//=============================================================================
+//							SayGoodbye
+//
+/// Called when any joint is about to be destroyed due
+/// to the destruction of one of its attached bodies.
+void PhysicsState::SayGoodbye(b2Joint* joint)
+{
+}
+
+
+//=============================================================================
+//							SayGoodbye
+//
+/// Called when any fixture is about to be destroyed due
+/// to the destruction of its parent body.
+void PhysicsState::SayGoodbye(b2Fixture* fixture)
+{
 }

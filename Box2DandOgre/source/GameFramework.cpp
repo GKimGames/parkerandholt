@@ -1,4 +1,6 @@
 #include "GameFramework.h"
+#include "GameObject.h"
+#include "GameObjectFactory.h"
 
 using namespace Ogre;
 
@@ -46,17 +48,23 @@ bool GameFramework::InitOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 	
 	root_ = new Ogre::Root();
 
-	if(root_->showConfigDialog())
-	{
-		// If returned true, user clicked OK so initialise
-		// Here we choose to let the system create a default rendering window by passing 'true'
-		renderWindow_ = root_->initialise(true, wndTitle);        
-	}
-	else
-	{
-		return false;
+	//try first to restore an existing config 
+	//if (!root_->restoreConfig()) 
+	{ 
+		if(root_->showConfigDialog())
+		{
+			// If returned true, user clicked OK so initialise
+			// Here we choose to let the system create a default rendering window by passing 'true'
+			renderWindow_ = root_->initialise(true, wndTitle);        
+		}
+		else
+		{
+			return false;
+		}
+
 	}
 
+	//renderWindow_ = root_->initialise(true, wndTitle);    
 	viewport_ = renderWindow_->addViewport(0);
 	viewport_->setBackgroundColour(ColourValue(0.8, 0.8, 0.8, 1.0));
 
@@ -117,12 +125,12 @@ bool GameFramework::InitOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 
 	renderWindow_->setActive(true);
 
-
-
+	gameObjectFactory = new GameObjectFactory();
+	gameObjectFactory->AddObjectCreators();
+	
+	
 	return true;
 }
-
-
 
 //  KeyPressed
 /// 
@@ -149,7 +157,6 @@ bool GameFramework::KeyPressed(const OIS::KeyEvent &keyEventRef)
 
 	return true;
 }
-
 
 
 bool GameFramework::KeyReleased(const OIS::KeyEvent &keyEventRef)

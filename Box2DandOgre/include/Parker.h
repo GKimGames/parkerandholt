@@ -21,6 +21,7 @@ class CharacterParker : public Character, public b2RayCastCallback
 {
 	friend class ParkerStateOnGround;
 	friend class ParkerStateInAir;
+	friend class ParkerStateLedgeGrab;
 
 public:
 
@@ -51,6 +52,9 @@ public:
 			GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec2, feetVec2, color);
 		}
 		*/
+		
+		UpdateDebugDraw();
+
 		return stateMachine_->Update();
 	}
 
@@ -141,9 +145,11 @@ private:
 	// These sensors are used to tell where things are in front of Parker
 	// Such as if something is only shin high, thigh high, or up to the torso.
 	// Used to check if something above the character is within a grabbable reach.
-	b2Fixture*			shinSensor_;
-	b2Fixture*			thighSensor_;
-	b2Fixture*			torsoSensor_;
+	b2Fixture*			shinSensorRight_;
+	b2Fixture*			torsoSensorRight_;
+
+	b2Fixture*			shinSensorLeft_;
+	b2Fixture*			torsoSensorLeft_;
 
 	int					shinSensorHitCount_;
 	int					thighSensorHitCount_;

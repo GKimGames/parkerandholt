@@ -39,10 +39,7 @@ public:
 	/// Called when two fixtures cease to touch.
 	void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 	
-	virtual bool UpdateGraphics(double timeSinceLastFrame)
-	{
-		return true;
-	};
+	//virtual bool UpdateGraphics(double timeSinceLastFrame)
 
 	virtual void Jump();
 

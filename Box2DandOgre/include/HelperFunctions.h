@@ -1,13 +1,18 @@
 #ifndef HELPER_FUNCTIONS_H
 #define HELPER_FUNCTIONS_H
 #define DEBUGLOG_ON 1
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include "windows.h"
+#include "Ogre.h"
+
 //=============================================================================
 //								Debug log functions
 #if DEBUGLOG_ON
 #define DEBUG_LOG(X) PrintDebug(X)
 #define DEBUG_LOGC(X) PrintDebugC(X)
 #else
-#define DLOG(X) 
 #endif
 
 #define OGRE_LOG(X) GameFramework::getSingletonPtr()->log_->logMessage(X) 
@@ -15,12 +20,7 @@
 //Ogre::String s = Ogre::StringConverter::toString(Ogre::Real(capsuleRadius_));
 //DEBUG_LOG(s.c_str());
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include "windows.h"
 
-#include "GameFramework.h"
 
 //=============================================================================
 //						PrintDebug

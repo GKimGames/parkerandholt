@@ -10,44 +10,50 @@
 #define GAME_OBJECT_OGRE_H
 
 #include "GameObject.h"
-#include "MessageDispatcher.h"
-#include "Message.h"
-
+#include "GameFramework.h"
 
 /// GameObjectOgre extends GameObject
 class GameObjectOgre : public GameObject
 {
+
+	friend class ObjectOgreCreator;
+
 public:
 
-	GameObjectOgre(){}
-	virtual ~GameObjectOgre(){}
 
-	virtual bool UpdateGraphics(double timeSinceLastFrame)=0;
+	GameObjectOgre(Ogre::String = "GameObjectOgre");
+
+	virtual ~GameObjectOgre();
+
+	virtual bool Initialize();
+	virtual bool Initialize(Ogre::String meshName);
+
+	/// Update calls UpdataGraphics
+	virtual bool Update(double timeSinceLastFrame);
+
+	virtual bool UpdateGraphics(double timeSinceLastFrame);
+
+/*=============================================================================
+			Getter / Setter methods
+=============================================================================*/
 
 	/// Returns the position of the scene node 
 	virtual Ogre::Vector3 GetPosition()
 	{
 		return sceneNode_->getPosition();
-	};
-
-	/// Update calls UpdataGraphics
-	virtual bool Update(double timeSinceLastFrame)
-	{
-		UpdateGraphics(timeSinceLastFrame);
-		return true;
-	};
+	}
 
 	/// Returns the Ogre::SceneNode for this Object
 	virtual Ogre::SceneNode* GetSceneNode()
 	{
 		return sceneNode_;
-	};
+	}
 
 	/// Returns the Ogre::Entity for this Object
 	virtual Ogre::Entity* GetEntity()
 	{
 		return entity_;
-	};
+	}
 
 protected:
 

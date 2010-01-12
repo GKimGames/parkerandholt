@@ -47,7 +47,7 @@ MovingPlatform::MovingPlatform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec
 		*plane,
 		lengthOfPlane,  // X Length
 		5,				// Z Length
-		5, 5,			// Segments x ,y
+		3 * lengthOfPlane / 15, 5,			// Segments x ,y
 		true,
 		1, 
 		3 * lengthOfPlane / 10,		// Tile x
@@ -59,8 +59,9 @@ MovingPlatform::MovingPlatform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec
 	MaterialPtr material = MaterialManager::getSingleton().create("Background", "General");
 	material->getTechnique(0)->getPass(0)->createTextureUnitState("roadtexture.jpg");
 	material->getTechnique(0)->getPass(0)->setLightingEnabled(true);
-	//material->getTechnique(0)->getPass(0)->setDepthCheckEnabled(false);
-	//material->getTechnique(0)->getPass(0)->setDepthWriteEnabled(false);
+	material->getTechnique(0)->getPass(0)->setDepthCheckEnabled(true);
+	material->getTechnique(0)->getPass(0)->setDepthWriteEnabled(true);
+
 	// Temporary
 
 	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();

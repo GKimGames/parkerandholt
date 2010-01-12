@@ -26,6 +26,9 @@ LedgeSensor::LedgeSensor() : GameObjectSensor(NO_MESSAGE)
 
 }
 
+//=============================================================================
+//							BeginContact
+//
 /// Called when two fixtures begin to touch.
 /// Sends out the signal OnTouch to its subscribers
 void LedgeSensor::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)

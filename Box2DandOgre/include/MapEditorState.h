@@ -105,7 +105,8 @@ protected:
 #endif
 
 private:
-
+	
+	MyGUI::Gui*					myGUI_;
 	SceneNode*					linesNode_;
 	DynamicLines*				dynamicLines_;
 	int							linesNodeScale_;

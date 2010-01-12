@@ -14,11 +14,8 @@
 #pragma warning (disable:4786)
 
 #include <set>
-
 #include "OgreSingleton.h"
-#include "GameObject.h"
 #include "Message.h"
-#include "HelperFunctions.h"
 
 #define Dispatch KGBMessageDispatcher::getSingletonPtr()
 typedef unsigned int GameObjectId;
@@ -28,8 +25,7 @@ const double SEND_IMMEDIATELY = 0.0;
 
 /// Send the message to all Objects.
 const unsigned int SEND_TO_ALL = 0;
-
-
+class GameObject;
 class KGBMessageDispatcher : public Ogre::Singleton<KGBMessageDispatcher>
 {
 public:
@@ -43,7 +39,7 @@ public:
 						 GameObjectId	pSender,
 						 GameObjectId	pReceiver,
 						 KGBMessageType	pMessageType,
-						 boost::any*	pUserData);
+						 boost::any	pUserData);
 
 	// Call this to send out delayed messages
 	void DispatchDelayedMessages();
@@ -58,7 +54,7 @@ public:
 private:  
 
 	// This method discharges the message to all Entitys
-	void DischargeToAll(const KGBMessage& pMsg);
+	void DischargeToAll(const KGBMessage pMsg);
 
 	// A std::set is used as the container for the delayed messages
 	// because of the benefit of automatic sorting and avoidance

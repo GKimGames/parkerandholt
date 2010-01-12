@@ -1,6 +1,9 @@
 #include "PressureSwitch.h"
 
 
+//=============================================================================
+//							PressureSwitch::Constructor
+//
 PressureSwitch::PressureSwitch(Ogre::SceneManager* sceneManager,
 							   b2Body* body, Ogre::Entity* entity)
 {
@@ -65,16 +68,25 @@ PressureSwitch::PressureSwitch(Ogre::SceneManager* sceneManager,
 
 	world_->CreateJoint(&pjd);
 
+
+	messageList_.insert(
+		std::make_pair<GameObjectId, SensorMessage>(
+		SEND_TO_ALL,SensorMessage(STUPID_MESSAGE,STUPID_MESSAGE))
+		);
+
 	messageList_.insert(
 		std::make_pair<GameObjectId, SensorMessage>(
 		SEND_TO_ALL,SensorMessage(CHARACTER_JUMP,CHARACTER_JUMP))
 		);
+
 }
 
+//=============================================================================
+//							BeginContact
+//
 /// Called when two fixtures begin to touch.
 /// Contact fixture is the fixture in this Object's body.
 /// Collided fixture is the fixture that hit this Object's body.
-/// By default this does nothing.
 void PressureSwitch::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
 	if(collidedFixture == movingFixture_)
@@ -85,15 +97,15 @@ void PressureSwitch::BeginContact(ContactPoint* contact, b2Fixture* contactFixtu
 		// This helps prevent bouncing
 		body_->SetLinearVelocity(b2Vec2(0,0));
 		
-		//SendOnMessageToList();
 	}
 }
 
-
+//=============================================================================
+//							EndContact
+//
 /// Called when two fixtures cease to touch.
 /// Contact fixture is the fixture in this Object's body.
 /// Collided fixture is the fixture that hit this Object's body.
-/// By default this does nothing.
 void PressureSwitch::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
 	if(collidedFixture == movingFixture_)
@@ -102,7 +114,8 @@ void PressureSwitch::EndContact(ContactPoint* contact, b2Fixture* contactFixture
 		{
 			if(timeAccum_ > minimumTime_)
 			{
-				SendOffMessageToList();
+				std::string* s = new std::string("assss");
+				SendOffMessageToList(s);
 			}
 			else
 			{
@@ -118,6 +131,9 @@ void PressureSwitch::EndContact(ContactPoint* contact, b2Fixture* contactFixture
 	}
 }
 
+//=============================================================================
+//								Update
+//
 bool PressureSwitch::Update(double timeSinceLastFrame)
 { 
 	if(hitBegun_)
@@ -126,7 +142,8 @@ bool PressureSwitch::Update(double timeSinceLastFrame)
 		
 		if(timeAccum_ > minimumTime_)
 		{
-			SendOnMessageToList();
+			std::string* s = new std::string("assss");
+			SendOnMessageToList(s);
 			hitBegun_ = false;
 		}
 	}

@@ -3,4 +3,7 @@
   <Camera>
     <InitialPosition x="0" y="0" z="20"/>
   </Camera>
+  <GameObject name="MapEditorState"/>
+  <Platform gameObject="Platform" name="Platformy" px1="0" py1="-5" px2="5" py2="-5"/>
+  <ObjectOgre name="something"/>
 </Settings>

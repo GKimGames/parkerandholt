@@ -18,7 +18,6 @@ HoltBox::HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center)
 
 	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
 	sceneNode_->attachObject(entity_);
-
 	sceneNode_->setPosition(center.x, center.y, 0);
 	
 	boxWidth_ = 0.6;
