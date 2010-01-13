@@ -25,6 +25,7 @@ public:
 	void AddCreator(std::string str, GameObjectCreator* objectCreator);
 
 	GameObject* CreateGameObject(std::string creator,TiXmlElement* element);
+	GameObject* CreateGameObject(TiXmlElement* element);
 	Ogre::SceneManager* sceneManager;
 
 	void AddObjectCreators();

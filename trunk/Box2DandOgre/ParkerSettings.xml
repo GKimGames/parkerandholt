@@ -40,4 +40,14 @@
     </Body>
   </Bodys>
   <Platform gameObject="Platform" name="Platformy" p1="0 -5" p2="5 -5"/>
+  <Object3 type="OgreBox2D">
+    <GameObject name="OgreBox2D_Demo"/>
+    <OgreObject mesh="cube.1m.mesh" position="0 0 10" />
+    <Box2DObject>
+      <Body>
+        <BodyDef bodyType="dynamicBody" position="0 10"/>
+        <Fixture shape="box" boxWidth="1" boxHeight="1" density="10"/>
+      </Body>
+    </Box2DObject>
+  </Object3>
 </Character>

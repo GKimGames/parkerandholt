@@ -1,4 +1,6 @@
 #include "Parker.h"
+#include "GameFramework.h"
+#include "GameObjectFactory.h"
 
 //=============================================================================
 //								Constructor
@@ -261,11 +263,16 @@ bool CharacterParker::ReadXMLConfig()
 	TiXmlElement* wallJumpNode = hRoot.FirstChild( "MovementInfo" ).FirstChildElement( "WallJumpInfo" ).Element();
 	wallJumpNode->QueryDoubleAttribute("jumpingForce", &wallJumpForce_);
 
+
+	TiXmlElement* objectOgreElement = hRoot.FirstChild( "Object3" ).Element();
+	GAMEFRAMEWORK->gameObjectFactory->CreateGameObject(objectOgreElement);
+	
+
+	/*
 	TiXmlElement* bodys = hRoot.FirstChildElement( "Bodys" ).ToElement();
 	
 	bodys = bodys->FirstChildElement();
 	
-	/*
 	while(bodys != 0)
 	{
 		b2Body* b = 0;

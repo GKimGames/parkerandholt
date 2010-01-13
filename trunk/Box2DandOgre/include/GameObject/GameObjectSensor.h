@@ -29,8 +29,9 @@ public:
 	/// using SetBodyPosition.
 	GameObjectSensor(KGBMessageType messageOn = GAME_SENSOR_ON,
 					 KGBMessageType messageOff = GAME_SENSOR_OFF,
+					 Ogre::String name = "GameObjectSensor",
 					 b2Body* body = 0, Ogre::Entity* entity = 0):
-	GameObjectOgreBox2D(body, entity)
+	GameObjectOgreBox2D(name, body, entity)
 	{
 		defaultMessageOn_  = messageOn;
 		defaultMessageOff_ = messageOff;

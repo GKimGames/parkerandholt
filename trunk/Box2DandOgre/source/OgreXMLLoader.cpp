@@ -27,7 +27,7 @@ OgreXMLLoaderResult OgreXMLLoader::GetVector3(TiXmlElement* element, const char*
 		DEBUG_LOG(s);
 	}
 
-	if(result = OGREXML_OK)
+	if(result == OGREXML_OK)
 	{
 
 		const char* str1 = element->Attribute(name);
