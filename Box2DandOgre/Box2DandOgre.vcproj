@@ -226,7 +226,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\sour\OgreXMLLoader.cpp"
+				RelativePath=".\source\OgreXMLLoader.cpp"
 				>
 			</File>
 			<Filter
@@ -531,6 +531,10 @@
 					>
 					<File
 						RelativePath=".\include\GameObjectCreator.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\GameObjectOgreBox2DCreator.h"
 						>
 					</File>
 					<File

@@ -38,10 +38,8 @@ bool GameObjectOgre::Initialize(Ogre::String meshName)
 	entityName += "_Entity";
 
 	entity_ = sceneManager_->createEntity(entityName, meshName);
-
-	Ogre::SceneNode* planeNode = sceneManager_->getRootSceneNode()->createChildSceneNode();
-	planeNode->attachObject(entity_);
-
+	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
+	sceneNode_->attachObject(entity_);
 	initialized_ = true;
 
 	return initialized_;

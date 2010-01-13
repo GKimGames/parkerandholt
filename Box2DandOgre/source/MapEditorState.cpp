@@ -273,8 +273,12 @@ void MapEditorState::createPhysics()
 	TiXmlElement* platformElement = hRoot.FirstChild( "Platform" ).Element();
 	GAMEFRAMEWORK->gameObjectFactory->CreateGameObject("Platform", platformElement);
 
-	TiXmlElement* objectOgreElement = hRoot.FirstChild( "ObjectOgre" ).Element();
-	GAMEFRAMEWORK->gameObjectFactory->CreateGameObject("ObjectOgre", objectOgreElement);
+	TiXmlElement* objectOgreElement = hRoot.FirstChild( "Object3" ).Element();
+	GAMEFRAMEWORK->gameObjectFactory->CreateGameObject(objectOgreElement);
+
+
+	//TiXmlElement* ogreBox2DElement = hRoot.FirstChild( "Object" ).Element();
+	//GAMEFRAMEWORK->gameObjectFactory->CreateGameObject(ogreBox2DElement);
 
 }
 

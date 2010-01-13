@@ -34,20 +34,20 @@ const static signed short STATIC_MAP_GROUP = -10;
 /// This extends GameObjectOgre and adds a Box2D component.
 class GameObjectOgreBox2D  : public GameObjectOgre
 {
+
+	friend class GameObjectOgreBox2DCreator;
 public:
 
 	/// Constructor grabs the reference from the OgreFramework of the b2World.
 	/// The object is not initialized until Initialize is called and will only
 	/// be initialized if the body doesn't equal 0.
-	GameObjectOgreBox2D(b2Body* body = 0, Ogre::Entity* entity = 0);
+	GameObjectOgreBox2D(Ogre::String name = "GameObjectOgreBox2D", b2Body* body = 0, Ogre::Entity* entity = 0);
 
 	virtual ~GameObjectOgreBox2D();
 
 	virtual bool Update(double timeSinceLastFrame);
 
 	virtual bool Initialize();
-
-
 	virtual bool InitializeDebugDraw(Ogre::ColourValue color = Ogre::ColourValue(1,1,1,1), Ogre::String materialName = "debugDraw");
 
 	virtual void UpdateDebugDraw();

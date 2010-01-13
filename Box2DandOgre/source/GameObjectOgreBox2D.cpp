@@ -14,7 +14,8 @@ Author: Matt King
 /// Constructor grabs the reference from the OgreFramework of the b2World.
 /// The object is not initialized until Initialize is called and will only
 /// be initialized if the body doesn't equal 0.
-GameObjectOgreBox2D::GameObjectOgreBox2D(b2Body* body, Ogre::Entity* entity)
+GameObjectOgreBox2D::GameObjectOgreBox2D(Ogre::String name, b2Body* body, Ogre::Entity* entity)
+: GameObjectOgre(name)
 {
 	// There is only ever one world at a time and all objects get the
 	// current world from the GameFramework singleton.

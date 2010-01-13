@@ -81,7 +81,6 @@ void PhysicsState::enter()
 
 	CompositorManager::getSingleton().addCompositor(GAMEFRAMEWORK->viewport_, "B&W");
 	CompositorManager::getSingleton().setCompositorEnabled(GAMEFRAMEWORK->viewport_, "B&W",true);
-
 }
 
 
@@ -116,6 +115,10 @@ void PhysicsState::resume()
 //
 void PhysicsState::exit()
 {
+
+	CompositorManager::getSingleton().setCompositorEnabled(GAMEFRAMEWORK->viewport_, "B&W",false);
+
+	CompositorManager::getSingleton().removeAll();
 
 	delete world;
 

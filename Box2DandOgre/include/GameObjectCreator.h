@@ -19,6 +19,9 @@ enum CreatorResult
 	CREATOR_OK,
 	CREATOR_ELEMENT_IS_ZERO,
 	CREATOR_OBJECT_IS_ZERO,
+	CREATOR_NO_MESH,
+	CREATOR_INITIALIZED_FAILED,
+	CREATOR_NO_OGRE_OBJECT_ELEMENT,
 	CREATOR_RESULT_COUNT
 };
 
@@ -26,7 +29,11 @@ const static char* CreatorResultString[CREATOR_RESULT_COUNT] =
 {
 	"Creator_OK",
 	"Creator_Element_Is_Zero",
-	"Creator_Object_Is_Zero"
+	"Creator_Object_Is_Zero",
+	"Creator_No_Mesh",
+	"Creator_Initialized_Failed",
+	"Creator_No_Ogre_Object_Element"
+
 };
 
 class GameObjectCreator
@@ -41,22 +48,18 @@ public:
 	virtual GameObject* LoadFromXML(TiXmlElement* element)
 	{
 		GameObject* object = new GameObject();
-		if(element != 0)
-		{
-			std::string str;
-			element->QueryValueAttribute("name", &str);
-			object->objectName_ = str;
-		}
-		else
-		{
-			Ogre::String s = "GameObjectCreator: Failed to load - Element is zero";
-			GAMEFRAMEWORK->log_->logMessage(s);
-			DEBUG_LOG(s);
+		CreatorResult result = LoadFromXML(element, object);
 
+		if(result == CREATOR_OK)
+		{
+			return object;
 		}
 
+		// It didn't get created ok.
 
-		return object;
+		delete object;
+		
+		return 0;		
 	}
 
 	virtual CreatorResult LoadFromXML(TiXmlElement* element, GameObject* gameObject)
@@ -64,11 +67,25 @@ public:
 		CreatorResult result;
 		if(element != 0 && gameObject != 0)
 		{
-			std::string str;
-			element->QueryValueAttribute("name", &str);
-			gameObject->objectName_ = str;
+			TiXmlElement* gameObjectElement = element->FirstChild( "GameObject" )->ToElement();
+			if(gameObjectElement != 0)
+			{
+				std::string str;
+				element->QueryValueAttribute("name", &str);
+				gameObject->objectName_ = str;
 
-			result =  CREATOR_OK;
+				result =  CREATOR_OK;
+			}
+			else
+			{
+				result = CREATOR_ELEMENT_IS_ZERO;
+
+				Ogre::String s = "GameObjectCreator: Failed to load - ";
+
+				s += element->Value();
+				s += ". Error ";
+				s += CreatorResultString[result];
+			}
 		}
 		else
 		{
@@ -82,10 +99,7 @@ public:
 				result = CREATOR_OBJECT_IS_ZERO;
 			}
 
-			Ogre::String s = "GameObjectCreator: Failed to load - ";
-
-			s += element->Value();
-			s += ". Error ";
+			Ogre::String s = "GameObjectCreator: Failed to load. Error: ";;
 			s += CreatorResultString[result];
 
 			GAMEFRAMEWORK->log_->logMessage(s);
