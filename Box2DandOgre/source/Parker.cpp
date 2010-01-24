@@ -9,10 +9,11 @@ CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager)
 :Character(sceneManager)
 {
 	parkerId_ = objectId_;
+
 	stateMachine_ = new FSMStateMachine<CharacterParker>(this);
 
-	onGroundState_ = new ParkerStateOnGround(this);
-	inAirState_ = new ParkerStateInAir(this);
+	onGroundState_ = new ParkerStateOnGround(this,stateMachine_);
+	inAirState_ = new ParkerStateInAir(this,stateMachine_);
 
 	stateMachine_->SetCurrentState(onGroundState_);
 	stateMachine_->ChangeState(onGroundState_);
@@ -35,6 +36,9 @@ bool CharacterParker::Initialize()
 	CreateGraphics();
 
 	CreatePhysics();
+
+	animationBlender_ = new AnimationBlender(entity_);
+	animationBlender_->Initialize("idle");
 
 	initialized_ = true;
 
@@ -60,8 +64,11 @@ void CharacterParker::InitVariables()
 	torsoSensorHitCount_ = 0;
 	feetSensorHitCount_ = 0;
 
-	timeBetweenJump_ = .25;
+	timeBetweenJump_ = .08;
 
+	moveLeft_ = false;
+	moveRight_ = false;
+	jump_ = false;
 }
 
 //=============================================================================
@@ -79,14 +86,14 @@ void CharacterParker::CreatePhysics()
 	b2PolygonShape bodyShapeDef;
 
 	// The extents are the half-widths of the box.
-	
+
 	b2Vec2 bodyVecs[4];
 	bodyVecs[0].Set(-boundingBoxWidth_/2, -boundingBoxHeight_/4);
 	bodyVecs[1].Set(boundingBoxWidth_/2, -boundingBoxHeight_/4);
 	bodyVecs[2].Set(boundingBoxWidth_/2, boundingBoxHeight_/2);
 	bodyVecs[3].Set(-boundingBoxWidth_/2, boundingBoxHeight_/2);
 	bodyShapeDef.Set(bodyVecs,4);
-	
+
 	bodyShapeDef.SetAsBox(boundingBoxWidth_/2, boundingBoxHeight_/2);
 
 	b2FixtureDef fd;
@@ -103,7 +110,7 @@ void CharacterParker::CreatePhysics()
 
 	//body_->SetLinearDamping(linearDamping_);
 
-	
+
 	// Create the sensor for the feet
 	b2PolygonShape feetSensor_Def;
 	feetSensor_Def.m_vertexCount = 4;
@@ -111,13 +118,13 @@ void CharacterParker::CreatePhysics()
 	feetSensor_Def.m_vertices[1].Set(-boundingBoxWidth_/2 + 0.05, -boundingBoxHeight_/2 - 0.1);
 	feetSensor_Def.m_vertices[2].Set(boundingBoxWidth_/2  - 0.05,  -boundingBoxHeight_/2 - 0.1);
 	feetSensor_Def.m_vertices[3].Set(boundingBoxWidth_/2  - 0.05,  -boundingBoxHeight_/2 + 0.1);
-	
+
 	fd.shape = &feetSensor_Def;
 	fd.isSensor = true;
 	fd.userData = &gameObjectType_;
 
 	feetSensor_ = body_->CreateFixture(&fd);
-	
+
 
 	// Create the definition of the polygon for the shin sensor
 	b2PolygonShape shinSensorRight_Def;
@@ -160,7 +167,7 @@ void CharacterParker::CreatePhysics()
 	fd.shape = &torsoSensorLeft_Def;
 	fd.userData = &gameObjectType_;
 	torsoSensorLeft_ = body_->CreateFixture(&fd);
-	
+
 	body_->SetUserData(this); 
 
 }
@@ -174,7 +181,7 @@ void CharacterParker::CreateGraphics()
 {
 	// Set up the Graphics part of Parker
 	entity_ = sceneManager_->createEntity("Parker", meshName_);
-	animationState_ = entity_->getAnimationState("Walk");
+	animationState_ = entity_->getAnimationState("run");
 	animationState_->setLoop(true);
 	animationState_->setEnabled(true);
 
@@ -190,9 +197,9 @@ void CharacterParker::CreateGraphics()
 
 	// Scale the bodyNode to the apppropriate size.
 	bodyNode_->scale(scaleX_,scaleY_,scaleZ_);
-	bodyNode_->translate(translateX,translateY,translateZ);
+	bodyNode_->translate(translate_);
 	bodyNode_->rotate(Ogre::Vector3::UNIT_Y,Ogre::Degree(rotateY));
-	sceneNode_->showBoundingBox(true);
+
 }
 
 //=============================================================================
@@ -216,13 +223,9 @@ bool CharacterParker::ReadXMLConfig()
 
 	hRoot = TiXmlHandle(pElem);
 	TiXmlElement* meshNode = hRoot.FirstChild( "MeshInfo" ).FirstChild().Element();
-	std::string str("name");
-	str = *meshNode->Attribute(str);
-	const char* c = str.c_str();
-	meshName_ = Ogre::String(c);
-	meshNode->QueryDoubleAttribute("translateX", &translateX);
-	meshNode->QueryDoubleAttribute("translateY", &translateY);
-	meshNode->QueryDoubleAttribute("translateZ", &translateZ);
+
+	meshName_ = Ogre::String(meshNode->Attribute("name"));
+	OgreXMLLoader::GetVector3(meshNode,"translate", &translate_);
 	meshNode->QueryDoubleAttribute("rotateY", &rotateY);
 
 	TiXmlElement* sizeNode = hRoot.FirstChild( "ShapeInfo" ).FirstChild( "Size" ).Element();
@@ -266,26 +269,45 @@ bool CharacterParker::ReadXMLConfig()
 
 	TiXmlElement* objectOgreElement = hRoot.FirstChild( "Object3" ).Element();
 	GAMEFRAMEWORK->gameObjectFactory->CreateGameObject(objectOgreElement);
-	
 
-	/*
+	TiXmlElement* objectWall = hRoot.FirstChild( "Object4" ).Element();
+	GAMEFRAMEWORK->gameObjectFactory->CreateGameObject(objectWall);
+
+	objectWall = hRoot.FirstChild( "Object5" ).Element();
+	GAMEFRAMEWORK->gameObjectFactory->CreateGameObject(objectWall);
+
+	objectWall = hRoot.FirstChild( "Object6" ).Element();
+	GAMEFRAMEWORK->gameObjectFactory->CreateGameObject(objectWall);
+
+
+	TiXmlElement* loaderElement = hRoot.FirstChildElement( "Bodys" ).Element();
+	Box2DXMLLoader* loader = new Box2DXMLLoader(loaderElement);
+
+	//TiXmlElement* mp = hRoot.FirstChild( "MovingPlatform" ).Element();
+	//GAMEFRAMEWORK->gameObjectFactory->CreateGameObject(mp);
+
+	/*	
 	TiXmlElement* bodys = hRoot.FirstChildElement( "Bodys" ).ToElement();
-	
 	bodys = bodys->FirstChildElement();
-	
+
+	int i = 0;
 	while(bodys != 0)
 	{
-		b2Body* b = 0;
-		b = Box2DXMLLoader::Createb2Body(world_, bodys);
-		GameObjectOgreBox2D* goob = new GameObjectOgreBox2D(b);
+	Ogre::String str = "goober_";
+	str += Ogre::StringConverter::toString(i);
 
-		goob->InitializeDebugDraw(Ogre::ColourValue(.7,1,.2,1));
+	b2Body* b = 0;
+	b = Box2DXMLLoader::Createb2Body(world_, bodys);
+	GameObjectOgreBox2D* goob = new GameObjectOgreBox2D(str,b);
+	goob->Initialize();
+	goob->InitializeDebugDraw(Ogre::ColourValue(.7,1,.2,1));
 
-		bodys = bodys->NextSiblingElement();
-		
+	bodys = bodys->NextSiblingElement();
+
+	++i;
 	}
-	*/
 
+	*/
 	return true;
 }
 
@@ -297,10 +319,10 @@ bool CharacterParker::ReadXMLConfig()
 void CharacterParker::ApplyWalkingFriction(double timeSinceLastFrame)
 {
 
-	
+
 	b2Vec2 frictionVector(0,0);
 	b2Vec2 lv = body_->GetLinearVelocity();
-	
+
 	if(elevator_ != NULL)
 	{
 		lv -= elevator_->GetLinearVelocity();
@@ -326,7 +348,7 @@ void CharacterParker::ApplyWalkingFriction(double timeSinceLastFrame)
 
 		body_->ApplyForce(frictionVector, body_->GetPosition());
 	}
-	
+
 }
 
 
@@ -350,4 +372,95 @@ void CharacterParker::UpdateAnimation(double timeSinceLastFrame)
 	//animationBlender_->addTime(timeSinceLastFrame / 80);
 
 	//animationState_->addTime(timeSinceLastFrame);
+}
+
+bool CharacterParker::HandleMessage(const KGBMessage message)
+{ 
+
+	if(message.messageType == CREATE_BOX)
+	{
+		new HoltBox(sceneManager_, b2Vec2(-7, 10), 1, 2000);
+	}
+
+	return stateMachine_->HandleMessage(message); 
+}
+
+
+
+bool CharacterParker::Update(double timeSinceLastFrame)
+{
+	/*
+	static b2Color color(1,1,0);
+	bodyVec1 = body_->GetWorldPoint(b2Vec2(-boundingBoxWidth_/2,	0));
+	bodyVec2 = body_->GetWorldPoint(b2Vec2(boundingBoxWidth_/2,	0));
+	feetVec1 = body_->GetWorldPoint(b2Vec2(-boundingBoxWidth_/2,	-boundingBoxHeight_/2));
+	feetVec2 = body_->GetWorldPoint(b2Vec2(boundingBoxWidth_/2,	-boundingBoxHeight_/2));
+
+	world_->RayCast(this, bodyVec1, feetVec1);
+	world_->RayCast(this, bodyVec2, feetVec2);
+
+	if(GAMEFRAMEWORK->GetDebugDraw())
+	{
+	GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec1, feetVec1, color);
+	GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec2, feetVec2, color);
+	}
+	*/
+
+
+
+	return stateMachine_->Update();
+}
+
+float32 CharacterParker::ReportFixture(b2Fixture* fixture, const b2Vec2& point,
+									   const b2Vec2& normal, float32 fraction)
+{
+	/*
+	static bool oneTwo = true;
+	static b2Color color(1,0,234.0/255.0);
+
+	if(oneTwo == false)
+	{
+	GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec1, point, color);
+	oneTwo = true;
+	}
+	else
+	{
+	GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec2, point, color);
+	oneTwo = false;
+	}
+
+	body_->ApplyForce(b2Vec2(0,abs(body_->GetMass() * world_->GetGravity().y * 2)), body_->GetPosition());
+	body_->SetLinearVelocity(b2Vec2(0,0));
+	*/
+	return 0;
+
+}
+
+/// Called when two fixtures begin to touch.
+void CharacterParker::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+{
+	if(collidedFixture->IsSensor() == false)
+	{
+		if(contactFixture == feetSensor_ )
+		{
+			feetSensorHitCount_++;
+		}
+	}
+
+	stateMachine_->BeginContact(contact,contactFixture, collidedFixture);
+}
+
+/// Called when two fixtures cease to touch.
+void CharacterParker::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+{
+	if(collidedFixture->IsSensor() == false)
+	{
+		if(contactFixture == feetSensor_ )
+		{
+			feetSensorHitCount_--;
+		}
+	}
+
+	stateMachine_->EndContact(contact,contactFixture, collidedFixture);
+
 }

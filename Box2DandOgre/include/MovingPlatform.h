@@ -19,14 +19,20 @@
 class MovingPlatform : public GameObjectOgreBox2D
 {
 
+	friend class MovingPlatformCreator;
+
 public:
 
 	MovingPlatform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2, b2Vec2 start, b2Vec2 end, double speed);
 	MovingPlatform(Ogre::SceneManager* sceneManager, Ogre::Entity entity, b2Vec2 start, b2Vec2 end, double speed);
-	
+	MovingPlatform::MovingPlatform(Ogre::String name) : GameObjectOgreBox2D(name)
+	{
+		// do nothing
+	}
 	~MovingPlatform();
 
 	bool Update(double timeSinceLastFrame);
+	bool Initialize();
 
 	/// Called when two fixtures begin to touch.
 	/// Contact fixture is the fixture in this Object's body.
@@ -63,7 +69,7 @@ public:
 		
 		if(contact->contact->IsTouching())
 		{
-			DEBUG_LOGC("Its touching and leaving the platform");
+			DEBUG_LOG("Its touching and leaving the platform");
 		}
 	}
 

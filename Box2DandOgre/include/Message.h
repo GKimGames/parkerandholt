@@ -1,11 +1,11 @@
 /*=============================================================================
 
-KGBMessage.h
+		KGBMessage.h
 
-Author: Matt King
+		Author: Matt King
 
-This is a message that allows objects to send commands to each other.
-All objects have the method HandleMessage
+		This is a message that allows objects to send commands to each other.
+		All objects have the method HandleMessage
 
 =============================================================================*/
 
@@ -24,13 +24,37 @@ enum KGBMessageType
 {
 	MESSAGE_NULL,
 	NO_MESSAGE,
-	CHARACTER_MOVE_LEFT,
-	CHARACTER_MOVE_RIGHT,
-	CHARACTER_JUMP,
+	CHARACTER_MOVE_LEFT_PLUS,
+	CHARACTER_MOVE_LEFT_MINUS,
+	CHARACTER_MOVE_RIGHT_PLUS,
+	CHARACTER_MOVE_RIGHT_MINUS,
+	CHARACTER_JUMP_PLUS,
+	CHARACTER_JUMP_MINUS,
 	GAME_SENSOR_ON,
 	GAME_SENSOR_OFF,
-	STUPID_MESSAGE
-}; 
+	STUPID_MESSAGE,
+	CREATE_BOX,
+	UPDATE_MOUSE,
+	MESSAGE_TYPE_COUNT
+};  
+
+
+const static char* KGBMessageTypeString[MESSAGE_TYPE_COUNT] = 
+{
+	"Message Null",
+	"No Message",
+	"Character Move Left Plus",
+	"Character Move Left Minus",
+	"Character Move Right Plus",
+	"Character Move Right Minus",
+	"Character Jump Plus",
+	"Character Jump Minus",
+	"Game Sensor On",
+	"Game Sensor Off",
+	"Stupid Message",
+	"Create Box",
+	"Update Mouse"
+};
 
 struct KGBMessage
 {
@@ -104,6 +128,16 @@ inline bool operator < (const KGBMessage& t1, const KGBMessage& t2)
 }
 
 
+//=============================================================================
+//						MessageToString
+//
+/// This returns a KGBMessageType as an Ogre::String
+static Ogre::String MessageToString(KGBMessageType message)
+{
+	return Ogre::String(KGBMessageTypeString[message]);
+}
+
+
 
 //=============================================================================
 //						StringToMessage
@@ -111,17 +145,37 @@ inline bool operator < (const KGBMessage& t1, const KGBMessage& t2)
 /// This returns an Ogre::Stringas a KGBMessageType
 static KGBMessageType StringToMessage(const Ogre::String str)
 {
-	if(str.compare("CHARACTER_MOVE_LEFT") == 0)
+	if(str.compare("CHARACTER_MOVE_LEFT_PLUS") == 0)
 	{
-		return CHARACTER_MOVE_LEFT;
+		return CHARACTER_MOVE_LEFT_PLUS;
 	}
-	else if(str.compare("CHARACTER_MOVE_RIGHT") == 0)
+	else if(str.compare("CHARACTER_MOVE_RIGHT_PLUS") == 0)
 	{
-		return CHARACTER_MOVE_RIGHT;
+		return CHARACTER_MOVE_RIGHT_PLUS;
 	}
-	else if(str.compare("CHARACTER_JUMP") == 0)
+	else if(str.compare("CHARACTER_JUMP_PLUS") == 0)
 	{
-		return CHARACTER_JUMP;
+		return CHARACTER_JUMP_PLUS;
+	}
+	else if(str.compare("CHARACTER_MOVE_LEFT_MINUS") == 0)
+	{
+		return CHARACTER_MOVE_LEFT_MINUS;
+	}
+	else if(str.compare("CHARACTER_MOVE_RIGHT_MINUS") == 0)
+	{
+		return CHARACTER_MOVE_RIGHT_MINUS;
+	}
+	else if(str.compare("CHARACTER_JUMP_MINUS") == 0)
+	{
+		return CHARACTER_JUMP_MINUS;
+	}
+	else if(str.compare("CREATE_BOX") == 0)
+	{
+		return CREATE_BOX;
+	}
+	else if(str.compare("UPDATE_MOUSE") == 0)
+	{
+		return UPDATE_MOUSE;
 	}
 
 	return NO_MESSAGE;
@@ -129,6 +183,7 @@ static KGBMessageType StringToMessage(const Ogre::String str)
 }
 
 
+/*
 //=============================================================================
 //						MessageToString
 //
@@ -138,17 +193,29 @@ static Ogre::String MessageToString(KGBMessageType message)
 
 	switch(message)
 	{
-	case CHARACTER_MOVE_LEFT:
+	case CHARACTER_MOVE_LEFT_PLUS:
 		{
-			return Ogre::String("CHARACTER_MOVE_LEFT");
+			return Ogre::String("CHARACTER_MOVE_LEFT_PLUS");
 		}
-	case CHARACTER_MOVE_RIGHT:
+	case CHARACTER_MOVE_RIGHT_PLUS:
 		{
-			return Ogre::String("CHARACTER_MOVE_RIGHT");
+			return Ogre::String("CHARACTER_MOVE_RIGHT_PLUS");
 		}
-	case CHARACTER_JUMP:
+	case CHARACTER_JUMP_PLUS:
 		{
-			return Ogre::String("CHARACTER_JUMP");
+			return Ogre::String("CHARACTER_JUMP_PLUS");
+		}
+	case CHARACTER_MOVE_LEFT_MINUS:
+		{
+			return Ogre::String("CHARACTER_MOVE_LEFT_MINUS");
+		}
+	case CHARACTER_MOVE_RIGHT_MINUS:
+		{
+			return Ogre::String("CHARACTER_MOVE_RIGHT_MINUS");
+		}
+	case CHARACTER_JUMP_MINUS:
+		{
+			return Ogre::String("CHARACTER_JUMP_MINUS");
 		}
 	case GAME_SENSOR_ON:
 		{
@@ -158,9 +225,19 @@ static Ogre::String MessageToString(KGBMessageType message)
 		{
 			return Ogre::String("GAME_SENSOR_OFF");
 		}
+	case CREATE_BOX:
+		{
+			return Ogre::String("CREATE_BOX");
+		}
+	case UPDATE_MOUSE:
+		{
+			return Ogre::String("UPDATE_MOUSE");
+		}
 	}
 
 	return Ogre::String("Unrecognized message type");
 }
+*/
+
 
 #endif

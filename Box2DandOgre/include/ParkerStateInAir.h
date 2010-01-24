@@ -11,7 +11,7 @@
 #define PARKER_STATE_IN_AIR_H
 
 #include "FSMState.h"
-#include "Parker.h"
+
 
 class CharacterParker;
 class ParkerStateInAir : public FSMState<CharacterParker>
@@ -19,7 +19,7 @@ class ParkerStateInAir : public FSMState<CharacterParker>
 
 public:
 
-	ParkerStateInAir(CharacterParker* parker);
+	ParkerStateInAir(CharacterParker* parker, FSMStateMachine<CharacterParker>* stateMachine);
 
 	~ParkerStateInAir(){}
 

@@ -17,6 +17,7 @@
 
 typedef std::map<Ogre::String, b2Body*> BodyMap;
 typedef std::map<Ogre::String, b2Fixture*> FixtureMap;
+typedef std::map<Ogre::String, b2Joint*> JointMap;
 
 // b2Body
 // String	Id
@@ -55,27 +56,28 @@ typedef std::map<Ogre::String, b2Fixture*> FixtureMap;
 // b2Vec2[]	points
 // 
 
-// b2PrismaticJoint
-// String	Id
-// String	bodyA			Bodies use the XML Id, the body must be previously declared
-// String	bodyB
-// bool		collideConnect
-// bool		enableLimit
-// bool		enableMotor
-// float	maxMotorForce
-// float	motorSpeed
-// float	lowerTranslation
-// float	upperTranslation
-// b2Vec2	worldAxis
-// b2Vec2	worldAnchor
+enum Box2DXMLResult
+{
+	BOX2DXML_OK,
+	BOX2DXML_ELEMENT_IS_ZERO,
+	BOX2DXMLRESULT_COUNT
+};
 
+const static char* Box2DXMLResultString[BOX2DXMLRESULT_COUNT] = 
+{
+	"Box2DXML_OK",
+	"Box2DXML_Element_Is_Zero"
+};
 
 class Box2DXMLLoader
 {
 
 public:
-	static std::vector<b2Shape*> shapeVector;
-	// These methods can be called anywhere
+
+
+/*=============================================================================
+				PUBLIC static members
+=============================================================================*/
 	static bool Createb2Body(b2Body* body, b2World* world, TiXmlElement* element);
 	static b2Body* Createb2Body(b2World* world, TiXmlElement* element);
 	static bool Getb2BodyDefAttributes(b2BodyDef* bodyDef, TiXmlElement* element);
@@ -83,13 +85,37 @@ public:
 	static void ClearShapeVector();
 	static void GetB2Vec2(TiXmlElement* element, const char* name, b2Vec2* vector);
 
-	// You must actually instantiate the class to use these methods as they use Id's
-	bool Getb2PrismaticJointdefAttributes(b2PrismaticJointDef* jointDef, TiXmlElement* element);
+	static std::vector<b2Shape*> shapeVector;
+
+/*=============================================================================
+				Class Members
+=============================================================================*/
+	Box2DXMLLoader(TiXmlElement* element);
+
+	Box2DXMLResult GetLastResult();
+
+	b2Body*		GetBody(Ogre::String id);
+	b2Fixture*	GetFixture(Ogre::String id);
+	b2Joint*	GetJoint(Ogre::String id);
+	
+
 
 protected:
 
-	BodyMap bodyMap_;
-	FixtureMap fixtureMap_;
+	bool Initialize();
+
+	bool Createb2Body(TiXmlElement* element);
+	bool Createb2RevoluteJoint(TiXmlElement* element);
+	bool Createb2PrismaticJoint(TiXmlElement* element);
+	bool Createb2WeldJoint(TiXmlElement* element);
+	bool Createb2PulleyJoint(TiXmlElement* element);
+
+	b2World*		world_;
+	TiXmlElement*	element_;
+	Box2DXMLResult	result_;
+	BodyMap			bodyMap_;
+	FixtureMap		fixtureMap_;
+	JointMap		jointMap_;
 	
 };
 

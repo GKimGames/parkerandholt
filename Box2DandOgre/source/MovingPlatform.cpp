@@ -80,7 +80,7 @@ MovingPlatform::MovingPlatform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec
 
 	CreatePhysics();
 
-	Initialize();
+	initialized_ = true;
 
 	parker_ = NULL;
 	parkerCount_ = 0;
@@ -91,6 +91,79 @@ MovingPlatform::MovingPlatform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec
 	{
 		parker_ = (CharacterParker*) GameObject::GetObjectById(id);
 	}
+
+}
+
+bool MovingPlatform::Initialize()
+{
+
+	direction_ = startVec_ - endVec_;
+	direction_.Normalize();
+
+	Ogre::String planeName = "MovingPlatformPlaneInit";
+	Ogre::String planeMeshName = "MovingPlatformPlaneMeshInit";
+	Ogre::String planeEntityName = "MovingPlatformPlaneEntityInit";
+
+	planeName += Ogre::StringConverter::toString(objectId_);
+	planeMeshName += Ogre::StringConverter::toString(objectId_);
+	planeEntityName += Ogre::StringConverter::toString(objectId_);
+
+	plane = new MovablePlane(planeName);
+	plane->d = 0; 
+	plane->normal = Vector3(0.0, 1.0, 0.0);
+
+	float lengthOfPlane =  sqrt((point2.x - point1.x) * (point2.x - point1.x) + (point2.y - point1.y) * (point2.y - point1.y));
+	
+	Ogre::MeshManager::getSingleton().createPlane(planeMeshName, 
+		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+		*plane,
+		lengthOfPlane,  // X Length
+		5,				// Z Length
+		3 * lengthOfPlane / 15, 5,			// Segments x ,y
+		true,
+		1, 
+		3 * lengthOfPlane / 10,		// Tile x
+		1,							// Tile y
+		Vector3::UNIT_Z);
+	
+
+	// Create background material
+	MaterialPtr material = MaterialManager::getSingleton().create("Background", "General");
+	material->getTechnique(0)->getPass(0)->createTextureUnitState("roadtexture.jpg");
+	material->getTechnique(0)->getPass(0)->setLightingEnabled(true);
+	material->getTechnique(0)->getPass(0)->setDepthCheckEnabled(true);
+	material->getTechnique(0)->getPass(0)->setDepthWriteEnabled(true);
+
+	// Temporary
+
+	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
+	Ogre::SceneNode* planeNode = sceneNode_->createChildSceneNode();
+	
+	Ogre::Entity* planeEnt = sceneManager_->createEntity(planeEntityName , planeMeshName);
+	planeEnt->setMaterial(material);
+	planeNode->attachObject(planeEnt);
+
+	// Rotate the node to fit the points
+	planeNode->roll(Ogre::Radian(atan2(point2.y - point1.y, point2.x - point1.x)));
+	
+	// Center the node on the midpoint of the two points
+	planeNode->setPosition(Real(point1.x + point2.x) / 2.0, Real(point1.y + point2.y) / 2.0, 0.0);
+
+	CreatePhysics();
+
+	parker_ = NULL;
+	parkerCount_ = 0;
+	
+	unsigned int id = GameObject::GetHoltId();
+	
+	if(id != -1)
+	{
+		parker_ = (CharacterParker*) GameObject::GetObjectById(id);
+	}
+
+	disabled_ = false;
+	initialized_ = true;
+	return true;
 }
 
 void MovingPlatform::CreatePhysics()

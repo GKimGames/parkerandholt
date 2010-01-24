@@ -36,9 +36,17 @@ enum GameObjectType
 	GOType_Platform,
 	GOType_ElevatorBeginTypes,
 	GOType_MovingPlatform,
-	GOType_ElevatorEndTypes
+	GOType_ElevatorEndTypes,
+	GOType_Mouse
 };
 
+class GameObjectDef
+{
+
+public:
+	GameObjectType			gameObjectType_;	//< \brief GameObjectType of the object.
+	Ogre::String			objectName_;		//< \brief A name for the object.
+};
 /// GameObject represents the lowest form of object possible in the game.
 /// An Object doesn't have to have a graphical representation  or a
 /// physical representation. It is added to a vector of all Object's
@@ -59,6 +67,10 @@ public:
 	// It also increases the static objectId and assigns this object an Id.
 	GameObject(Ogre::String name = "GameObject" );
 
+	// Constructor adds this object to the objectList.
+	// It also increases the static objectId and assigns this object an Id.
+	GameObject(GameObjectDef* objectDef);
+
 	// The destructor removes it from the objectList and objectNameList
 	virtual ~GameObject();
 
@@ -71,7 +83,7 @@ public:
 	// true if the object was able to handle the message.
 	virtual bool HandleMessage(const KGBMessage message);
 
-	/// Initialize the GameObject.
+	// Initialize the GameObject.
 	virtual bool Initialize();
 
 /*=============================================================================

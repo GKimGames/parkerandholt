@@ -35,24 +35,6 @@ GameObject::GameObject(Ogre::String str)
 	objectList.insert(std::make_pair(objectId_,this));
 
 	initialized_ = false;
-	
-	std::pair<std::map<Ogre::String, GameObject*>::iterator,bool> ret;
-
-	ret = objectNameList.insert(std::make_pair(str,this));
-	
-	if(ret.second == false)
-	{
-		Ogre::String s = "ERROR: GameObject creation name conflict: ";
-		s += str;
-		s += ". Now is: ";
-
-		objectName_ += Ogre::StringConverter::toString(objectId_);
-
-		s += objectName_;
-
-		DEBUG_LOG(s);
-		
-	}
 }
 
 //=============================================================================
@@ -61,8 +43,7 @@ GameObject::GameObject(Ogre::String str)
 /// The destructor removes it from the objectList and objectNameList
 GameObject::~GameObject()
 {
-	objectList.erase(objectList.find(this->objectId_));
-	objectNameList.erase(objectNameList.find(this->objectName_));
+	objectList.erase(objectList.find(objectId_));
 }
 
 //=============================================================================
@@ -81,9 +62,27 @@ bool GameObject::Update(double timeSinceLastFrame)
 /// within the object after some variables are setup.
 bool GameObject::Initialize()
 {
+	std::pair<std::map<Ogre::String, GameObject*>::iterator,bool> ret;
+
+	ret = objectNameList.insert(std::make_pair(objectName_,this));
+	
+	if(ret.second == false)
+	{
+		Ogre::String s = "ERROR: GameObject creation name conflict: ";
+		s += objectName_;
+		s += ". Now is: ";
+
+		objectName_ += "_";
+		objectName_ += Ogre::StringConverter::toString(objectId_);
+
+		s += objectName_;
+
+		DEBUG_LOG(s);
+	}
+
 	initialized_ = true;
 
-	return true;
+	return initialized_;
 }
 
 //=============================================================================

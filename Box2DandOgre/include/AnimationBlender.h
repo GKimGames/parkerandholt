@@ -4,42 +4,57 @@
 #define ANIMATONBLENDER_H
 
 #include "Ogre.h"
-using namespace Ogre;
 
 class AnimationBlender
 {
 
 public:
-  enum BlendingTransition
-  {
-     BlendSwitch,			// stop source and start dest
-     BlendWhileAnimating,   // cross fade, blend source animation out while blending destination animation in
-     BlendThenAnimate		// blend source to first frame of dest, when done, start dest anim
-  };
+
+	enum BlendingTransition
+	{
+		BlendSwitch,				// stop source and start dest
+		BlendWhileAnimating,		// cross fade, blend source animation out while blending destination animation in
+		BlendThenAnimate			// blend source to first frame of dest, when done, start dest anim
+	};
+
+	AnimationBlender( Ogre::Entity *);
+
+	void Blend( 
+		const Ogre::String &animation,
+		BlendingTransition transition,
+		Ogre::Real duration,
+		bool loop = true,
+		Ogre::Real targetTime = 9999
+		);
+
+	void Initialize( const Ogre::String &animation, bool loop = true );
+	void AddTime( Ogre::Real time );
+
+/*=============================================================================
+				Getter / Setter methods
+=============================================================================*/
+	Ogre::Real GetProgress() { return timeleft_ / duration_; }
+	Ogre::AnimationState *GetSource() { return source_; }
+	Ogre::AnimationState *GetTarget() { return target_; }
 
 private:
-  Entity *mEntity;
-  AnimationState *mSource;
-  AnimationState *mTarget;
 
-  BlendingTransition mTransition;
+	Ogre::Entity* entity_;
+	Ogre::AnimationState* source_;
+	Ogre::AnimationState* target_;
 
-  bool loop;
+	BlendingTransition transition_;
 
-  ~AnimationBlender() {}
+	~AnimationBlender() {}
 
 public: 
-  Real mTimeleft, mDuration;
 
-  bool complete;
-  
-  void blend( const String &animation, BlendingTransition transition, Real duration, bool l=true );
-  void addTime( Real );
-  Real getProgress() { return mTimeleft/ mDuration; }
-  AnimationState *getSource() { return mSource; }
-  AnimationState *getTarget() { return mTarget; }
-  AnimationBlender( Entity *);
-  void init( const String &animation, bool l=true );
+	Ogre::Real timeleft_, duration_, targetTime_;
+	bool loop_;
+	bool complete_;
+
+
+
 };
 
 

@@ -10,11 +10,16 @@
 
 #include "ParkerStateOnGround.h"
 
+#include "Parker.h"
+#include "Message.h"
+
 //=============================================================================
 //								Constructor
 //
-ParkerStateOnGround::ParkerStateOnGround(CharacterParker* parker):
-FSMState(parker)
+ParkerStateOnGround::ParkerStateOnGround(	
+	CharacterParker* parker,
+	FSMStateMachine<CharacterParker>* stateMachine):
+	FSMState<CharacterParker>(parker,stateMachine)
 {
 	isJumping_ = false;
 	moveLeftDown_ = false;
@@ -22,39 +27,59 @@ FSMState(parker)
 	feetContactCount_ = 0;
 }
 
+
+
 //=============================================================================
 //								Enter
 //
 void ParkerStateOnGround::Enter()
 {
 
+	blendingRun_ = false;
+	blendingIdle_ = false;
 	isJumping_ = false;
 	moveLeftDown_ = false;
 	moveRightDown_ = false;
 
-	jumpTimer_ = owner_->timeBetweenJump_;
+	jumpTimer_ = driver_->timeBetweenJump_;
 
-	if(owner_->initialized_)
+	if(driver_->initialized_)
 	{
-		owner_->animationState_->setEnabled(false);
-		owner_->animationState_ = owner_->entity_->getAnimationState("Walk");
-		owner_->animationState_->setLoop(true);
-		owner_->animationState_->setEnabled(true);
+		driver_->animationBlender_->Blend("jump", AnimationBlender::BlendSwitch, 0.0, false);
+		driver_->animationBlender_->GetSource()->setTimePosition(0.6);
+		driver_->animationBlender_->Blend("run", AnimationBlender::BlendWhileAnimating, 0.2, true);
 	}
 }
+
+
 
 //=============================================================================
 //								Update
 //
 bool ParkerStateOnGround::Update()
 {
+	if(driver_->moveLeft_)
+	{
+		MoveLeft();
+	}
+
+	if(driver_->moveRight_)
+	{
+		MoveRight();
+	}
+
+	if(driver_->jump_)
+	{
+		Jump();
+	}
+
 	static Ogre::Vector3 direction;
 	
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 	
-	if(owner_->feetSensorHitCount_ == 0)
+	if(driver_->feetSensorHitCount_ == 0)
 	{
-		owner_->stateMachine_->ChangeState(owner_->inAirState_);
+		stateMachine_->ChangeState(driver_->inAirState_);
 	}
 	else
 	{
@@ -69,31 +94,38 @@ bool ParkerStateOnGround::Update()
 
 		//if(moveRightDown_ || moveLeftDown_)
 		{
-			owner_->ApplyWalkingFriction(timeSinceLastFrame);
+			driver_->ApplyWalkingFriction(timeSinceLastFrame);
 		}
 
 		moveRightDown_ = false;
 		moveLeftDown_ = false;
 		
 
-		if(owner_->body_->GetLinearVelocity().x > 0.1)
+		if(driver_->body_->GetLinearVelocity().x > 0.1)
 		{
 			direction = Ogre::Vector3(0,0,1);
 		}
-		else if(owner_->body_->GetLinearVelocity().x < -0.1)
+		else if(driver_->body_->GetLinearVelocity().x < -0.1)
 		{
 			direction = Ogre::Vector3(0,0,-1);
 		}
 
 		UpdateAnimation();
 
-		b2Vec2 v = owner_->body_->GetPosition();
-		owner_->sceneNode_->setPosition(Ogre::Real(v.x),Ogre::Real(v.y),0);
-		owner_->sceneNode_->setDirection(direction,Ogre::Node::TS_WORLD);
+		b2Vec2 v = driver_->body_->GetPosition();
+		driver_->sceneNode_->setPosition(Ogre::Real(v.x),Ogre::Real(v.y),0);
+		driver_->sceneNode_->setDirection(direction,Ogre::Node::TS_WORLD);
+
+		if(driver_->debugDrawOn_)
+		{
+			driver_->UpdateDebugDraw();
+		}
 	}
 
 	return true;
 }
+
+
 
 //=============================================================================
 //								HandleMessage
@@ -104,38 +136,58 @@ bool ParkerStateOnGround::HandleMessage(const KGBMessage message)
 	
 	switch(message.messageType)
 	{
-		case CHARACTER_MOVE_LEFT:
-			{
-				MoveLeft();
-				return true;
-			}
-		case CHARACTER_MOVE_RIGHT:
-			{
-				MoveRight();
-				return true;
-			}
-		case CHARACTER_JUMP:
-			{
-				Jump();
-				return true;
-			}
-		case STUPID_MESSAGE:
-			{
-				gameObject = any_cast<std::string*>(message.messageData);
-			}
+		case CHARACTER_MOVE_LEFT_PLUS:
+		{
+
+			driver_->moveLeft_ = true;
+			return true;
+		}
+		case CHARACTER_MOVE_RIGHT_PLUS:
+		{
+
+			driver_->moveRight_ = true;
+			return true;
+		}
+		case CHARACTER_JUMP_PLUS:
+		{
+
+			driver_->jump_ = true;
+			return true;
+		}
+
+		case CHARACTER_MOVE_LEFT_MINUS:
+		{
+
+			driver_->moveLeft_ = false;
+			return true;
+		}
+		case CHARACTER_MOVE_RIGHT_MINUS:
+		{
+			driver_->moveRight_ = false;
+			return true;
+		}
+		case CHARACTER_JUMP_MINUS:
+		{
+			driver_->jump_ = false;
+			return true;
+		}
 	}
 
 	return false;
 }
+
+
 
 //=============================================================================
 //								Exit
 //
 void ParkerStateOnGround::Exit()
 {
-	owner_->elevator_ = NULL;
-	owner_->feetSensorHitCount_ = 0;                                                                              
+	driver_->elevator_ = NULL;
+	driver_->feetSensorHitCount_ = 0;                                                                              
 }
+
+
 
 //=============================================================================
 //								BeginContact
@@ -145,7 +197,7 @@ void ParkerStateOnGround::BeginContact(ContactPoint* contact, b2Fixture* contact
 {
 	if(!collidedFixture->IsSensor())
 	{
-		if(contactFixture == owner_->feetSensor_)
+		if(contactFixture == driver_->feetSensor_)
 		{
 			feetContactCount_++;
 
@@ -154,18 +206,17 @@ void ParkerStateOnGround::BeginContact(ContactPoint* contact, b2Fixture* contact
 				GameObject* go = (GameObject*) collidedFixture->GetBody()->GetUserData();
 				int type = go->GetGameObjectType();
 
-				if(owner_->elevator_ == NULL)
+				if(driver_->elevator_ == NULL)
 				{
-					owner_->elevator_ = collidedFixture->GetBody();
+					driver_->elevator_ = collidedFixture->GetBody();
 				}
 
 			}
 		}
-
-		
-		
 	}
 }
+
+
 
 //=============================================================================
 //								EndContact
@@ -175,23 +226,24 @@ void ParkerStateOnGround::EndContact(ContactPoint* contact, b2Fixture* contactFi
 {
 	if(!collidedFixture->IsSensor())
 	{
-		if(contactFixture == owner_->feetSensor_)
+		if(contactFixture == driver_->feetSensor_)
 		{
 			feetContactCount_--;
 
 			if(feetContactCount_ == 0)
 			{
-				owner_->stateMachine_->ChangeState(owner_->inAirState_);
+				stateMachine_->ChangeState(driver_->inAirState_);
 			}
 
 			if(elevator_ == collidedFixture->GetBody())
 			{
-				owner_->elevator_ = NULL;
+				driver_->elevator_ = NULL;
 			}
 
 		}
 	}
 }
+
 
 
 //=============================================================================
@@ -206,13 +258,15 @@ void ParkerStateOnGround::MoveLeft()
 		moveLeftDown_ = true;
 		double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
-		if(owner_->body_->GetLinearVelocity().x > -owner_->maximumRunningVelocity_)
+		if(driver_->body_->GetLinearVelocity().x > -driver_->maximumRunningVelocity_)
 		{
-			owner_->body_->ApplyForce(b2Vec2(-owner_->runningForce_ * timeSinceLastFrame,0), owner_->body_->GetPosition());
+			driver_->body_->ApplyForce(b2Vec2(-driver_->runningForce_ * timeSinceLastFrame,0), driver_->body_->GetPosition());
 		}
 	}
 
 }
+
+
 
 //=============================================================================
 //								MoveRight
@@ -225,13 +279,14 @@ void ParkerStateOnGround::MoveRight()
 		moveRightDown_ = true;
 		double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 		
-		if(owner_->body_->GetLinearVelocity().x < owner_->maximumRunningVelocity_)
+		if(driver_->body_->GetLinearVelocity().x < driver_->maximumRunningVelocity_)
 		{
-			owner_->body_->ApplyForce(b2Vec2(owner_->runningForce_ * timeSinceLastFrame,0), owner_->body_->GetPosition());
+			driver_->body_->ApplyForce(b2Vec2(driver_->runningForce_ * timeSinceLastFrame,0), driver_->body_->GetPosition());
 		}
 	}
 
 }
+
 
 
 //=============================================================================
@@ -248,20 +303,19 @@ void ParkerStateOnGround::Jump()
 	else
 	{
 
-		owner_->body_->ApplyImpulse(b2Vec2(0,owner_->jumpingForce_), owner_->body_->GetPosition());
+		driver_->body_->ApplyImpulse(b2Vec2(0,driver_->jumpingForce_), driver_->body_->GetPosition());
 
-		owner_->animationState_->setEnabled(false);
-		owner_->animationState_ = owner_->entity_->getAnimationState("JumpNoHeight");
-		owner_->animationState_->setTimePosition(0);
-		owner_->animationState_->setLoop(false);
-		owner_->animationState_->setEnabled(true);
+		driver_->animationBlender_->Blend("jump", AnimationBlender::BlendWhileAnimating, 0.2, false, 0.6);
+		driver_->animationBlender_->GetTarget()->setTimePosition(0.3);
 
 		isJumping_ = true;
 
-		jumpTimer_ = owner_->timeBetweenJump_;
+		jumpTimer_ = driver_->timeBetweenJump_;
 	}
 
 }
+
+
 
 //=============================================================================
 //								UpdateAnimation
@@ -270,21 +324,42 @@ void ParkerStateOnGround::UpdateAnimation()
 {
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
-	b2Vec2 lv = owner_->body_->GetLinearVelocity();
+	b2Vec2 lv = driver_->body_->GetLinearVelocity();
 	
-	if(owner_->elevator_ != NULL)
+	if(driver_->elevator_ != NULL)
 	{
-		lv -= owner_->elevator_->GetLinearVelocity();
+		lv -= driver_->elevator_->GetLinearVelocity();
 	}
 
-	if(abs(lv.x)  < .1)
+	if(abs(lv.x)  < .1 && isJumping_ == false)
 	{
-		owner_->animationState_->setTimePosition(0.8);
-	}
-	else
-	{
-		double ratio = owner_->maximumRunningVelocity_ / lv.x;
+		if(blendingIdle_ == false)
+		{
+			blendingIdle_ = true;
+			blendingRun_ = false;
+			driver_->animationBlender_->Blend("idle", AnimationBlender::BlendWhileAnimating, 0.3, true);
+		}
 
-		owner_->animationState_->addTime(timeSinceLastFrame / abs(ratio));
+		driver_->animationBlender_->AddTime(timeSinceLastFrame);
+	}
+	else if(isJumping_ == false)
+	{
+		double ratio = driver_->maximumRunningVelocity_ / lv.x;
+		
+		if(blendingRun_ == false)
+		{
+			blendingRun_ = true;
+			blendingIdle_ = false;
+			driver_->animationBlender_->Blend("run", AnimationBlender::BlendWhileAnimating, 0.3, true);
+		}
+
+		if(driver_->animationBlender_->timeleft_ == 0)
+		{
+			driver_->animationBlender_->AddTime(timeSinceLastFrame / abs(ratio));
+		}
+		else
+		{
+			driver_->animationBlender_->AddTime(timeSinceLastFrame);
+		}
 	}
 }

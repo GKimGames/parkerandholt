@@ -23,7 +23,8 @@ GameObjectOgreBox2D::GameObjectOgreBox2D(Ogre::String name, b2Body* body, Ogre::
 	sceneManager_ = GAMEFRAMEWORK->sceneManager;
 	entity_ = entity;
 	body_ = body;
-	
+
+	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
 	debugSceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
 	
 	debugDrawInitialized_ = false;
@@ -47,6 +48,7 @@ bool GameObjectOgreBox2D::Initialize()
 	{
 		initialized_ = true;
 	}
+
 	return initialized_;
 }
 
@@ -130,16 +132,19 @@ bool GameObjectOgreBox2D::UpdateGraphics(double timeSinceLastFrame)
 	// and not to a specific value we must store the previous angle
 	// that it was rotated by and rotate back by that and then rotate
 	// to our new angle.
-
 	
 	if(initialized_)
 	{
+
+		sceneNode_->rotate(Ogre::Vector3::UNIT_Z, Ogre::Radian(-previousAngle_)); 
+		
 		b2Vec2 v = body_->GetPosition();
 		sceneNode_->setPosition(Ogre::Real(v.x),Ogre::Real(v.y),0);
-		sceneNode_->rotate(Ogre::Vector3::UNIT_Z, Ogre::Radian(-prevAngle)); 
-		sceneNode_->rotate(Ogre::Vector3::UNIT_Z, Ogre::Radian(body_->GetAngle()));
 
-		prevAngle = body_->GetAngle();
+		float32 angle = body_->GetAngle();
+		sceneNode_->rotate(Ogre::Vector3::UNIT_Z, Ogre::Radian(angle));
+
+		previousAngle_ = body_->GetAngle();
 
 	}
 

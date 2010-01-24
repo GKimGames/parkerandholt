@@ -11,7 +11,6 @@
 #define PARKER_STATE_ON_GROUND_H
 
 #include "FSMState.h"
-#include "Parker.h"
 
 class CharacterParker;
 class ParkerStateOnGround : public FSMState<CharacterParker>
@@ -19,7 +18,7 @@ class ParkerStateOnGround : public FSMState<CharacterParker>
 
 public:
 
-	ParkerStateOnGround(CharacterParker* parker);
+	ParkerStateOnGround(CharacterParker* parker, FSMStateMachine<CharacterParker>* stateMachine);
 
 	~ParkerStateOnGround(){}
 
@@ -54,11 +53,16 @@ protected:
 
 	bool isJumping_;
 
+	bool blendingRun_;
+	bool blendingIdle_;
+
 	double jumpTimer_;
 
 	bool moveLeftDown_;
 	bool moveRightDown_;
 
+	/// This is an object that will be moving the character
+	/// when the character is on it.
 	b2Body* elevator_;
 
 };

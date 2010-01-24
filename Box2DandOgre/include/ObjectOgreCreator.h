@@ -51,10 +51,10 @@ public:
 				{
 					TiXmlElement* ogreObjectElement = element->FirstChild( "OgreObject" )->ToElement();
 					// Get the mesh for the Game Ogre Object
-					std::string meshName;
-					int xmlResult = ogreObjectElement->QueryValueAttribute("mesh", &meshName);
-
-					if(xmlResult == TIXML_SUCCESS)
+					Ogre::String meshName;
+					const char* c = ogreObjectElement->Attribute("mesh");
+					meshName = Ogre::String(c);
+					if(!meshName.empty())
 					{
 						if(gameObjectOgre->Initialize(meshName))
 						{

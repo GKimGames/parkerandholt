@@ -20,6 +20,7 @@
 
 #include "OgreB2DebugDraw.h"
 #include "MousePicking.h"
+#include "KeyHandler.h"
 
 #include "Platform.h"
 #include "MovingPlatform.h"
@@ -38,6 +39,8 @@
 #include "Parker.h"
 
 #include "MyGUI.h"
+
+#include "MousePicking.h"
 
 #define DEBUG_DRAW_ON 1
 
@@ -115,8 +118,6 @@ protected:
 
 	Character* myCharacter_;
 
-	MousePicking* myPicking_;
-	Ogre::Plane pickingPlane;
 
 #ifdef DEBUG_DRAW_ON
 	OgreB2DebugDraw* debugDraw_;
@@ -138,6 +139,9 @@ private:
 	Ogre::Entity*				m_pCurrentEntity;
 	bool						m_bLMouseDown, m_bRMouseDown;
 	bool						m_bChatMode;
+
+	MousePicking*				myMouse_;
+	KeyHandler*					myKeyHandler_;
 
 	double						gravity_;
 

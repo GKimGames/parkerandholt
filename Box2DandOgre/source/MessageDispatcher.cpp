@@ -220,7 +220,9 @@ Ogre::String KGBMessageDispatcher::GetObjectName(GameObjectId id)
 		// All objects are the receiver
 		return Ogre::String("ALL_OBJECTS");
 	}
+
 	GameObject* go = GameObject::GetObjectById(id);
+
 	if(go)
 	{
 		return go->GetName();

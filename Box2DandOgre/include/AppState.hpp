@@ -1,17 +1,17 @@
-//|||||||||||||||||||||||||||||||||||||||||||||||
+
 
 #ifndef APP_STATE_HPP
 #define APP_STATE_HPP
 
-//|||||||||||||||||||||||||||||||||||||||||||||||
+
 
 #include "GameFramework.h"
 #include "boost\bind.hpp"
 #include "Message.h"
 
 class AppState;
+class GameObject;
 
-//|||||||||||||||||||||||||||||||||||||||||||||||
 
 class AppStateListener
 {
@@ -28,7 +28,7 @@ public:
 	virtual void		shutdown() = 0;
 };
 
-//|||||||||||||||||||||||||||||||||||||||||||||||
+
 
 class AppState : public OIS::KeyListener, public OIS::MouseListener
 {
@@ -62,7 +62,7 @@ protected:
 
 };
 
-//|||||||||||||||||||||||||||||||||||||||||||||||
+
 
 #define DECLARE_APPSTATE_CLASS(T)										\
 static void create(AppStateListener* parent, const Ogre::String name)	\
@@ -72,8 +72,8 @@ static void create(AppStateListener* parent, const Ogre::String name)	\
 	parent->manageAppState(name, myAppState);							\
 }
 
-//|||||||||||||||||||||||||||||||||||||||||||||||
+
 
 #endif
 
-//|||||||||||||||||||||||||||||||||||||||||||||||
+

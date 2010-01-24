@@ -1,4 +1,3 @@
-
 /*=============================================================================
 
 	ParkerStateLedgeGrab.h
@@ -11,7 +10,6 @@
 #ifndef PARKER_STATE_LEDGE_GRAB_H
 #define PARKER_STATE_LEDGE_GRAB_H
 
-#include "FSMState.h"
 #include "Parker.h"
 
 class CharacterParker;
@@ -20,7 +18,7 @@ class ParkerStateLedgeGrab : public FSMState<CharacterParker>
 
 public:
 
-	ParkerStateLedgeGrab(CharacterParker* parker);
+	ParkerStateLedgeGrab(CharacterParker* parker, FSMStateMachine<CharacterParker>* stateMachine);
 
 	~ParkerStateLedgeGrab(){}
 
@@ -35,6 +33,7 @@ public:
 
 	/// This will execute when the state is exited.
 	virtual void Exit();
+
 
 	/// Called when two fixtures begin to touch.
 	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);

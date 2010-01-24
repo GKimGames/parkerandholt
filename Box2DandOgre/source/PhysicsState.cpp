@@ -167,7 +167,6 @@ void PhysicsState::createPhysics()
 	new Platform(sceneManager_, b2Vec2(10.0f, 0.0f),   b2Vec2(20.0f, 3.0f));
 	new Platform(sceneManager_, b2Vec2(25.0f, 5.0f),   b2Vec2(30.0f, 5.0f));
 	new Platform(sceneManager_, b2Vec2(30.0f, 6.4f),   b2Vec2(35.0f, 6.4f));
-	new Platform(sceneManager_, b2Vec2(22.0f, 7.5f),   b2Vec2(27.0f, 7.5f));
 
 	// Create myCharacter
 	//myCharacter_ = new Character(sceneManager_);
@@ -177,15 +176,22 @@ void PhysicsState::createPhysics()
 	parker_->Initialize();
 	parker_->InitializeDebugDraw();
 
-	for(int i = 0; i < 15;i++)
+	for(int i = 0; i < 3;i++)
 	{
-		HoltBox* bb = new HoltBox(sceneManager_, b2Vec2(8.0f, 10.0f));
-		bb->Initialize();
+		//HoltBox* bb = new HoltBox(sceneManager_, b2Vec2(8.0f, 10.0f),1,50);
+		//bb->Initialize();
 	}
 
 	new MovingPlatform(sceneManager_, b2Vec2(10.0f, 1.0f), b2Vec2(0.0f, 1.0f), b2Vec2(5.0f, 1.0f), b2Vec2(0.0f, 5.0f), 2);
-	new PressureSwitch(sceneManager_);
+	PressureSwitch* ps = new PressureSwitch(sceneManager_);
+	ps->AddToMessageList(parker_->GetId(), CREATE_BOX);
+	myMouse_ = new MousePicking(sceneManager_, camera_);
 
+	myKeyHandler_ = new KeyHandler(GameFramework::getSingletonPtr()->keyboard_);
+
+	myKeyHandler_->AddKey(OIS::KC_RIGHT, std::make_pair(CHARACTER_MOVE_RIGHT_PLUS, CHARACTER_MOVE_RIGHT_MINUS));
+	myKeyHandler_->AddKey(OIS::KC_LEFT, std::make_pair(CHARACTER_MOVE_LEFT_PLUS, CHARACTER_MOVE_LEFT_MINUS));
+	myKeyHandler_->AddKey(OIS::KC_UP, std::make_pair(CHARACTER_JUMP_PLUS, CHARACTER_JUMP_MINUS));
 
 #if DEBUG_DRAW_ON
 	debugDraw_ = new OgreB2DebugDraw(sceneManager_, "debugDraw", 0);
@@ -202,6 +208,83 @@ void PhysicsState::createPhysics()
 #endif
 
 	//myPicking_ = new MousePicking(sceneManager_, world, camera_, pickingPlane);
+
+
+	b2BodyDef bdef;
+	bdef.position.Set(0, -1000);
+	b2PolygonShape bodyShapeDef2;
+	bodyShapeDef2.SetAsBox(3.54/2.0, 0.6/2.0);
+
+	b2Body* b2 = world->CreateBody(&bdef);
+	b2->CreateFixture(&bodyShapeDef2);
+
+	{
+		b2BodyDef bd;
+		bd.position.Set(22, 3.5);
+		bd.type = b2_dynamicBody;
+		
+		b2PolygonShape bodyShapeDef;
+		bodyShapeDef.SetAsBox(3.54/2.0, 0.6/2.0);
+
+		b2FixtureDef fd;
+		fd.shape = &bodyShapeDef;
+		fd.density = 50;
+		fd.friction = DEFAULT_FRICTION;
+		fd.restitution = .2;
+
+		b2Body* b = world->CreateBody(&bd);
+		b->CreateFixture(&fd);
+
+		Ogre::Entity* e = sceneManager_->createEntity("Hey Steve", "LeverArm.mesh");
+
+		GameObjectOgreBox2D* goob = new GameObjectOgreBox2D("Meow meow meow", b,e);
+		goob->GetSceneNode()->attachObject(e);
+		goob->GetSceneNode()->scale(0.1,0.1,0.1);
+		goob->Initialize();
+
+		b2RevoluteJointDef jointDef;
+		jointDef.Initialize(b2, b, b->GetWorldCenter());
+		//jointDef.maxMotorTorque = 10.0f;
+		//jointDef.motorSpeed = 0.0f;
+		//jointDef.enableMotor = true;
+
+		world->CreateJoint(&jointDef);
+	}
+	
+	{
+		b2BodyDef bd;
+		bd.position.Set(-5, 3.5);
+		bd.type = b2_dynamicBody;
+		
+		b2PolygonShape bodyShapeDef;
+		bodyShapeDef.SetAsBox(3.54, 0.6/2.0);
+
+		b2FixtureDef fd;
+		fd.shape = &bodyShapeDef;
+		fd.density = 50;
+		fd.friction = DEFAULT_FRICTION;
+		fd.restitution = .2;
+
+		b2Body* b = world->CreateBody(&bd);
+		b->CreateFixture(&fd);
+
+		Ogre::Entity* e = sceneManager_->createEntity("Hey Steve2", "LeverArm.mesh");
+
+		GameObjectOgreBox2D* goob = new GameObjectOgreBox2D("Meow meow meow2", b,e);
+		goob->GetSceneNode()->attachObject(e);
+		goob->GetSceneNode()->scale(0.2,0.1,0.1);
+		goob->Initialize();
+
+		b2RevoluteJointDef jointDef;
+		jointDef.Initialize(b2, b, b->GetWorldCenter());
+		//jointDef.maxMotorTorque = 10.0f;
+		//jointDef.motorSpeed = 0.0f;
+		//jointDef.enableMotor = true;
+
+		world->CreateJoint(&jointDef);
+	}
+
+
 
 }
 
@@ -236,8 +319,23 @@ void PhysicsState::createScene()
 	light->setDirection(0,-1,0);
 	light->setSpotlightRange(Degree(35), Degree(50));
 
-	sceneManager_->setAmbientLight(ColourValue(0.05, 0.05, 0.05));
-	//sceneManager_->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
+	Ogre::Light* light2 = sceneManager_->createLight("Light2");
+	
+	light2->setType(Light::LT_SPOTLIGHT);
+	light2->setPosition(0,25,50);
+	light2->setDirection(0,-1,-1);
+	light2->setSpotlightRange(Degree(35), Degree(50));
+
+	Ogre::Light* light3 = sceneManager_->createLight("Light3");
+	
+	light3->setType(Light::LT_SPOTLIGHT);
+	light3->setPosition(28,25,0);
+	light3->setDirection(0,-1,0);
+	light3->setSpotlightRange(Degree(35), Degree(50));
+
+	sceneManager_->setAmbientLight(ColourValue(0.09, 0.09, 0.09));
+	sceneManager_->setAmbientLight(ColourValue(0.7, 0.7, 0.7));
+	sceneManager_->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
 	myGUI = new MyGUI::Gui();
 	myGUI->initialise(GAMEFRAMEWORK->renderWindow_);
 	
@@ -246,8 +344,6 @@ void PhysicsState::createScene()
 
 	//button->eventMouseButtonClick = MyGUI::newDelegate(this, &CLASS_NAME::METHOD_NAME);
 	//button->eventMouseButtonClick = MyGUI::newDelegate(this, &PhysicsState::MakeExit);
-
-
 
 	/*
 	//=============================================================
@@ -347,6 +443,7 @@ void PhysicsState::createScene()
 //
 bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 {
+	myKeyHandler_->KeyPressed(keyEventRef);
 	if(keyEventRef.key == OIS::KC_P)
 	{
 		pause_ = true;
@@ -372,6 +469,7 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 bool PhysicsState::keyReleased(const OIS::KeyEvent &keyEventRef)
 {
 	GameFramework::getSingletonPtr()->KeyReleased(keyEventRef);
+	myKeyHandler_->KeyReleased(keyEventRef);
 
 #if DEBUG_DRAW_ON
 	if(keyEventRef.key == OIS::KC_C)
@@ -379,6 +477,16 @@ bool PhysicsState::keyReleased(const OIS::KeyEvent &keyEventRef)
 		debugDraw_->SetFlags(debugDraw_->GetFlags() ^ b2DebugDraw::e_shapeBit);
 	}
 #endif 
+
+	if(keyEventRef.key == OIS::KC_G)
+	{
+		parker_->SetDebugDrawOn();
+	}
+
+	if(keyEventRef.key == OIS::KC_H)
+	{
+		parker_->SetDebugDrawOff();
+	}
 
 	return true;
 }
@@ -389,7 +497,7 @@ bool PhysicsState::keyReleased(const OIS::KeyEvent &keyEventRef)
 //
 bool PhysicsState::mouseMoved(const OIS::MouseEvent &evt)
 {
-
+	Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, myMouse_->GetId(), UPDATE_MOUSE, &evt);
 	myGUI->injectMouseMove(evt);
 	//myPicking_->MouseMoved(evt);
 
@@ -408,6 +516,7 @@ bool PhysicsState::mouseMoved(const OIS::MouseEvent &evt)
 bool PhysicsState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
 	myGUI->injectMousePress(evt, id);
+	Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, myMouse_->GetId(), CREATE_BOX, NULL);
 	//myPicking_->MousePressed(evt, id);
 
 	if(id == OIS::MB_Left)
@@ -429,6 +538,7 @@ bool PhysicsState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID i
 bool PhysicsState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
 	//myPicking_->MouseReleased(evt, id);
+	
 	myGUI->injectMouseRelease(evt, id);
 	if(id == OIS::MB_Left)
 	{
@@ -453,6 +563,9 @@ void PhysicsState::moveCamera()
 		camera_->moveRelative(m_TranslateVector);
 
 	camera_->moveRelative(m_TranslateVector / 10);
+
+	
+	Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, myMouse_->GetId(), UPDATE_MOUSE, boost::any());
 }
 
 
@@ -495,21 +608,6 @@ void PhysicsState::getInput()
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_S))
 		{
 			m_TranslateVector.z = m_MoveScale;
-		}
-
-		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_LEFT))
-		{
-			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, gameObject_->GetId(), parker_->GetId(), CHARACTER_MOVE_LEFT, NULL);
-		}
-
-		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_RIGHT))
-		{
-			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, gameObject_->GetId(), parker_->GetId(), CHARACTER_MOVE_RIGHT, NULL);
-		}
-
-		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_UP))
-		{
-			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, gameObject_->GetId(), parker_->GetId(), CHARACTER_JUMP, NULL);
 		}
 
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_DOWN))
@@ -564,6 +662,7 @@ bool PhysicsState::update(double timeSinceLastFrame)
 
 	time += timeSinceLastFrame;
 
+	// Update the variables that control how the camera moves
 	m_MoveScale = m_MoveSpeed   * timeSinceLastFrame;
 	m_RotScale  = m_RotateSpeed * timeSinceLastFrame;
 
@@ -571,20 +670,20 @@ bool PhysicsState::update(double timeSinceLastFrame)
 	
 	while(time >= timeStep)
 	{
+		// Get Input from keyboard, the keys that are pressed down during this update
 		getInput();
+
+		// Move the camera based upon input
 		moveCamera();
 
-		// Only compile the debug draw commands if DEBUG_DRAW_ON
-#if DEBUG_DRAW_ON
-		debugDraw_->clear();
-#endif
-
+		// Update the physical Box2D world
 		world->Step(timeStep,10,10);
 		world->ClearForces();
 
 #if DEBUG_DRAW_ON
+		debugDraw_->clear();
 		if(debugDrawOn_)
-		{
+		{	
 			world->DrawDebugData();
 		}
 #endif
@@ -594,8 +693,10 @@ bool PhysicsState::update(double timeSinceLastFrame)
 		// Process b2Contacts that happened in this world step.
 		ProcessContacts();
 
+		// Update all the game objects.
 		GameObject::UpdateObjectList(timeStep);
 
+		// Update the camera to look at Parker.
 		camera_->setPosition(parker_->GetBodyPosition().x,parker_->GetBodyPosition().y + 3,camera_->getPosition().z);
 		camera_->lookAt(parker_->GetBodyPosition().x,parker_->GetBodyPosition().y,0);
 		
@@ -627,6 +728,8 @@ void PhysicsState::BeginContact(b2Contact* contact)
 	ContactPoint* c = new ContactPoint();
 	c->fixtureA = contact->GetFixtureA();
 	c->fixtureB = contact->GetFixtureB();
+
+	// Should probably be making a deep copy of contact.
 	c->contact = contact;
 	beginContactList_.push_back(c);
 }
@@ -644,6 +747,8 @@ void PhysicsState::EndContact(b2Contact* contact)
 	ContactPoint* c = new ContactPoint();
 	c->fixtureA = contact->GetFixtureA();
 	c->fixtureB = contact->GetFixtureB();
+
+	// Should probably be making a deep copy of contact.
 	c->contact = contact;
 	endContactList_.push_back(c);
 }

@@ -12,8 +12,548 @@
 
 std::vector<b2Shape*> Box2DXMLLoader::shapeVector;
 
+
 //=============================================================================
-//								Getb2BodyDefAttributes
+//								Box2DXMLLoader
+//
+Box2DXMLLoader::Box2DXMLLoader(TiXmlElement* element)
+{
+
+	if(element != 0)
+	{
+		if(element->NoChildren())
+		{
+			
+		}
+		else
+		{
+			element_ = element;
+			world_ = GAMEFRAMEWORK->GetWorld();
+			Initialize();
+		}
+	}
+	else
+	{
+		result_ = BOX2DXML_ELEMENT_IS_ZERO; 
+	}
+}
+
+
+//=============================================================================
+//								Initialize
+//
+bool Box2DXMLLoader::Initialize()
+{
+
+	TiXmlElement* bodyElement = element_->FirstChildElement("Body");
+
+	while(bodyElement)
+	{
+		Createb2Body(bodyElement);
+
+		bodyElement = bodyElement->NextSiblingElement("Body");
+	}
+
+	TiXmlElement* jointElement = element_->FirstChildElement("Joint");
+
+	while(jointElement)
+	{
+
+		// Find out what type of joint this element contains
+		std::string str;
+		if(jointElement->QueryValueAttribute("type", &str) == TIXML_SUCCESS)
+		{
+
+			// Check what kind of joint it is
+			if(str.compare("revolute") == 0)
+			{
+				Createb2RevoluteJoint(jointElement);
+			}
+			else if(str.compare("prismatic") == 0)
+			{
+				Createb2PrismaticJoint(jointElement);
+			}
+		}
+		else
+		{
+			DEBUG_LOG("Box2DXMLLoader::Initialize Error: Joint contained no type");
+		}
+		jointElement = jointElement->NextSiblingElement("Joint");
+	}
+
+
+	return true;
+}
+
+//=============================================================================
+//								GetBody
+//
+/// Returns a body given its string id
+b2Body*	Box2DXMLLoader::GetBody(Ogre::String id)
+{
+
+	return 0;
+}
+
+
+//=============================================================================
+//								GetFixture
+//
+/// Returns a fixture given its string id
+b2Fixture* Box2DXMLLoader::GetFixture(Ogre::String id)
+{
+	return 0;
+}
+
+
+//=============================================================================
+//								GetJoint
+//
+/// Returns a joint given its string id
+b2Joint* Box2DXMLLoader::GetJoint(Ogre::String id)
+{
+	return 0;
+}
+
+
+//=============================================================================
+//								Createb2Body
+//
+/// Internal function used to create b2Bodys from an element. This adds the 
+/// body and fixtures in that body to maps in this object.
+bool Box2DXMLLoader::Createb2Body(TiXmlElement* element)
+{
+	if(element->NoChildren())
+	{
+		// The element has no children and can't possibly define a body
+		return false;
+	}
+	else
+	{
+		// We first look for the b2BodyDef for the body as the body must be
+		// created before everything else.
+		TiXmlElement* bodyDefNode = element->FirstChildElement("BodyDef");
+
+		b2BodyDef bodyDef;
+		Getb2BodyDefAttributes(&bodyDef, bodyDefNode);
+
+		// Insert the body into the bodyMap
+		b2Body* body = world_->CreateBody(&bodyDef);
+		
+		if(element->Attribute("id") != NULL)
+		{
+			Ogre::String id = Ogre::String(element->Attribute("id"));
+			bodyMap_.insert(std::make_pair(id, body));
+		}
+
+		TiXmlElement* fixtureDefNode;
+
+		// The bodydefNode doesn't have to exist for the body to be created correctly
+		// So we need to check that it existed to get the sibling elements.
+		if(bodyDefNode)
+		{
+			fixtureDefNode = bodyDefNode->NextSiblingElement();
+		}
+		else
+		{
+			fixtureDefNode = element->FirstChildElement();
+		}
+
+
+		b2FixtureDef fixtureDef;
+		
+		while(fixtureDefNode != 0)
+		{
+			if(Getb2FixtureDefAttributes(&fixtureDef,fixtureDefNode))
+			{
+
+				b2Fixture* f = body->CreateFixture(&fixtureDef);
+				
+				// Get the id of the fixture and insert it into the map.
+				if(fixtureDefNode->Attribute("id") != NULL)
+				{
+					Ogre::String id = Ogre::String(fixtureDefNode->Attribute("id"));
+					fixtureMap_.insert(std::make_pair(id, f));
+				}	
+			}
+
+			fixtureDefNode = fixtureDefNode->NextSiblingElement();
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+
+//=============================================================================
+//								Createb2RevoluteJoint
+//
+bool Box2DXMLLoader::Createb2RevoluteJoint(TiXmlElement* element)
+{
+	if(element != 0)
+	{
+		TiXmlElement* jointDefNode = element->FirstChildElement("JointDef");
+
+		if(jointDefNode != 0)
+		{
+			Ogre::String strA;
+			Ogre::String strB;
+
+
+			if(jointDefNode->QueryValueAttribute("bodyA", &strA) != TIXML_SUCCESS)
+			{
+				DEBUG_LOG("Createb2RevoluteJoint Error: bodyA not found");
+				return false;
+			}
+
+			if(jointDefNode->QueryValueAttribute("bodyB", &strB) != TIXML_SUCCESS)
+			{
+				DEBUG_LOG("Createb2RevoluteJoint Error: bodyB not found");
+				return false;
+			}
+
+			b2RevoluteJointDef jointDef;
+
+			// Find the bodys for the joint
+			BodyMap::iterator iter;
+			iter = bodyMap_.find(strA);
+
+			if(iter == bodyMap_.end())
+			{
+				DEBUG_LOG("Createb2RevoluteJoint Error: bodyA not found in map");
+				return false;
+			}
+
+			b2Body* bodyA = iter->second;
+
+			iter = bodyMap_.find(strB);
+			if(iter == bodyMap_.end())
+			{
+				DEBUG_LOG("Createb2RevoluteJoint Error: bodyB not found in map");
+				return false;
+			}
+
+			b2Body* bodyB = iter->second;
+
+			// Now load all the jointDef's properties
+
+			jointDefNode->QueryBoolAttribute("collideConnected", &jointDef.collideConnected);
+			jointDefNode->QueryBoolAttribute("enableLimit", &jointDef.enableLimit);
+			jointDefNode->QueryBoolAttribute("enableMotor", &jointDef.enableMotor);
+			GetB2Vec2(jointDefNode, "localAnchorA", &jointDef.localAnchorA);
+			GetB2Vec2(jointDefNode, "localAnchorB", &jointDef.localAnchorA);
+			jointDefNode->QueryFloatAttribute("lowerAngle", &jointDef.lowerAngle);
+			jointDefNode->QueryFloatAttribute("maxMotorTorque", &jointDef.maxMotorTorque);
+			jointDefNode->QueryFloatAttribute("motorSpeed", &jointDef.motorSpeed);
+			jointDefNode->QueryFloatAttribute("upperAngle", &jointDef.upperAngle);
+
+			b2Vec2 worldAnchor;
+			GetB2Vec2(jointDefNode, "worldAnchor", &worldAnchor);
+
+			jointDef.Initialize(bodyA,bodyB, worldAnchor);
+			b2Joint* j = world_->CreateJoint(&jointDef);
+
+			// If the joint has an id we will add it the map of joints
+			if(element->Attribute("id") != NULL)
+			{
+				Ogre::String id = Ogre::String(element->Attribute("id"));
+				jointMap_.insert(std::make_pair(id, j));
+			}
+		}
+		else
+		{
+			DEBUG_LOG("Createb2RevoluteJoint Error: Element contained no JointDef");
+		}
+	}
+	else
+	{
+		DEBUG_LOG("Createb2RevoluteJoint Error: Element is zero");
+		return false;
+	}
+
+	return true;
+}
+
+
+
+//=============================================================================
+//								Createb2PrismaticJoint
+//
+bool Box2DXMLLoader::Createb2PrismaticJoint(TiXmlElement* element)
+{
+	if(element != 0)
+	{
+		TiXmlElement* jointDefNode = element->FirstChildElement("JointDef");
+
+		if(jointDefNode != 0)
+		{
+			Ogre::String strA;
+			Ogre::String strB;
+
+
+			if(jointDefNode->QueryValueAttribute("bodyA", &strA) != TIXML_SUCCESS)
+			{
+				DEBUG_LOG("Createb2PrismaticJoint Error: bodyA not found");
+				return false;
+			}
+
+			if(jointDefNode->QueryValueAttribute("bodyB", &strB) != TIXML_SUCCESS)
+			{
+				DEBUG_LOG("Createb2PrismaticJoint Error: bodyB not found");
+				return false;
+			}
+
+			b2PrismaticJointDef jointDef;
+
+			// Find the bodys for the joint
+			BodyMap::iterator iter;
+			iter = bodyMap_.find(strA);
+
+			if(iter == bodyMap_.end())
+			{
+				DEBUG_LOG("Createb2PrismaticJoint Error: bodyA not found in map");
+				return false;
+			}
+
+			b2Body* bodyA = iter->second;
+
+			iter = bodyMap_.find(strB);
+			if(iter == bodyMap_.end())
+			{
+				DEBUG_LOG("Createb2PrismaticJoint Error: bodyB not found in map");
+				return false;
+			}
+
+			b2Body* bodyB = iter->second;
+			
+			// Now load all the jointDef's properties
+
+			jointDefNode->QueryBoolAttribute("collideConnected", &jointDef.collideConnected);
+			jointDefNode->QueryBoolAttribute("enableLimit", &jointDef.enableLimit);
+			jointDefNode->QueryBoolAttribute("enableMotor", &jointDef.enableMotor);
+			GetB2Vec2(jointDefNode, "localAnchorA", &jointDef.localAnchorA);
+			GetB2Vec2(jointDefNode, "localAnchorB", &jointDef.localAnchorA);
+			GetB2Vec2(jointDefNode, "localAxis1", &jointDef.localAxis1);
+			jointDefNode->QueryFloatAttribute("lowerTranslation", &jointDef.lowerTranslation);
+			jointDefNode->QueryFloatAttribute("maxMotorForce", &jointDef.maxMotorForce);
+			jointDefNode->QueryFloatAttribute("motorSpeed", &jointDef.motorSpeed);
+			jointDefNode->QueryFloatAttribute("upperTranslation", &jointDef.upperTranslation);
+
+			b2Vec2 worldAnchor;
+			GetB2Vec2(jointDefNode, "worldAnchor", &worldAnchor);
+
+			jointDef.Initialize(bodyA,bodyB, worldAnchor, jointDef.localAxis1);
+			b2Joint* j = world_->CreateJoint(&jointDef);
+
+			// If the joint has an id we will add it to the map of joints
+			if(element->Attribute("id") != NULL)
+			{
+				Ogre::String id = Ogre::String(element->Attribute("id"));
+				jointMap_.insert(std::make_pair(id, j));
+			}
+		}
+		else
+		{
+			DEBUG_LOG("Createb2PrismaticJoint Error: Element contained no JointDef");
+		}
+	}
+	else
+	{
+		DEBUG_LOG("Createb2PrismaticJoint Error: Element is zero");
+		return false;
+	}
+
+	return true;
+}
+
+
+//=============================================================================
+//								Createb2PulleyJoint
+//
+bool Box2DXMLLoader::Createb2PulleyJoint(TiXmlElement* element)
+{
+	if(element != 0)
+	{
+		TiXmlElement* jointDefNode = element->FirstChildElement("JointDef");
+
+		if(jointDefNode != 0)
+		{
+			Ogre::String strA;
+			Ogre::String strB;
+
+
+			if(jointDefNode->QueryValueAttribute("bodyA", &strA) != TIXML_SUCCESS)
+			{
+				DEBUG_LOG("Createb2PulleyJoint Error: bodyA not found");
+				return false;
+			}
+
+			if(jointDefNode->QueryValueAttribute("bodyB", &strB) != TIXML_SUCCESS)
+			{
+				DEBUG_LOG("Createb2PulleyJoint Error: bodyB not found");
+				return false;
+			}
+
+			b2PulleyJointDef jointDef;
+
+			// Find the bodys for the joint
+			BodyMap::iterator iter;
+			iter = bodyMap_.find(strA);
+
+			if(iter == bodyMap_.end())
+			{
+				DEBUG_LOG("Createb2PulleyJoint Error: bodyA not found in map");
+				return false;
+			}
+
+			b2Body* bodyA = iter->second;
+
+			iter = bodyMap_.find(strB);
+			if(iter == bodyMap_.end())
+			{
+				DEBUG_LOG("Createb2PulleyJoint Error: bodyB not found in map");
+				return false;
+			}
+
+			b2Body* bodyB = iter->second;
+
+			// Now load all the jointDef's properties
+
+			jointDefNode->QueryBoolAttribute("collideConnected", &jointDef.collideConnected);
+			GetB2Vec2(jointDefNode, "localAnchorA", &jointDef.localAnchorA);
+			GetB2Vec2(jointDefNode, "localAnchorB", &jointDef.localAnchorB);
+			GetB2Vec2(jointDefNode, "groundAnchorA", &jointDef.groundAnchorA);
+			GetB2Vec2(jointDefNode, "groundAnchorB", &jointDef.groundAnchorB);
+			jointDefNode->QueryFloatAttribute("lengthA", &jointDef.lengthA);
+			jointDefNode->QueryFloatAttribute("maxLengthA", &jointDef.maxLengthA);
+			jointDefNode->QueryFloatAttribute("lengthB", &jointDef.lengthB);
+			jointDefNode->QueryFloatAttribute("maxLengthB", &jointDef.maxLengthB);
+			jointDefNode->QueryFloatAttribute("ratio", &jointDef.ratio);
+
+			jointDef.Initialize(
+				bodyA,bodyB,
+				jointDef.groundAnchorA, jointDef.groundAnchorB,
+				jointDef.localAnchorA,jointDef.localAnchorB,
+				jointDef.ratio
+				);
+
+			b2Joint* j = world_->CreateJoint(&jointDef);
+
+			// If the joint has an id we will add it to the map of joints
+			if(element->Attribute("id") != NULL)
+			{
+				Ogre::String id = Ogre::String(element->Attribute("id"));
+				jointMap_.insert(std::make_pair(id, j));
+			}
+		}
+		else
+		{
+			DEBUG_LOG("Createb2PulleyJoint Error: Element contained no JointDef");
+		}
+	}
+	else
+	{
+		DEBUG_LOG("Createb2PulleyJoint Error: Element is zero");
+		return false;
+	}
+
+	return true;
+}
+
+
+//=============================================================================
+//								Createb2WeldJoint
+//
+bool Box2DXMLLoader::Createb2WeldJoint(TiXmlElement* element)
+{
+	if(element != 0)
+	{
+		TiXmlElement* jointDefNode = element->FirstChildElement("JointDef");
+
+		if(jointDefNode != 0)
+		{
+			Ogre::String strA;
+			Ogre::String strB;
+
+			// It is necessary to define what kind of shape the fixture is.
+			if(jointDefNode->QueryValueAttribute("bodyA", &strA) != TIXML_SUCCESS)
+			{
+				DEBUG_LOG("Createb2WeldJoint Error: bodyA not found");
+				return false;
+			}
+
+			if(jointDefNode->QueryValueAttribute("bodyB", &strB) != TIXML_SUCCESS)
+			{
+				DEBUG_LOG("Createb2WeldJoint Error: bodyB not found");
+				return false;
+			}
+
+			b2WeldJointDef jointDef;
+
+			// Find the bodys for the joint
+			BodyMap::iterator iter;
+			iter = bodyMap_.find(strA);
+
+			if(iter == bodyMap_.end())
+			{
+				DEBUG_LOG("Createb2WeldJoint Error: bodyA not found in map");
+				return false;
+			}
+
+			b2Body* bodyA = iter->second;
+
+			iter = bodyMap_.find(strB);
+			if(iter == bodyMap_.end())
+			{
+				DEBUG_LOG("Createb2WeldJoint Error: bodyB not found in map");
+				return false;
+			}
+
+			b2Body* bodyB = iter->second;
+
+			// Now load all the jointDef's properties
+
+			jointDefNode->QueryBoolAttribute("collideConnected", &jointDef.collideConnected);
+			GetB2Vec2(jointDefNode, "localAnchorA", &jointDef.localAnchorA);
+			GetB2Vec2(jointDefNode, "localAnchorB", &jointDef.localAnchorA);
+
+			b2Vec2 worldAnchor;
+			GetB2Vec2(jointDefNode, "worldAnchor", &worldAnchor);
+
+			jointDef.Initialize(bodyA,bodyB, worldAnchor);
+			b2Joint* j = world_->CreateJoint(&jointDef);
+
+			// If the joint has an id we will add it to the map of joints
+			if(element->Attribute("id") != NULL)
+			{
+				Ogre::String id = Ogre::String(element->Attribute("id"));
+				jointMap_.insert(std::make_pair(id, j));
+			}
+		}
+		else
+		{
+			DEBUG_LOG("Createb2WeldJoint Error: Element contained no JointDef");
+		}
+	}
+	else
+	{
+		DEBUG_LOG("Createb2WeldJoint Error: Element is zero");
+		return false;
+	}
+
+	return true;
+}
+
+
+
+//=============================================================================
+//				PUBLIC static members
+//=============================================================================
+
+//=============================================================================
+//								ClearShapeVector
 //
 /// This has to be called as shapes for fixtures can't be built on the stack.
 /// Call if after you're done with fixtureDefs return from this class.
@@ -61,7 +601,7 @@ bool Box2DXMLLoader::Createb2Body(b2Body* body, b2World* world, TiXmlElement* el
 		
 		while(fixtureDefNode != 0)
 		{
-			if(Getb2FixtureDefAttributes(&fixtureDef,fixtureDefNode));
+			if(Getb2FixtureDefAttributes(&fixtureDef,fixtureDefNode))
 			{
 				body->CreateFixture(&fixtureDef);
 			}
@@ -117,7 +657,7 @@ b2Body* Box2DXMLLoader::Createb2Body(b2World* world, TiXmlElement* element)
 		
 		while(fixtureDefNode != 0)
 		{
-			if(Getb2FixtureDefAttributes(&fixtureDef,fixtureDefNode));
+			if(Getb2FixtureDefAttributes(&fixtureDef,fixtureDefNode))
 			{
 				body->CreateFixture(&fixtureDef);
 			}
@@ -168,7 +708,7 @@ bool Box2DXMLLoader::Getb2BodyDefAttributes(b2BodyDef* bodyDef, TiXmlElement* el
 		return true;
 	}
 	
-	DEBUG_LOGC("Fixture Get Body Def Error: Element is 0.");
+	DEBUG_LOG("Getb2BodyDefAttributes Error: Element is 0.");
 	return false;
 }
 
@@ -265,13 +805,13 @@ bool Box2DXMLLoader::Getb2FixtureDefAttributes(b2FixtureDef* fixtureDef, TiXmlEl
 				else
 				{
 					;
-					DEBUG_LOGC("Fixture Creation Error: No point count set while creating polygon.");
+					DEBUG_LOG("Fixture Creation Error: No point count set while creating polygon.");
 					return false;
 				}
 			}
 			else
 			{
-				DEBUG_LOGC("Fixture Creation Error: No shape type defined.");
+				DEBUG_LOG("Fixture Creation Error: No shape type defined.");
 				return false;
 			}
 		}
@@ -300,49 +840,19 @@ bool Box2DXMLLoader::Getb2FixtureDefAttributes(b2FixtureDef* fixtureDef, TiXmlEl
 		return true;
 	}
 
-	DEBUG_LOGC("Fixture Creation Error: Element is 0.");
+	DEBUG_LOG("Fixture Creation Error: Element is 0.");
 
 	return false;
 	
 }
 
 
-
-// b2PrismaticJoint
-// String	Id
-// String	bodyA			Bodies use the XML Id, the body must be previously declared
-// String	bodyB
-// bool		collideConnect
-// bool		enableLimit
-// bool		enableMotor
-// float	maxMotorForce
-// float	motorSpeed
-// float	lowerTranslation
-// float	upperTranslation
-// b2Vec2	worldAxis
-// b2Vec2	worldAnchor
-
-//=============================================================================
-//								Getb2PrismaticJointdefAttributes
-//
-bool Box2DXMLLoader::Getb2PrismaticJointdefAttributes(b2PrismaticJointDef* jointDef, TiXmlElement* element)
-{
-	if(element != 0)
-	{
-
-	}
-	else
-	{
-		return false;
-	}
-	return true;
-}
-
-
-
 //=============================================================================
 //								Getb2Vec2
 //
+/// This function takes an element and attribute as its first two parameters
+/// to find the vector you want to load that will be put into the pointer to
+/// a b2Vec2 that was also passed.
 void Box2DXMLLoader::GetB2Vec2(TiXmlElement* element, const char* name, b2Vec2* vector)
 {
 	

@@ -1,140 +1,183 @@
 #include "AnimationBlender.h"
 
-void AnimationBlender::init(const String &animation, bool l)
+using namespace Ogre;
+//=============================================================================
+//						Constructor
+//
+/// Sets entity_ to entity.
+AnimationBlender::AnimationBlender( Entity *entity ) : entity_(entity) 
 {
-	AnimationStateSet *set = mEntity->getAllAnimationStates();
+}
+
+//=============================================================================
+//						Initialize
+//
+/// This sets the source animation to animation and disables all other
+/// animation states and sets their weight and position to 0.
+void AnimationBlender::Initialize(const String &animation, bool loop)
+{
+	AnimationStateSet *set = entity_->getAllAnimationStates();
 	AnimationStateIterator it = set->getAnimationStateIterator();
-	while(it.hasMoreElements())
+
+	while( it.hasMoreElements() )
 	{
 		AnimationState *anim = it.getNext();
 		anim->setEnabled(false);
 		anim->setWeight(0);
 		anim->setTimePosition(0);
 	}
-	mSource = mEntity->getAnimationState( animation );
-	mSource->setEnabled(true);
-	mSource->setWeight(1);
-	mTimeleft = 0;
-	mDuration = 1;
-	mTarget = 0;
-	complete = false;
-	loop = l;
+
+	source_ = entity_->getAnimationState( animation );
+	source_->setEnabled(true);
+	source_->setWeight(1);
+
+	timeleft_ = 0;
+	duration_ = 1;
+	target_ = 0;
+	complete_ = false;
+	loop_ = loop;
 } 
 
-
-void AnimationBlender::blend( const String &animation, BlendingTransition transition, Real duration, bool l )
+//=============================================================================
+//						Blend
+//
+/// Blend to a new animation or switch to it depending on the BlendingTransition
+/// passed to the function.
+void AnimationBlender::Blend(
+		const String &animation,
+		BlendingTransition transition,
+		Real duration,
+		bool loop,
+		Real targetTime)
 {
-	loop = l;
+	loop_ = loop;
+	targetTime_ = targetTime;
 	if( transition == AnimationBlender::BlendSwitch )
 	{
-		if( mSource != 0 )
-			mSource->setEnabled(false);
+		if( source_ != 0 )
+		{
+			source_->setEnabled(false);
+		}
 
-		mSource = mEntity->getAnimationState( animation );
-		mSource->setEnabled(true);
-		mSource->setWeight(1);
-		mSource->setTimePosition(0);
-		mTimeleft = 0;
+		source_ = entity_->getAnimationState( animation );
+		source_->setEnabled(true);
+		source_->setWeight(1);
+		source_->setTimePosition(0);
+		timeleft_ = 0;
 	} 
 	else 
 	{ 
-		AnimationState *newTarget = mEntity->getAnimationState( animation );
-		if( mTimeleft > 0 )
+		AnimationState* newTarget = entity_->getAnimationState( animation );
+
+		if( timeleft_ > 0 )
 		{
 			// oops, weren't finished yet
-			if( newTarget == mTarget )
+			if( newTarget == target_ )
 			{
 				// nothing to do! (ignoring duration here)
 			}
-			else if( newTarget == mSource )
+			else if( newTarget == source_ )
 			{
 				// going back to the source state, so let's switch
-				mSource = mTarget;
-				mTarget = newTarget;
-				mTimeleft = mDuration - mTimeleft; // i'm ignoring the new duration here
+				source_ = target_;
+				target_ = newTarget;
+				timeleft_ = duration_ - timeleft_; // i'm ignoring the new duration here
 			}
 			else
 			{
 				// ok, newTarget is really new, so either we simply replace the target with this one, or
 				// we make the target the new source
-				if( mTimeleft < mDuration * 0.5 )
+				if( timeleft_ < duration_ * 0.5 )
 				{
 					// simply replace the target with this one
-					mTarget->setEnabled(false);
-					mTarget->setWeight(0);
+					target_->setEnabled(false);
+					target_->setWeight(0);
 				}
 				else
 				{
 					// old target becomes new source
-					mSource->setEnabled(false);
-					mSource->setWeight(0);
-					mSource = mTarget;
+					source_->setEnabled(false);
+					source_->setWeight(0);
+					source_ = target_;
 				} 
-				mTarget = newTarget;
-				mTarget->setEnabled(true);
-				mTarget->setWeight( 1.0 - mTimeleft / mDuration );
-				mTarget->setTimePosition(0);
+
+				target_ = newTarget;
+				target_->setEnabled(true);
+				target_->setWeight( 1.0 - timeleft_ / duration_ );
+				target_->setTimePosition(0);
 			}
+
 		}
 		else
 		{
 			// assert( target == 0, "target should be 0 when not blending" )
-			// mSource->setEnabled(true);
-			// mSource->setWeight(1);
-			mTransition = transition;
-			mTimeleft = mDuration = duration;
-			mTarget = newTarget;
-			mTarget->setEnabled(true);
-			mTarget->setWeight(0);
-			mTarget->setTimePosition(0);
+			// source_->setEnabled(true);
+			// source_->setWeight(1);
+
+			transition_ = transition;
+			timeleft_ = duration_ = duration;
+			target_ = newTarget;
+			target_->setEnabled(true);
+			target_->setWeight(0);
+			target_->setTimePosition(0);
+			
 		}
 	}
 }
 
 
-void AnimationBlender::addTime( Real time )
+void AnimationBlender::AddTime( Real time )
 {
-	if( mSource != 0 )
+	if( source_ != 0 )
 	{
-		if( mTimeleft > 0 )
+		if( timeleft_ > 0 )
 		{
-			mTimeleft -= time;
-			if( mTimeleft < 0 )
+			timeleft_ -= time;
+			if( timeleft_ < 0 )
 			{
 				// finish blending
-				mSource->setEnabled(false);
-				mSource->setWeight(0);
-				mSource = mTarget;
-				mSource->setEnabled(true);
-				mSource->setWeight(1);
-				mTarget = 0;
+				source_->setEnabled(false);
+				source_->setWeight(0);
+				source_ = target_;
+				source_->setEnabled(true);
+				source_->setWeight(1);
+				target_ = 0;
 			}
 			else
 			{
 				// still blending, advance weights
-				mSource->setWeight(mTimeleft / mDuration);
-				mTarget->setWeight(1.0 - mTimeleft / mDuration);
-				
-				if(mTransition == AnimationBlender::BlendWhileAnimating)
-					mTarget->addTime(time);
+				source_->setWeight(timeleft_ / duration_);
+				target_->setWeight(1.0 - timeleft_ / duration_);
+
+				if(transition_ == AnimationBlender::BlendWhileAnimating)
+				{
+					target_->addTime(time);
+				}
+
 			}
 		}
 
-		if (mSource->getTimePosition() >= mSource->getLength())
+		if (source_->getTimePosition() >= source_->getLength())
 		{
-			complete = true;
+			complete_ = true;
 		}
 		else
 		{
-			complete = false;
+			complete_ = false;
 		}
 
-		mSource->addTime(time);
-		mSource->setLoop(loop);
+		
+		if (source_->getTimePosition() < targetTime_)
+		{
+			source_->addTime(time);
+		}
+		else if(loop_)
+		{
+			source_->setTimePosition(0);
+		}
+
+		source_->setLoop(loop_);
 	}
 }
 
 
-AnimationBlender::AnimationBlender( Entity *entity ) : mEntity(entity) 
-{
-}
