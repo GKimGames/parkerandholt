@@ -53,12 +53,12 @@ public:
 					gameObjectOgreBox2D->Initialize();
 				}
 
-			}// if(gameObjectOgre != 0)
+			}// end if(gameObjectOgreBox2D != 0)
 			else
 			{
 				result = CREATOR_OBJECT_IS_ZERO;
 			}
-		}// if(element != 0)
+		}// end if(element != 0)
 		else
 		{
 			result = CREATOR_ELEMENT_IS_ZERO;

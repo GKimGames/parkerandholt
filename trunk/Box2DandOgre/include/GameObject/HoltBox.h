@@ -19,7 +19,11 @@ public:
 
 	// Center is where the box is centered at. 
 	HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center);
-	~HoltBox(){}
+	HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center, double size, double density = 10);
+	~HoltBox()
+	{
+
+	}
 
 	bool Initialize()
 	{
@@ -52,6 +56,8 @@ protected:
 
 	/// This is half the width of the cube
 	double boxWidth_;
+
+	double density_;
 
 	/// Position to initially draw the box at.
 	b2Vec2 position_;

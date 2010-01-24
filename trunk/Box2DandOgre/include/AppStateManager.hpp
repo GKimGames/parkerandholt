@@ -1,16 +1,9 @@
-//|||||||||||||||||||||||||||||||||||||||||||||||
-
 #ifndef APP_STATE_MANAGER_HPP
 #define APP_STATE_MANAGER_HPP
-
-//|||||||||||||||||||||||||||||||||||||||||||||||
 
 #include "AppState.hpp"
 #include "OgreGpuCommandBufferFlush.h"
 #include "MessageDispatcher.h"
-
-//|||||||||||||||||||||||||||||||||||||||||||||||
-
 class AppStateManager : public AppStateListener
 {
 public:
@@ -43,8 +36,5 @@ protected:
 	Ogre::GpuCommandBufferFlush		m_BufferFlush;
 };
 
-//|||||||||||||||||||||||||||||||||||||||||||||||
 
 #endif
-
-//|||||||||||||||||||||||||||||||||||||||||||||||

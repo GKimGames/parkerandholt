@@ -26,10 +26,10 @@ public:
 
 	GameObject* CreateGameObject(std::string creator,TiXmlElement* element);
 	GameObject* CreateGameObject(TiXmlElement* element);
-	Ogre::SceneManager* sceneManager;
-
+	
 	void AddObjectCreators();
-
+	
+	Ogre::SceneManager* sceneManager;
 protected:
 
 	std::map<std::string, GameObjectCreator*> creatorMap_;

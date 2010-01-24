@@ -5,7 +5,7 @@ HoltBox::HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center)
 {
 
 	position_ = center;
-
+	density_ =  10;
 	gameObjectType_ = GOType_HoltBox;
 
 	sceneManager_ = sceneManager;
@@ -27,6 +27,34 @@ HoltBox::HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center)
 	CreateBox2DBox();
 	
 }
+
+HoltBox::HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center, double size, double density)
+{
+	position_ = center;
+	density_ = density;
+	boxWidth_ = size;
+	
+	gameObjectType_ = GOType_HoltBox;
+
+
+	sceneManager_ = sceneManager;
+	Ogre::String entityName = "HoltBox";
+
+	// Add the entity number to the HoltBox name to make it unique.
+	entityName += Ogre::StringConverter::toString(objectId_);
+
+	entity_ = sceneManager_->createEntity(entityName, "cube.1m.mesh");
+
+	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
+	sceneNode_->attachObject(entity_);
+
+	sceneNode_->setPosition(center.x, center.y, 0);
+
+	ModifyBoxWidth(0.0);
+
+	CreateBox2DBox();
+}
+
 
 bool HoltBox::CreateBox2DBox()
 {
@@ -69,7 +97,7 @@ bool HoltBox::CreateBox2DBox()
 
 		b2FixtureDef fd;
 		fd.shape = &sd;
-		fd.density = 10.0;
+		fd.density = density_;
 		fd.friction = DEFAULT_FRICTION;
 
 		body_->CreateFixture(&fd);

@@ -70,9 +70,16 @@ public:
 			TiXmlElement* gameObjectElement = element->FirstChild( "GameObject" )->ToElement();
 			if(gameObjectElement != 0)
 			{
-				std::string str;
-				element->QueryValueAttribute("name", &str);
-				gameObject->objectName_ = str;
+				std::string str = "GameObject_";
+				str += Ogre::StringConverter::toString(gameObject->objectId_);
+				// We make sure that getting the name attribute succeeds.
+				if(element->QueryValueAttribute("name", &str) == TIXML_SUCCESS)
+				{
+					gameObject->objectName_ = str;
+				}
+
+				gameObject->Initialize();
+
 
 				result =  CREATOR_OK;
 			}

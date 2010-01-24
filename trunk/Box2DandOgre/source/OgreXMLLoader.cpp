@@ -109,7 +109,7 @@ OgreXMLLoaderResult OgreXMLLoader::GetVector2(TiXmlElement* element, const char*
 			
 			if(v == Ogre::Vector2::ZERO)
 			{
-				result = OgreXMLLoaderResult::OGREXML_PARSED_VECTOR3_ZERO;
+				result = OGREXML_PARSED_VECTOR3_ZERO;
 				Ogre::String s = "OgreXMLLoader::GetVector2: Parsing Error - ";
 				s += name;
 				s += ".";

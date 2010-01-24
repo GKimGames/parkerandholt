@@ -1,5 +1,3 @@
-
-
 /*=============================================================================
 
 	ParkerStateLedgeGrab.cpp
@@ -12,11 +10,17 @@
 
 #include "ParkerStateLedgeGrab.h"
 
+#include "Parker.h"
+#include "Message.h"
+
+
 //=============================================================================
 //								Constructor
 //
-ParkerStateLedgeGrab::ParkerStateLedgeGrab(CharacterParker* parker):
-FSMState(parker)
+ParkerStateLedgeGrab::ParkerStateLedgeGrab(
+	CharacterParker* parker,
+	FSMStateMachine<CharacterParker>* stateMachine):
+	FSMState<CharacterParker>(parker,stateMachine)
 {
 }
 
@@ -26,8 +30,8 @@ FSMState(parker)
 void ParkerStateLedgeGrab::Enter()
 {
 	//b2RevoluteJointDef jdef;
-	//jdef.bodyA = owner_->body_;
-	//owner_->world_->CreateJoint();
+	//jdef.bodyA = driver_->body_;
+	//driver_->world_->CreateJoint();
 
 }
 
@@ -36,33 +40,52 @@ void ParkerStateLedgeGrab::Enter()
 //
 bool ParkerStateLedgeGrab::Update()
 {
+	if(driver_->moveLeft_)
+	{
+		MoveLeft();
+	}
+	if(driver_->moveRight_)
+	{
+		MoveRight();
+	}
+	if(driver_->jump_)
+	{
+		//Jump();
+		;
+	}
 	static Ogre::Vector3 direction;
 	
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
-	if(owner_->feetSensorHitCount_ > 0)
+	if(driver_->feetSensorHitCount_ > 0)
 	{
-		owner_->stateMachine_->ChangeState(owner_->onGroundState_);
+		stateMachine_->ChangeState(driver_->onGroundState_);
 	}
 	else
 	{
 		// Set the position of the scene node to that of the Box2D body
-		b2Vec2 v = owner_->body_->GetPosition();
-		owner_->sceneNode_->setPosition(v.x, v.y,0);
+		b2Vec2 v = driver_->body_->GetPosition();
+		driver_->sceneNode_->setPosition(v.x, v.y,0);
 
 		// Make the scene face the direction the body is moving
-		if(owner_->body_->GetLinearVelocity().x > 0.1)
+		if(driver_->body_->GetLinearVelocity().x > 0.1)
 		{
 			direction = Ogre::Vector3(0,0,1);
 		}
-		else if(owner_->body_->GetLinearVelocity().x < -0.1)
+		else if(driver_->body_->GetLinearVelocity().x < -0.1)
 		{
 			direction = Ogre::Vector3(0,0,-1);
 		}
 
-		owner_->sceneNode_->setDirection(direction,Ogre::Node::TS_WORLD);
+		driver_->sceneNode_->setDirection(direction,Ogre::Node::TS_WORLD);
 
 		UpdateAnimation();
+
+		if(driver_->debugDrawOn_)
+		{
+			driver_->UpdateDebugDraw();
+		}
+
 	}
 
 	// We've successfully updated.
@@ -77,20 +100,43 @@ bool ParkerStateLedgeGrab::HandleMessage(const KGBMessage message)
 
 	switch(message.messageType)
 	{
-		case CHARACTER_MOVE_LEFT:
-			{
-				MoveLeft();
-				return true;
-			}
-		case CHARACTER_MOVE_RIGHT:
-			{
-				MoveRight();
-				return true;
-			}
-		case CHARACTER_JUMP:
-			{
-				return true;
-			}
+		case CHARACTER_MOVE_LEFT_PLUS:
+		{
+			driver_->moveLeft_ = true;
+			//MoveLeft();
+			return true;
+		}
+		case CHARACTER_MOVE_RIGHT_PLUS:
+		{
+			driver_->moveRight_ = true;
+			//MoveRight();
+			return true;
+		}
+		case CHARACTER_JUMP_PLUS:
+		{
+			driver_->jump_ = true;
+			//Jump();
+			return true;
+		}
+
+		case CHARACTER_MOVE_LEFT_MINUS:
+		{
+			driver_->moveLeft_ = false;
+			//MoveLeft();
+			return true;
+		}
+		case CHARACTER_MOVE_RIGHT_MINUS:
+		{
+			driver_->moveRight_ = false;
+			//MoveRight();
+			return true;
+		}
+		case CHARACTER_JUMP_MINUS:
+		{
+			driver_->jump_ = false;
+			//Jump();
+			return true;
+		}
 	}
 
 	return false;
@@ -112,10 +158,10 @@ void ParkerStateLedgeGrab::BeginContact(ContactPoint* contact, b2Fixture* contac
 {
 	if(!collidedFixture->IsSensor())
 	{
-		if(contactFixture == owner_->feetSensor_)
+		if(contactFixture == driver_->feetSensor_)
 		{
-			owner_->stateMachine_->ChangeState(owner_->onGroundState_);
-			owner_->BeginContact(contact,contactFixture,collidedFixture);
+			stateMachine_->ChangeState(driver_->onGroundState_);
+			driver_->BeginContact(contact,contactFixture,collidedFixture);
 		}
 	}
 
@@ -139,9 +185,9 @@ void ParkerStateLedgeGrab::MoveLeft()
 
 	double timeSinceLastFrame = GameFramework::getSingletonPtr()->GetTimeSinceLastFrame();
 
-	if(owner_->body_->GetLinearVelocity().x > -owner_->maximumAirVelocity_)
+	if(driver_->body_->GetLinearVelocity().x > -driver_->maximumAirVelocity_)
 	{
-		owner_->body_->ApplyForce(b2Vec2(-owner_->airForce_ * timeSinceLastFrame,0), owner_->body_->GetPosition());
+		driver_->body_->ApplyForce(b2Vec2(-driver_->airForce_ * timeSinceLastFrame,0), driver_->body_->GetPosition());
 	}
 
 }
@@ -154,9 +200,9 @@ void ParkerStateLedgeGrab::MoveRight()
 {
 	double timeSinceLastFrame = GameFramework::getSingletonPtr()->GetTimeSinceLastFrame();
 
-	if(owner_->body_->GetLinearVelocity().x < owner_->maximumAirVelocity_)
+	if(driver_->body_->GetLinearVelocity().x < driver_->maximumAirVelocity_)
 	{
-		owner_->body_->ApplyForce(b2Vec2(owner_->airForce_ * timeSinceLastFrame,0), owner_->body_->GetPosition());
+		driver_->body_->ApplyForce(b2Vec2(driver_->airForce_ * timeSinceLastFrame,0), driver_->body_->GetPosition());
 	}
 
 }
@@ -170,8 +216,8 @@ void ParkerStateLedgeGrab::MoveRight()
 void ParkerStateLedgeGrab::Climb()
 {
 
-	double timeLeft = (owner_->animationState_->getLength() - owner_->animationState_->getTimePosition()) / owner_->animationState_->getLength();
-	owner_->body_->ApplyForce(b2Vec2(0,owner_->jumpingAfterForce_ * timeLeft), owner_->body_->GetPosition());
+	double timeLeft = (driver_->animationState_->getLength() - driver_->animationState_->getTimePosition()) / driver_->animationState_->getLength();
+	driver_->body_->ApplyForce(b2Vec2(0,driver_->jumpingAfterForce_ * timeLeft), driver_->body_->GetPosition());
 
 	// Code to wall jump
 	/*
@@ -197,5 +243,5 @@ void ParkerStateLedgeGrab::UpdateAnimation()
 {
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
-	owner_->animationState_->addTime(timeSinceLastFrame);
+	driver_->animationState_->addTime(timeSinceLastFrame);
 }

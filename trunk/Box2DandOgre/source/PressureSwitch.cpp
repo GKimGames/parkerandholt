@@ -69,15 +69,13 @@ PressureSwitch::PressureSwitch(Ogre::SceneManager* sceneManager,
 	world_->CreateJoint(&pjd);
 
 
+
+	/*
 	messageList_.insert(
 		std::make_pair<GameObjectId, SensorMessage>(
 		SEND_TO_ALL,SensorMessage(STUPID_MESSAGE,STUPID_MESSAGE))
 		);
-
-	messageList_.insert(
-		std::make_pair<GameObjectId, SensorMessage>(
-		SEND_TO_ALL,SensorMessage(CHARACTER_JUMP,CHARACTER_JUMP))
-		);
+	*/
 
 }
 

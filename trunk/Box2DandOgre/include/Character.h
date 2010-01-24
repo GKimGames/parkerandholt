@@ -22,6 +22,7 @@
 
 #include "FSMStateMachine.h"
 
+#include "OgreXMLLoader.h"
 /// Base class for a character. Character extends GameObjectOgreBox2D
 class Character :public GameObjectOgreBox2D
 {
@@ -48,19 +49,40 @@ public:
 
 		switch(message.messageType)
 		{
-			case CHARACTER_MOVE_LEFT:
+		case CHARACTER_MOVE_LEFT_PLUS:
 			{
-				MoveLeft();
+				moveLeft_ = true;
+				//MoveLeft();
 				return true;
 			}
-			case CHARACTER_MOVE_RIGHT:
+		case CHARACTER_MOVE_RIGHT_PLUS:
 			{
-				MoveRight();
+				moveRight_ = true;
+				//MoveRight();
 				return true;
 			}
-			case CHARACTER_JUMP:
+		case CHARACTER_JUMP_PLUS:
 			{
-				Jump();
+				jump_ = true;
+				//Jump();
+				return true;
+			}
+		case CHARACTER_MOVE_LEFT_MINUS:
+			{
+				moveLeft_ = false;
+				//MoveLeft();
+				return true;
+			}
+		case CHARACTER_MOVE_RIGHT_MINUS:
+			{
+				moveRight_ = false;
+				//MoveRight();
+				return true;
+			}
+		case CHARACTER_JUMP_MINUS:
+			{
+				jump_ = false;
+				//Jump();
 				return true;
 			}
 	
@@ -133,10 +155,12 @@ protected:
 	double				restitution_;
 	double				linearDamping_;
 
+	Ogre::Vector3		translate_;
 	double				translateX;
 	double				translateY;
 	double				translateZ;	
 
+	Ogre::Vector3		scale_;
 	double				scaleX_;
 	double				scaleY_;
 	double				scaleZ_;
@@ -145,6 +169,9 @@ protected:
 
 	bool				justJumped;
 	bool				justWallJumped_;
+	bool				moveLeft_;
+	bool				moveRight_;
+	bool				jump_;
 
 	int					canJump_;
 

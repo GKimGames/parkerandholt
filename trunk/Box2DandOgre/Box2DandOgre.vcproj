@@ -206,15 +206,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\source\Box2DXMLLoader.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\source\DotSceneLoader.cpp"
 				>
 			</File>
 			<File
+				RelativePath=".\source\KeyHandler.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\source\main.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\source\MousePicking.cpp"
 				>
 			</File>
 			<File
@@ -225,15 +229,15 @@
 				RelativePath=".\source\OgreGpuCommandBufferFlush.cpp"
 				>
 			</File>
-			<File
-				RelativePath=".\source\OgreXMLLoader.cpp"
-				>
-			</File>
 			<Filter
 				Name="KGBandOGRE"
 				>
 				<File
 					RelativePath=".\source\GameFramework.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\source\HelperFunctions.cpp"
 					>
 				</File>
 				<File
@@ -349,6 +353,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="XML Loaders"
+				>
+				<File
+					RelativePath=".\source\Box2DXMLLoader.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\source\OgreXMLLoader.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -360,11 +376,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\Box2DXMLLoader.h"
+				RelativePath=".\include\DotSceneLoader.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\include\DotSceneLoader.hpp"
+				RelativePath=".\include\KeyHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\MousePicking.h"
 				>
 			</File>
 			<File
@@ -376,7 +396,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\OgreXMLLoader.h"
+				RelativePath=".\resource.h"
 				>
 			</File>
 			<Filter
@@ -538,6 +558,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\include\MovingPlatformCreator.h"
+						>
+					</File>
+					<File
 						RelativePath=".\include\ObjectOgreCreator.h"
 						>
 					</File>
@@ -556,6 +580,18 @@
 				</File>
 				<File
 					RelativePath=".\include\DynamicRenderable.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="XML Loaders"
+				>
+				<File
+					RelativePath=".\include\Box2DXMLLoader.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\OgreXMLLoader.h"
 					>
 				</File>
 			</Filter>
@@ -598,19 +634,19 @@
 			Name="XML Configs"
 			>
 			<File
-				RelativePath=".\Boxes.xml"
+				RelativePath="..\..\OgreSDK\bin\Boxes.xml"
 				>
 			</File>
 			<File
-				RelativePath=".\CharacterSettings.xml"
+				RelativePath="..\..\OgreSDK\bin\CharacterSettings.xml"
 				>
 			</File>
 			<File
-				RelativePath=".\MapEditorSettings.xml"
+				RelativePath="..\..\OgreSDK\bin\MapEditorSettings.xml"
 				>
 			</File>
 			<File
-				RelativePath=".\ParkerSettings.xml"
+				RelativePath="..\..\OgreSDK\bin\ParkerSettings.xml"
 				>
 			</File>
 		</Filter>

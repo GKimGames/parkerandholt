@@ -19,12 +19,12 @@
 /// Structure to represent a contact point.
 struct ContactPoint
 {
+	b2Contact* contact;
 	b2Fixture* fixtureA;
 	b2Fixture* fixtureB;
 	b2Vec2 normal;
 	b2Vec2 position;
 	b2PointState state;
-	b2Contact* contact;
 };
 
 /// The default value of friction for all Box2D objects in the game.

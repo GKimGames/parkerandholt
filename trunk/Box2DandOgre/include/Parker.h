@@ -14,6 +14,8 @@
 #include "ParkerStateInAir.h"
 #include "PhysicsState.h"
 
+#include "FSMStateMachine.h"
+
 #include "Box2DXMLLoader.h"
 
 /// Parkers class
@@ -29,88 +31,18 @@ public:
 
 	~CharacterParker(){}
 
-	bool HandleMessage(const KGBMessage message)
-	{ 
-		return stateMachine_->HandleMessage(message); 
-	}
+	bool HandleMessage(const KGBMessage message);
 
-	bool Update(double timeSinceLastFrame)
-	{
-		/*
-		static b2Color color(1,1,0);
-		bodyVec1 = body_->GetWorldPoint(b2Vec2(-boundingBoxWidth_/2,	0));
-		bodyVec2 = body_->GetWorldPoint(b2Vec2(boundingBoxWidth_/2,	0));
-		feetVec1 = body_->GetWorldPoint(b2Vec2(-boundingBoxWidth_/2,	-boundingBoxHeight_/2));
-		feetVec2 = body_->GetWorldPoint(b2Vec2(boundingBoxWidth_/2,	-boundingBoxHeight_/2));
-
-		world_->RayCast(this, bodyVec1, feetVec1);
-		world_->RayCast(this, bodyVec2, feetVec2);
-
-		if(GAMEFRAMEWORK->GetDebugDraw())
-		{
-			GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec1, feetVec1, color);
-			GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec2, feetVec2, color);
-		}
-		*/
-		
-		UpdateDebugDraw();
-
-		return stateMachine_->Update();
-	}
+	bool Update(double timeSinceLastFrame);
 
 	virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point,
-									const b2Vec2& normal, float32 fraction)
-	{
-		/*
-		static bool oneTwo = true;
-		static b2Color color(1,0,234.0/255.0);
-		
-		if(oneTwo == false)
-		{
-			GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec1, point, color);
-			oneTwo = true;
-		}
-		else
-		{
-			GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec2, point, color);
-			oneTwo = false;
-		}
-
-		body_->ApplyForce(b2Vec2(0,abs(body_->GetMass() * world_->GetGravity().y * 2)), body_->GetPosition());
-		body_->SetLinearVelocity(b2Vec2(0,0));
-		*/
-		return 0;
-
-	}
+									const b2Vec2& normal, float32 fraction);
 
 	/// Called when two fixtures begin to touch.
-	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
-	{
-		if(collidedFixture->IsSensor() == false)
-		{
-			if(contactFixture == feetSensor_ )
-			{
-				feetSensorHitCount_++;
-			}
-		}
-
-		stateMachine_->BeginContact(contact,contactFixture, collidedFixture);
-	}
+	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 
 	/// Called when two fixtures cease to touch.
-	void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
-	{
-		if(collidedFixture->IsSensor() == false)
-		{
-			if(contactFixture == feetSensor_ )
-			{
-				feetSensorHitCount_--;
-			}
-		}
-
-		stateMachine_->EndContact(contact,contactFixture, collidedFixture);
-
-	}
+	void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 
 
 	bool Initialize();

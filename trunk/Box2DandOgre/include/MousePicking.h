@@ -1,58 +1,53 @@
-//|||||||||||||||||||||||||||||||||||||||||||||||
-
 #ifndef MOUSEPICKING_H
 #define MOUSEPICKING_H
 
 #include "AppState.hpp"
-
-#include <OgreSubEntity.h>
-#include <OgreMaterialManager.h>
 #include <Ogre.h>
 #include <tinyxml.h>
 
 #include <Box2D\Box2D.h>
 
 #include "AnimationBlender.h"
-#include "GameObject.h"
+#include "GameObjectOgreBox2D.h"
+#include "HoltBox.h"
+#include "Message.h"
+#include "MessageDispatcher.h"
 
 
-class MousePicking
+
+
+class MousePicking : public GameObjectOgreBox2D
 {
-public:
-	MousePicking(Ogre::SceneManager* sceneManager, b2World* world, Ogre::Camera* camera, Ogre::Plane pPlane);
-	~MousePicking();
+public: 
+	MousePicking(Ogre::SceneManager* sceneManager, Ogre::Camera* camera);
+	~MousePicking(){}
 
 	void MouseMoved(const OIS::MouseEvent &arg);
 	void MousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id); 
 	void MouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
-	void CreateBox(Vector3 position);
+	void UpdateMouse();
+	bool HandleMessage(const KGBMessage message);
 
-	void Update(double timeSinceLastFrame);
+
+	Ogre::Vector3 GetPosition();
 
 
 protected:
-
-	b2World*					world_;
 	Ogre::SceneManager*			sceneManager_;
 	Ogre::RaySceneQuery*		m_pRSQ_;
 	Ogre::Camera*				m_pCamera_;
-	Ogre::Plane					pickingPlane_;
-	
-	
-	bool						m_bLMouseDown_;
-	bool						m_bRMouseDown_;
-	bool						changingSize_;
-	bool						hasHit_;
-	b2Body*						cubes_[4];
-	Entity**					boxes_;
-	Vector3						pointClicked_;
-	int							boxCount_;
-	double						boxMax_;
-	double						boxMin_;
-	double						boxIncriment_;
+	Ogre::Plane*				pickingPlane_;
+	Ogre::Vector3				position_;
+	Ogre::Vector3				pointClicked_;
+	Ogre::Entity*				mouseIcon_;
+	Ogre::Real					rayPositionX_;
+	Ogre::Real					rayPositionY_;
+	HoltBox*					box_[3];
 	double						boxSize_;
-	double						boxDensity_;
-	double						boxFriction_;
-	
+	double						boxMinSize_;
+	double						boxSizeIncrement_;
+	double						boxMaxSize_;
+	int							incrementer_;
+
 };
 #endif 

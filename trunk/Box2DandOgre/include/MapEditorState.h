@@ -107,7 +107,7 @@ protected:
 private:
 	
 	MyGUI::Gui*					myGUI_;
-	SceneNode*					linesNode_;
+	Ogre::SceneNode*			linesNode_;
 	DynamicLines*				dynamicLines_;
 	int							linesNodeScale_;
 	bool						m_bQuit;

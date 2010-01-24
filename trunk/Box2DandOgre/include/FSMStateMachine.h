@@ -1,157 +1,162 @@
 /*=============================================================================
 
-	FSMStateMachine.h
+		FSMStateMachine.h
 
-	Author: Matt King
+		Author: Matt King
 
-	Finite State Machine
+		Finite State Machine
 
 =============================================================================*/
 
 #ifndef FSMSTATEMACHINE_H
 #define FSMSTATEMACHINE_H
 
-#include <cassert>
-#include <string>
-
 #include "FSMState.h"
-
+#include "GameObjectOgreBox2D.h"
 
 /// Finite state machines have two states at a time, a global state and a
-/// current state, both are updated 
+/// current state, both are updated every cycle if they exist. 
 template <class T>
 class FSMStateMachine
 {
 
 public:
 
-	FSMStateMachine(T* owner):owner_(owner),
-		currentState_(NULL),
-		previousState_(NULL),
-		globalState_(NULL)
-	{}
 
-	virtual ~FSMStateMachine()
-	{
-		if(currentState_)
-		{
-			delete currentState_;
-		}
+	FSMStateMachine(T* driver):
+		  driver_(driver),
+		  currentState_(0),
+		  previousState_(0),
+		  globalState_(0)
+	  {
+		  // Do Nothing
+	  }
 
-		if(globalState_)
-		{
-			delete globalState_;
-		}
-	}
+	  /// Delete the current state and global state if they exist.
+	  virtual ~FSMStateMachine()
+	  {
+		  if(currentState_ != 0)
+		  {
+			  delete currentState_;
+		  }
 
-	/// Set the current state
-	void SetCurrentState(FSMState<T>* s)  {  currentState_	= s;}
-	
-	/// Set the global state
-	void SetGlobalState(FSMState<T>* s)   {  globalState_	= s;}
-	
-	/// Set the previous state
-	void SetPreviousState(FSMState<T>* s) {  previousState_	= s;}
+		  if(globalState_  != 0)
+		  {
+			  delete globalState_;
+		  }
+	  }
 
-	/// Update the FSM
-	bool Update() const
-	{
-		// If a global state exists update it.
-		if(globalState_)
-		{
-			globalState_->Update();
-		}
+	  /// Update the FSM
+	  bool Update()
+	  {
+		  // If a global state exists update it.
+		  if(globalState_)
+		  {
+			  globalState_->Update();
+		  }
 
-		// If a current state exists update it.
-		if (currentState_)
-		{
-			return currentState_->Update();
-		}
+		  // If a current state exists update it.
+		  if (currentState_)
+		  {
+			  return currentState_->Update();
+		  }
 
-		return true;
-	}
+		  return true;
+	  }
 
-	/// Send a message to the FSM
-	bool HandleMessage(const KGBMessage message) const
-	{
-		// If a global state exists update it.
-		if(globalState_)
-		{
-			globalState_->HandleMessage(message);
-		}
+	  /// Change current state to newState.
+	  /// This calls the exit method of the current state before calling the
+	  /// enter method of the new state.
+	  void ChangeState(FSMState<T>* newState)
+	  {
+		  previousState_ = currentState_;
 
-		// If a current state exists update it.
-		if (currentState_)
-		{
-			return currentState_->HandleMessage(message);
-		}
+		  currentState_->Exit();
 
-		return true;
-	}
+		  currentState_ = newState;
 
-	/// Called when two fixtures begin to touch.
-	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
-	{
-		currentState_->BeginContact(contact,contactFixture, collidedFixture);
-	}
+		  currentState_->Enter();
+	  }
 
-	/// Called when two fixtures cease to touch.
-	void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
-	{
-		currentState_->EndContact(contact,contactFixture, collidedFixture);
-	}
 
-	/// Change current state to newState.
-	/// This calls the exit method of the current state before calling the
-	/// enter method of the new state.
-	void ChangeState(FSMState<T>* newState)
-	{
-		assert(newState && 
-			"<FSMStateMachine::ChangeState>: trying to change to NULL state");
+	  /// Change the current state back to the previous state. This calls
+	  /// ChangeState to change the state.
+	  void RevertToPreviousState()
+	  {
+		  ChangeState(previousState_);
+	  }
 
-		// Keep a record of the previous state
-		previousState_ = currentState_;
 
-		// Call the exit method of the existing state
-		currentState_->Exit();
 
-		// Change state to the new state
-		currentState_ = newState;
+	  /// Returns true if the current state's type is equal to the type of the
+	  /// class passed as a parameter. 
+	  bool IsInState(const FSMState<T>& state )const
+	  {
+		  return typeid(*currentState_) == typeid(state);
+	  }
 
-		// Call the entry method of the new state
-		currentState_->Enter();
-	}
+/*=============================================================================
+	These methods really should be in a class that extends FSMStateMachine
+	but for the sake of convenience they are in here.
+=============================================================================*/
+	  /// Send a message to the FSM
+	  bool HandleMessage(const KGBMessage message)
+	  {
+		  // If a global state exists hand it the message.
+		  if(globalState_)
+		  {
+			  globalState_->HandleMessage(message);
+		  }
 
-	/// Change the current state back to the previous state. This calls
-	/// ChangeState to change the state.
-	void RevertToPreviousState()
-	{
-		ChangeState(previousState_);
-	}
+		  // If a current state exists hand it the message.
+		  if (currentState_)
+		  {
+			  return currentState_->HandleMessage(message);
+		  }
 
-	/// Returns true if the current state's type is equal to the type of the
-	/// class passed as a parameter. 
-	bool IsInState(const FSMState<T>& st)const
-	{
-		return typeid(*currentState_) == typeid(st);
-	}
+		  return true;
+	  }
 
-	FSMState<T>*  GetCurrentState()  const { return currentState_;}
-	FSMState<T>*  GetGlobalState()   const { return globalState_;}
-	FSMState<T>*  GetPreviousState() const { return previousState_;}
+
+	  /// Called when two fixtures begin to touch.
+	  void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+	  {
+		  currentState_->BeginContact(contact,contactFixture, collidedFixture);
+	  }
+
+	  /// Called when two fixtures cease to touch.
+	  void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+	  {
+		  currentState_->EndContact(contact,contactFixture, collidedFixture);
+	  }
+
+
+
+/*=============================================================================
+	  Getter / Setter methods
+=============================================================================*/
+
+	  void SetCurrentState(FSMState<T>*  state)  {  currentState_	 = state;}
+	  void SetGlobalState(FSMState<T>*   state)  {  globalState_	 = state;}
+	  void SetPreviousState(FSMState<T>* state)  {  previousState_   = state;}
+
+	  FSMState<T>*  GetCurrentState()  const { return currentState_;}
+	  FSMState<T>*  GetGlobalState()   const { return globalState_;}
+	  FSMState<T>*  GetPreviousState() const { return previousState_;}
 
 private:
 
-	// A pointer to the agent that owns this instance.
-	T*          owner_;
+	/// A pointer to the object that drives the state machine.
+	T*				driver_;
 
-	FSMState<T>*   currentState_;
+	FSMState<T>*    currentState_;
 
-	// A record of the last state the agent was in.
-	FSMState<T>*   previousState_;
+	/// The previous state the machien was in.
+	FSMState<T>*    previousState_;
 
-	// This is called every time the FSM is updated
-	FSMState<T>*   globalState_;
+	/// The global state is updated all of the time and regularly does not change.
+	FSMState<T>*    globalState_;
+
 };
 
 

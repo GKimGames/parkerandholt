@@ -28,6 +28,7 @@ GameFramework::GameFramework()
 
 GameFramework::~GameFramework()
 {
+	
 	if(inputManager_)
 	{
 		delete keyboard_;

@@ -8,15 +8,19 @@
 
 
 
-//|||||||||||||||||||||||||||||||||||||||||||||||
-
+//=============================================================================
+//							AppStateManager
+//
 AppStateManager::AppStateManager()
 {
 	m_bShutdown = false;
 }
 
-//|||||||||||||||||||||||||||||||||||||||||||||||
 
+
+//=============================================================================
+//							AppStateManager
+//
 AppStateManager::~AppStateManager()
 {
 	while(!m_ActiveStateStack.empty()) 
@@ -31,8 +35,11 @@ AppStateManager::~AppStateManager()
 	}
 }
 
-//|||||||||||||||||||||||||||||||||||||||||||||||
 
+
+//=============================================================================
+//							manageAppState
+//
 void AppStateManager::manageAppState(Ogre::String stateName, AppState* state)
 {
 	try
@@ -49,8 +56,12 @@ void AppStateManager::manageAppState(Ogre::String stateName, AppState* state)
 	}
 }
 
-//|||||||||||||||||||||||||||||||||||||||||||||||
 
+
+//=============================================================================
+//							findByName
+//
+/// 
 AppState* AppStateManager::findByName(Ogre::String stateName)
 {
 	std::vector<state_info>::iterator itr;
@@ -64,8 +75,12 @@ AppState* AppStateManager::findByName(Ogre::String stateName)
 	return 0;
 }
 
-//|||||||||||||||||||||||||||||||||||||||||||||||
 
+
+//=============================================================================
+//							start
+//
+/// This is the main loop of the game.
 void AppStateManager::start(AppState* state)
 {
 	changeAppState(state);
@@ -102,11 +117,13 @@ void AppStateManager::start(AppState* state)
 
 			QueryPerformanceCounter(&t2);
 
-			// compute time
+			// Get the processor time.
 			LONGLONG qpart = (t2.QuadPart - t1.QuadPart);
+			// There is some weird math error here, I don't know what it is but
+			// I had to multiply by 10000000 or it gave wrong results.
 			timeSinceLastFrame = LONGLONG( (qpart * 10000000) / frequency.QuadPart );
 			timeSinceLastFrame /= 10000000.0;
-			// start timer
+
 			QueryPerformanceCounter(&t1);
 
 			// Prevent large timesteps.
@@ -118,8 +135,8 @@ void AppStateManager::start(AppState* state)
 			timeAccum += timeSinceLastFrame;
 			GAMEFRAMEWORK->SetRealTimeSinceLastFrame(timeSinceLastFrame);
 			
-			// if the timeAccum is corrupted and somehow is below -0.1
-			// we will set it back to zero
+			// If the timeAccum is corrupted and somehow is below -0.1
+			// we will set it back to zero.
 			if(timeAccum < -0.1)
 			{
 				timeAccum = 0;
@@ -157,7 +174,7 @@ void AppStateManager::start(AppState* state)
 			GAMEFRAMEWORK->root_->renderOneFrame();
 			*/
 
-			
+			// Sleep for 5ms, we can't possibly need to update this fast.
 			Sleep(5);
 		}
 		else
@@ -170,8 +187,9 @@ void AppStateManager::start(AppState* state)
 	GameFramework::getSingletonPtr()->log_->logMessage("Shutdown OGRE...");
 }
 
-//|||||||||||||||||||||||||||||||||||||||||||||||
-
+//=============================================================================
+//							changeAppState
+//
 void AppStateManager::changeAppState(AppState* state)
 {
 	if(!m_ActiveStateStack.empty()) 
@@ -185,8 +203,11 @@ void AppStateManager::changeAppState(AppState* state)
 	m_ActiveStateStack.back()->enter();
 }
 
-//|||||||||||||||||||||||||||||||||||||||||||||||
 
+
+//=============================================================================
+//							pushAppState
+//
 bool AppStateManager::pushAppState(AppState* state)
 {
 	if(!m_ActiveStateStack.empty()) 
@@ -202,8 +223,11 @@ bool AppStateManager::pushAppState(AppState* state)
 	return true;
 }
 
-//|||||||||||||||||||||||||||||||||||||||||||||||
 
+
+//=============================================================================
+//							popAppState
+//
 void AppStateManager::popAppState(void)
 {
 	if(!m_ActiveStateStack.empty()) 
@@ -218,18 +242,22 @@ void AppStateManager::popAppState(void)
 		m_ActiveStateStack.back()->resume();
 	}
     else
+	{
 		shutdown();
+	}
 }
 
-//|||||||||||||||||||||||||||||||||||||||||||||||
-
+//=============================================================================
+//							shutdown
+//
 void AppStateManager::shutdown()
 {
 	m_bShutdown=true;
 }
 
-//|||||||||||||||||||||||||||||||||||||||||||||||
-
+//=============================================================================
+//							init
+//
 void AppStateManager::init(AppState* state)
 {
 	GameFramework::getSingletonPtr()->keyboard_->setEventCallback(state);
@@ -237,5 +265,3 @@ void AppStateManager::init(AppState* state)
 
 	GameFramework::getSingletonPtr()->renderWindow_->resetStatistics();
 }
-
-//|||||||||||||||||||||||||||||||||||||||||||||||
