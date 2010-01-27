@@ -214,6 +214,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\source\LevelLoader.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\source\main.cpp"
 				>
 			</File>
@@ -364,6 +368,10 @@
 					RelativePath=".\source\OgreXMLLoader.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\source\TinyXMLHelper.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -381,6 +389,10 @@
 			</File>
 			<File
 				RelativePath=".\include\KeyHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\LevelLoader.h"
 				>
 			</File>
 			<File
@@ -558,6 +570,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\source\GameObjectSensorCreator.h"
+						>
+					</File>
+					<File
 						RelativePath=".\include\MovingPlatformCreator.h"
 						>
 					</File>
@@ -592,6 +608,10 @@
 				</File>
 				<File
 					RelativePath=".\include\OgreXMLLoader.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\TinyXMLHelper.h"
 					>
 				</File>
 			</Filter>
@@ -647,6 +667,10 @@
 			</File>
 			<File
 				RelativePath="..\..\OgreSDK\bin\ParkerSettings.xml"
+				>
+			</File>
+			<File
+				RelativePath="..\..\OgreSDK\bin\SampleLevel.xml"
 				>
 			</File>
 		</Filter>

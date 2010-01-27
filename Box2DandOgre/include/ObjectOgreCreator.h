@@ -1,8 +1,8 @@
 /*=============================================================================
 
-ObjectOgreCreator.h
+		ObjectOgreCreator.h
 
-Author: Matt King
+		Author: Matt King
 
 =============================================================================*/
 
@@ -18,7 +18,7 @@ class ObjectOgreCreator : public GameObjectCreator
 
 public:
 
-	ObjectOgreCreator(){}
+	ObjectOgreCreator(GameObjectFactory* gameObjectFactory):GameObjectCreator(gameObjectFactory){}
 
 
 	virtual GameObject* LoadFromXML(TiXmlElement* element)
@@ -34,11 +34,11 @@ public:
 
 		// It didn't get created ok.
 		delete object;
-		
+
 		return 0;
 	}
-	
-	virtual CreatorResult LoadFromXML(TiXmlElement* element, GameObjectOgre* gameObjectOgre )
+
+	virtual CreatorResult LoadFromXML(TiXmlElement* element, GameObjectOgre* gameObjectOgre)
 	{
 		CreatorResult result;
 		if(element != 0)
@@ -46,46 +46,27 @@ public:
 			if(gameObjectOgre != 0)
 			{
 				result = GameObjectCreator::LoadFromXML(element, gameObjectOgre);
-				
+
 				if(result == CREATOR_OK)
 				{
-					TiXmlElement* ogreObjectElement = element->FirstChild( "OgreObject" )->ToElement();
-					// Get the mesh for the Game Ogre Object
-					Ogre::String meshName;
-					const char* c = ogreObjectElement->Attribute("mesh");
-					meshName = Ogre::String(c);
-					if(!meshName.empty())
-					{
-						if(gameObjectOgre->Initialize(meshName))
-						{
-							// Get the position for the sceneNode of the Game Ogre Object
-							Ogre::Vector3 sceneNodePosition;
-							OgreXMLLoader::GetVector3(ogreObjectElement, "position", &sceneNodePosition);
-							gameObjectOgre->sceneNode_->setPosition(sceneNodePosition);
+					TiXmlHandle ogreObjectElement(element->FirstChild( "OgreObject" ));
+					
+					TiXmlElement* meshElement = ogreObjectElement.FirstChild("Mesh").ToElement();
 
-							// Get the position for the sceneNode of the Game Ogre Object
-							Ogre::Vector3 sceneNodeScale;
-							if(OgreXMLLoader::GetVector3(ogreObjectElement, "scale", &sceneNodeScale) == OGREXML_OK)
-							{
-								gameObjectOgre->sceneNode_->scale(sceneNodeScale);
-							}
-
-						}
-						else
-						{
-							result = CREATOR_INITIALIZED_FAILED;
-							Ogre::String s = "ObjectOgreCreator: Failed to initialize GameObjectOgre";
-							GAMEFRAMEWORK->log_->logMessage(s);
-							DEBUG_LOG(s);
-						}
-					}
-					else
+					while(meshElement)
 					{
-						result = CREATOR_NO_MESH;
-						Ogre::String s = "ObjectOgreCreator: Failed to initialize GameObjectOgre: no mesh attribute";
-						GAMEFRAMEWORK->log_->logMessage(s);
-						DEBUG_LOG(s);
+						ParseMesh(meshElement, gameObjectOgre);
+						meshElement = meshElement->NextSiblingElement("Mesh");
 					}
+
+					TiXmlElement* lightElement = ogreObjectElement.FirstChild("Light").ToElement();
+
+					while(lightElement)
+					{
+						ParseLight(lightElement, gameObjectOgre);
+						lightElement = lightElement->NextSiblingElement("Light");
+					}
+
 				}
 
 			}// if(gameObjectOgre != 0)
@@ -101,7 +82,55 @@ public:
 
 		return result;
 	}
-	
+
+	void ParseMesh(TiXmlElement* element, GameObjectOgre* gameObjectOgre)
+	{
+		static int meshCounter = 0;
+		meshCounter++;
+
+		// Get the mesh for the Game Ogre Object
+		Ogre::String meshName = TinyXMLHelper::GetAttribute(element, "mesh");
+		if(!meshName.empty())
+		{
+			if(gameObjectOgre->Initialize())
+			{
+				Ogre::String entityName = gameObjectOgre->objectName_ + "/entity/";
+				entityName += TinyXMLHelper::GetAttribute(element, "name", Ogre::StringConverter::toString(meshCounter));
+
+				Ogre::Entity* meshEntity = GAMEFRAMEWORK->sceneManager->createEntity(entityName,meshName);
+
+				// Get the position for the sceneNode of the Game Ogre Object
+				Ogre::Vector3 sceneNodePosition = TinyXMLHelper::GetAttributeVector3(element, "position");
+				Ogre::SceneNode* meshSceneNode = gameObjectOgre->sceneNode_->createChildSceneNode(sceneNodePosition);
+
+				// Attach the mesh entity.
+				meshSceneNode->attachObject(meshEntity);
+
+				// Get the scaling factor for the mesh
+				Ogre::Vector3 sceneNodeScale = TinyXMLHelper::GetAttributeVector3(element, "scale", Ogre::Vector3::UNIT_SCALE);
+				meshSceneNode->scale(sceneNodeScale);
+
+			}
+			else
+			{
+				Ogre::String s = "ObjectOgreCreator: Failed to initialize GameObjectOgre";
+				GAMEFRAMEWORK->log_->logMessage(s);
+				DEBUG_LOG(s);
+			}
+		}
+		else
+		{
+			Ogre::String s = "ObjectOgreCreator: Failed to initialize GameObjectOgre: no mesh attribute";
+			GAMEFRAMEWORK->log_->logMessage(s);
+			DEBUG_LOG(s);
+		}
+	}
+
+	void ParseLight(TiXmlElement* element, GameObjectOgre* gameObjectOgre)
+	{
+		//Ogre::String name = getAttrib(element, "name");
+	}
+
 };
 
 

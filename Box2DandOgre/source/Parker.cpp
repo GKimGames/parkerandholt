@@ -273,15 +273,12 @@ bool CharacterParker::ReadXMLConfig()
 	TiXmlElement* objectWall = hRoot.FirstChild( "Object4" ).Element();
 	GAMEFRAMEWORK->gameObjectFactory->CreateGameObject(objectWall);
 
-	objectWall = hRoot.FirstChild( "Object5" ).Element();
-	GAMEFRAMEWORK->gameObjectFactory->CreateGameObject(objectWall);
-
 	objectWall = hRoot.FirstChild( "Object6" ).Element();
 	GAMEFRAMEWORK->gameObjectFactory->CreateGameObject(objectWall);
 
 
 	TiXmlElement* loaderElement = hRoot.FirstChildElement( "Bodys" ).Element();
-	Box2DXMLLoader* loader = new Box2DXMLLoader(loaderElement);
+	Box2DXMLLoader* loader = new Box2DXMLLoader(loaderElement,world_);
 
 	//TiXmlElement* mp = hRoot.FirstChild( "MovingPlatform" ).Element();
 	//GAMEFRAMEWORK->gameObjectFactory->CreateGameObject(mp);

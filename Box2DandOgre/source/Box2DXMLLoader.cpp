@@ -16,7 +16,7 @@ std::vector<b2Shape*> Box2DXMLLoader::shapeVector;
 //=============================================================================
 //								Box2DXMLLoader
 //
-Box2DXMLLoader::Box2DXMLLoader(TiXmlElement* element)
+Box2DXMLLoader::Box2DXMLLoader(TiXmlElement* element, b2World* world)
 {
 
 	if(element != 0)
@@ -28,7 +28,7 @@ Box2DXMLLoader::Box2DXMLLoader(TiXmlElement* element)
 		else
 		{
 			element_ = element;
-			world_ = GAMEFRAMEWORK->GetWorld();
+			world_ = world;
 			Initialize();
 		}
 	}
@@ -73,11 +73,13 @@ bool Box2DXMLLoader::Initialize()
 			{
 				Createb2PrismaticJoint(jointElement);
 			}
+
 		}
 		else
 		{
 			DEBUG_LOG("Box2DXMLLoader::Initialize Error: Joint contained no type");
 		}
+
 		jointElement = jointElement->NextSiblingElement("Joint");
 	}
 

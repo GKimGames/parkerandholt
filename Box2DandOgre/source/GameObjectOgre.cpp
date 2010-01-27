@@ -6,7 +6,8 @@
 GameObjectOgre::GameObjectOgre(Ogre::String name):
 GameObject(name)
 {
-
+	sceneManager_ = GAMEFRAMEWORK->sceneManager;
+	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
 }
 
 
@@ -32,14 +33,12 @@ bool GameObjectOgre::Initialize()
 //
 bool GameObjectOgre::Initialize(Ogre::String meshName)
 {
-	sceneManager_ = GAMEFRAMEWORK->sceneManager;
-
+	
 	Ogre::String entityName = objectName_;
 	entityName += "_Entity_";
 	entityName += Ogre::StringConverter::toString(objectId_);
 
 	entity_ = sceneManager_->createEntity(entityName, meshName);
-	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
 	sceneNode_->attachObject(entity_);
 	initialized_ = true;
 

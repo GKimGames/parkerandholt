@@ -9,10 +9,14 @@
 #ifndef GAMEOBJECT_CREATOR_H
 #define GAMEOBJECT_CREATOR_H
 
-#include "GameObject.h"
-#include "Box2DXMLLoader.h"
 #include "HelperFunctions.h"
 #include "GameFramework.h"
+
+#include "GameObjectFactory.h"
+#include "TinyXMLHelper.h"
+#include "Box2DXMLLoader.h"
+
+#include "GameObject.h"
 
 enum CreatorResult
 {
@@ -20,8 +24,7 @@ enum CreatorResult
 	CREATOR_ELEMENT_IS_ZERO,
 	CREATOR_OBJECT_IS_ZERO,
 	CREATOR_NO_MESH,
-	CREATOR_INITIALIZED_FAILED,
-	CREATOR_NO_OGRE_OBJECT_ELEMENT,
+	CREATOR_INITIALIZED_FAILED,CREATOR_NO_OGRE_OBJECT_ELEMENT,
 	CREATOR_RESULT_COUNT
 };
 
@@ -41,7 +44,7 @@ class GameObjectCreator
 	
 public:
 
-	GameObjectCreator(){}
+	GameObjectCreator(GameObjectFactory* gameObjectFactory) : gameObjectFactory_(gameObjectFactory){}
 
 	virtual ~GameObjectCreator(){}
 
@@ -70,14 +73,10 @@ public:
 			TiXmlElement* gameObjectElement = element->FirstChild( "GameObject" )->ToElement();
 			if(gameObjectElement != 0)
 			{
-				std::string str = "GameObject_";
-				str += Ogre::StringConverter::toString(gameObject->objectId_);
-				// We make sure that getting the name attribute succeeds.
-				if(element->QueryValueAttribute("name", &str) == TIXML_SUCCESS)
-				{
-					gameObject->objectName_ = str;
-				}
+				Ogre::String str = "GameObject_" + Ogre::StringConverter::toString(gameObject->objectId_);
 
+	
+				gameObject->objectName_ = TinyXMLHelper::GetAttribute(element, "name", str);
 				gameObject->Initialize();
 
 
@@ -117,6 +116,9 @@ public:
 		return result;
 
 	}
+
+protected:
+	GameObjectFactory* gameObjectFactory_;
 };
 
 #endif 

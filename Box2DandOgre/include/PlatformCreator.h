@@ -17,7 +17,7 @@ class PlatformCreator : public GameObjectCreator
 
 public:
 
-	PlatformCreator(){}
+	PlatformCreator(GameObjectFactory* gameObjectFactory):GameObjectCreator(gameObjectFactory){}
 
 	virtual GameObject* LoadFromXML(TiXmlElement* element)
 	{
