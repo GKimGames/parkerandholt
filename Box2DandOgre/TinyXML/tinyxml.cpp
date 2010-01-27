@@ -670,13 +670,16 @@ int TiXmlElement::QueryBoolAttribute( const std::string& name, bool* ival ) cons
 
 	int result = node->QueryIntValue(&b);
 
-	if(b)
+	if(result == TIXML_SUCCESS)
 	{
-		*ival = true;
-	}
-	else
-	{
-		*ival = false;
+		if(b)
+		{
+			*ival = true;
+		}
+		else
+		{
+			*ival = false;
+		}
 	}
 
 	return result;
