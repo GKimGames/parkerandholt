@@ -10,8 +10,11 @@
 #define GAME_OBJECT_FACTORY_H
 
 #include <Ogre.h>
-#include "GameObjectCreator.h"
+#include "Box2DXMLLoader.h"
 
+class TiXmlElement;
+class GameObjectCreator;
+class GameObject;
 
 typedef std::map<std::string, GameObjectCreator*> CreatorMap;
 
@@ -22,6 +25,8 @@ public:
 
 	GameObjectFactory(){}
 
+	void LoadFile(Ogre::String fileName);
+
 	void AddCreator(std::string str, GameObjectCreator* objectCreator);
 
 	GameObject* CreateGameObject(std::string creator,TiXmlElement* element);
@@ -30,8 +35,14 @@ public:
 	void AddObjectCreators();
 	
 	Ogre::SceneManager* sceneManager;
+
+	b2Body*		GetBody(Ogre::String id);
+	b2Fixture*	GetFixture(Ogre::String id);
+	b2Joint*	GetJoint(Ogre::String id);
+
 protected:
 
+	Box2DXMLLoader* box2DLoader_;
 	std::map<std::string, GameObjectCreator*> creatorMap_;
 
 	

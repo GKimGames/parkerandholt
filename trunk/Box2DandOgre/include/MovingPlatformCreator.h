@@ -17,7 +17,7 @@ class MovingPlatformCreator : public GameObjectCreator
 
 public:
 
-	MovingPlatformCreator(){}
+	MovingPlatformCreator(GameObjectFactory* gameObjectFactory):GameObjectCreator(gameObjectFactory){}
 
 	virtual GameObject* LoadFromXML(TiXmlElement* element)
 	{
@@ -30,8 +30,6 @@ public:
 
 			MovingPlatform* movingPlatform = new MovingPlatform(str);
 			
-			
-
 			b2Vec2 point1, point2, start, end;
 			Box2DXMLLoader::GetB2Vec2(element, "point1", &movingPlatform->point1);
 			Box2DXMLLoader::GetB2Vec2(element, "point2", &movingPlatform->point2);
@@ -39,7 +37,6 @@ public:
 			Box2DXMLLoader::GetB2Vec2(element, "end", &movingPlatform->endVec_);
 			element->QueryValueAttribute("speed", &movingPlatform->speed_);
 
-			
 			movingPlatform->sceneManager_ = GAMEFRAMEWORK->sceneManager;
 
 			movingPlatform->Initialize();

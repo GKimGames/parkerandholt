@@ -153,6 +153,10 @@ public:
 		messageList_.erase(messageList_.find(Id));
 	}
 
+
+	void SetDefaultOnMessage(KGBMessageType onMessage){ defaultMessageOn_ = onMessage; }
+	void SetDefaultOffMessage(KGBMessageType offMessage){ defaultMessageOff_ = offMessage; }
+
 	void IgnoreSensors(){ignoreSensors_ = true;} 
 	void IgnoreSensorsOff(){ignoreSensors_ = false;}
 	bool IsIgnoringSensors(){return ignoreSensors_;}

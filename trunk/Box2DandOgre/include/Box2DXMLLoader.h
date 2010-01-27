@@ -14,7 +14,6 @@
 #include <Box2D/Box2D.h>
 #include "Ogre.h"
 
-
 typedef std::map<Ogre::String, b2Body*> BodyMap;
 typedef std::map<Ogre::String, b2Fixture*> FixtureMap;
 typedef std::map<Ogre::String, b2Joint*> JointMap;
@@ -90,15 +89,13 @@ public:
 /*=============================================================================
 				Class Members
 =============================================================================*/
-	Box2DXMLLoader(TiXmlElement* element);
+	Box2DXMLLoader(TiXmlElement* element, b2World* world);
 
 	Box2DXMLResult GetLastResult();
 
 	b2Body*		GetBody(Ogre::String id);
 	b2Fixture*	GetFixture(Ogre::String id);
 	b2Joint*	GetJoint(Ogre::String id);
-	
-
 
 protected:
 

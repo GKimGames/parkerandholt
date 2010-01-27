@@ -1,29 +1,28 @@
 /*=============================================================================
 
-	GameObjectOgreBox2DCreator.h
+	GameObjectSensorCreator.h
 
 	Author: Matt King
 
 =============================================================================*/
 
-#ifndef GAME_OBJECT_OGRE_BOX2D_CREATOR_H
-#define GAME_OBJECT_OGRE_BOX2D_CREATOR_H
 
-#include "GameObjectOgreBox2D.h"
-#include "ObjectOgreCreator.h"
-#include "OgreXMLLoader.h"
-#include "Box2DXMLLoader.h"
+#ifndef MOVING_PLATFORM_CREATOR_H
+#define MOVING_PLATFORM_CREATOR_H
 
-class GameObjectOgreBox2DCreator : public ObjectOgreCreator
+#include "GameObjectOgreBox2DCreator.h
+#include "GameObjectSensor.h"
+
+class GameObjectSensorCreator : public GameObjectOgreBox2DCreator
 {
 
 public:
 
-	GameObjectOgreBox2DCreator(GameObjectFactory* gameObjectFactory):ObjectOgreCreator(gameObjectFactory){}
-	
+	GameObjectSensorCreator(GameObjectFactory* gameObjectFactory):GameObjectOgreBox2DCreator(gameObjectFactory){}
+
 	virtual GameObject* LoadFromXML(TiXmlElement* element)
 	{
-		GameObjectOgreBox2D* object = new GameObjectOgreBox2D();
+		GameObjectSensor* object = new GameObjectSensor();
 		CreatorResult result = LoadFromXML(element, object);
 
 		if(result == CREATOR_OK)
@@ -37,20 +36,20 @@ public:
 		return 0;
 	}
 
-	virtual CreatorResult LoadFromXML(TiXmlElement* element, GameObjectOgreBox2D* gameObjectOgreBox2D )
+	virtual CreatorResult LoadFromXML(TiXmlElement* element, GameObjectSensor* gameObjectSensor )
 	{
 		CreatorResult result;
 		if(element != 0)
 		{
-			if(gameObjectOgreBox2D != 0)
+			if(gameObjectSensor != 0)
 			{
-				result = ObjectOgreCreator::LoadFromXML(element, gameObjectOgreBox2D);
+				result = ObjectOgreBox2DCreator::LoadFromXML(element, gameObjectSensor);
 				if(result == CREATOR_OK)
 				{
 					 
 					TiXmlElement* bodys = element->FirstChildElement( "Box2DObject" )->FirstChildElement("Body");
-					gameObjectOgreBox2D->body_ = Box2DXMLLoader::Createb2Body(GAMEFRAMEWORK->world_, bodys);
-					gameObjectOgreBox2D->Initialize();
+					gameObjectSensor->body_ = Box2DXMLLoader::Createb2Body(GAMEFRAMEWORK->world_, bodys);
+					gameObjectSensor->Initialize();
 				}
 	
 			}// end if(gameObjectOgreBox2D != 0)
