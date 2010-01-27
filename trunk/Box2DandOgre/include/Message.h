@@ -22,6 +22,7 @@ typedef unsigned int GameObjectId;
 /// An Enum for Messages.
 enum KGBMessageType
 {
+	MESSAGE_ZERO,
 	MESSAGE_NULL,
 	NO_MESSAGE,
 	CHARACTER_MOVE_LEFT_PLUS,
@@ -30,17 +31,23 @@ enum KGBMessageType
 	CHARACTER_MOVE_RIGHT_MINUS,
 	CHARACTER_JUMP_PLUS,
 	CHARACTER_JUMP_MINUS,
+	CHARACTER_ENTER_PLATFORMSTATE,
+	CHARACTER_ENTER_GRAVITYSTATE,
+	CHARACTER_EXIT_PLACINGSTATE,
 	GAME_SENSOR_ON,
 	GAME_SENSOR_OFF,
 	STUPID_MESSAGE,
 	CREATE_BOX,
 	UPDATE_MOUSE,
+	LEFT_MOUSE_PLUS,
+	LEFT_MOUSE_MINUS,
 	MESSAGE_TYPE_COUNT
 };  
 
-
+/// An array allowing easy conversion of KGBMessageType to a c string.
 const static char* KGBMessageTypeString[MESSAGE_TYPE_COUNT] = 
 {
+	"MESSAGE ZERO",
 	"Message Null",
 	"No Message",
 	"Character Move Left Plus",
@@ -49,11 +56,16 @@ const static char* KGBMessageTypeString[MESSAGE_TYPE_COUNT] =
 	"Character Move Right Minus",
 	"Character Jump Plus",
 	"Character Jump Minus",
+	"Character Enter Platformstate",
+	"Character Enter Gravitystate",
+	"Character Exit Placingstate",
 	"Game Sensor On",
 	"Game Sensor Off",
 	"Stupid Message",
 	"Create Box",
-	"Update Mouse"
+	"Update Mouse",
+	"Left Mouse Plus",
+	"Left Mouse Minus"
 };
 
 struct KGBMessage
@@ -134,7 +146,12 @@ inline bool operator < (const KGBMessage& t1, const KGBMessage& t2)
 /// This returns a KGBMessageType as an Ogre::String
 static Ogre::String MessageToString(KGBMessageType message)
 {
-	return Ogre::String(KGBMessageTypeString[message]);
+	if(message > MESSAGE_ZERO && message < MESSAGE_TYPE_COUNT)
+	{
+		return KGBMessageTypeString[message];
+	}
+
+	return Ogre::String("Message Not Found");
 }
 
 

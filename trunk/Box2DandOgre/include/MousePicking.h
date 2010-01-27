@@ -25,12 +25,14 @@ public:
 	void MouseMoved(const OIS::MouseEvent &arg);
 	void MousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id); 
 	void MouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
-	void UpdateMouse();
+	void UpdateMouse(const KGBMessage message);
 	bool HandleMessage(const KGBMessage message);
+	bool SpawnBox();
+	void SetVisibility(bool visible);
 
 
 	Ogre::Vector3 GetPosition();
-
+	double						boxSize_;
 
 protected:
 	Ogre::SceneManager*			sceneManager_;
@@ -43,7 +45,6 @@ protected:
 	Ogre::Real					rayPositionX_;
 	Ogre::Real					rayPositionY_;
 	HoltBox*					box_[3];
-	double						boxSize_;
 	double						boxMinSize_;
 	double						boxSizeIncrement_;
 	double						boxMaxSize_;

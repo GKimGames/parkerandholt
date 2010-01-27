@@ -1,77 +1,44 @@
-/*=============================================================================
-
-	ParkerStateOnGround.cpp
-
-	Author: Matt King
-
-	State for Parker on the ground.
-
-=============================================================================*/
-
-#include "ParkerStateOnGround.h"
-
-#include "Parker.h"
-#include "Message.h"
+#include "HoltStatePlacingPlatform.h"
 
 //=============================================================================
 //								Constructor
 //
-ParkerStateOnGround::ParkerStateOnGround(	
+HoltStatePlacingPlatform::HoltStatePlacingPlatform(	
 	CharacterParker* parker,
 	FSMStateMachine<CharacterParker>* stateMachine):
 	FSMState<CharacterParker>(parker,stateMachine)
 {
-	isJumping_ = false;
-	moveLeftDown_ = false;
-	moveRightDown_ = false;
 	feetContactCount_ = 0;
+	platform_ = 0;
+	box_[0] = 0;
+	box_[1] = 0;
+	box_[2] = 0;
+	incrimenter_ = 0;
 }
-
-
 
 //=============================================================================
 //								Enter
 //
-void ParkerStateOnGround::Enter()
+void HoltStatePlacingPlatform::Enter()
 {
-
+	
 	blendingRun_ = false;
 	blendingIdle_ = false;
-	isJumping_ = false;
-	moveLeftDown_ = false;
-	moveRightDown_ = false;
-
-	jumpTimer_ = driver_->timeBetweenJump_;
 
 	if(driver_->initialized_)
 	{
-		driver_->animationBlender_->Blend("jump", AnimationBlender::BlendSwitch, 0.0, false);
-		driver_->animationBlender_->GetSource()->setTimePosition(0.6);
 		driver_->animationBlender_->Blend("run", AnimationBlender::BlendWhileAnimating, 0.2, true);
 	}
+
+	driver_->mousePicking_->boxSize_ = 0.2f;
+	driver_->mousePicking_->SetVisibility(true);
 }
-
-
 
 //=============================================================================
 //								Update
 //
-bool ParkerStateOnGround::Update()
+bool HoltStatePlacingPlatform::Update()
 {
-	if(driver_->moveLeft_)
-	{
-		MoveLeft();
-	}
-
-	if(driver_->moveRight_)
-	{
-		MoveRight();
-	}
-
-	if(driver_->jump_)
-	{
-		Jump();
-	}
 
 	static Ogre::Vector3 direction;
 	
@@ -79,27 +46,11 @@ bool ParkerStateOnGround::Update()
 	
 	if(driver_->feetSensorHitCount_ == 0)
 	{
-		stateMachine_->ChangeState(driver_->inAirState_);
+		driver_->stateMachine_->ChangeState(driver_->inAirState_);
 	}
 	else
 	{
 
-		jumpTimer_ -= timeSinceLastFrame;
-
-		if(jumpTimer_ < 0.001)
-		{
-			jumpTimer_ = 0;
-			isJumping_ = false;
-		}
-
-		//if(moveRightDown_ || moveLeftDown_)
-		{
-			driver_->ApplyWalkingFriction(timeSinceLastFrame);
-		}
-
-		moveRightDown_ = false;
-		moveLeftDown_ = false;
-		
 
 		if(driver_->body_->GetLinearVelocity().x > 0.1)
 		{
@@ -115,90 +66,62 @@ bool ParkerStateOnGround::Update()
 		b2Vec2 v = driver_->body_->GetPosition();
 		driver_->sceneNode_->setPosition(Ogre::Real(v.x),Ogre::Real(v.y),0);
 		driver_->sceneNode_->setDirection(direction,Ogre::Node::TS_WORLD);
-
-		if(driver_->debugDrawOn_)
-		{
-			driver_->UpdateDebugDraw();
-		}
 	}
 
 	return true;
 }
 
-
-
 //=============================================================================
 //								HandleMessage
 //
-bool ParkerStateOnGround::HandleMessage(const KGBMessage message)
+bool HoltStatePlacingPlatform::HandleMessage(const KGBMessage message)
 {
 	std::string* gameObject = 0;
 	
 	switch(message.messageType)
 	{
-		case CHARACTER_MOVE_LEFT_PLUS:
+		case CHARACTER_EXIT_PLACINGSTATE:
 		{
-			driver_->moveLeft_ = true;
+			driver_->stateMachine_->ChangeState(driver_->onGroundState_);
 			return true;
 		}
-		case CHARACTER_MOVE_RIGHT_PLUS:
-		{
-			driver_->moveRight_ = true;
+		case LEFT_MOUSE_PLUS:
+		{	
+			startPosition_.x = driver_->mousePicking_->GetPosition().x;
+			startPosition_.y = driver_->mousePicking_->GetPosition().y;
 			return true;
 		}
-		case CHARACTER_JUMP_PLUS:
+		case LEFT_MOUSE_MINUS:
 		{
-			driver_->jump_ = true;
+			endPosition_.x = driver_->mousePicking_->GetPosition().x;
+			endPosition_.y = driver_->mousePicking_->GetPosition().y;
+			SpawnPlatform();
 			return true;
 		}
-		case CHARACTER_MOVE_LEFT_MINUS:
+		case CREATE_BOX:
 		{
-
-			driver_->moveLeft_ = false;
+			SpawnBox();
 			return true;
-		}
-		case CHARACTER_MOVE_RIGHT_MINUS:
-		{
-			driver_->moveRight_ = false;
-			return true;
-		}
-		case CHARACTER_JUMP_MINUS:
-		{
-			driver_->jump_ = false;
-			return true;
-		}
-		case CHARACTER_ENTER_PLATFORMSTATE:
-		{
-			driver_->stateMachine_->ChangeState(driver_->placingPlatform_);
-			return true;
-		}
-		case CHARACTER_ENTER_GRAVITYSTATE:
-		{
-			driver_->stateMachine_->ChangeState(driver_->placingGravityVector_);
-			return true;
-		}
+		}		
 	}
 
 	return false;
 }
 
-
-
 //=============================================================================
+
 //								Exit
 //
-void ParkerStateOnGround::Exit()
+void HoltStatePlacingPlatform::Exit()
 {
-	driver_->elevator_ = NULL;                                                                        
+	driver_->mousePicking_->SetVisibility(false);                                                                           
 }
-
-
 
 //=============================================================================
 //								BeginContact
 //
 /// Called when two fixtures begin to touch.
-void ParkerStateOnGround::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+void HoltStatePlacingPlatform::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
 	if(!collidedFixture->IsSensor())
 	{
@@ -218,16 +141,17 @@ void ParkerStateOnGround::BeginContact(ContactPoint* contact, b2Fixture* contact
 
 			}
 		}
+
+		
+		
 	}
 }
-
-
 
 //=============================================================================
 //								EndContact
 //
 /// Called when two fixtures cease to touch.
-void ParkerStateOnGround::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+void HoltStatePlacingPlatform::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
 	if(!collidedFixture->IsSensor())
 	{
@@ -237,7 +161,7 @@ void ParkerStateOnGround::EndContact(ContactPoint* contact, b2Fixture* contactFi
 
 			if(feetContactCount_ == 0)
 			{
-				stateMachine_->ChangeState(driver_->inAirState_);
+				driver_->stateMachine_->ChangeState(driver_->inAirState_);
 			}
 
 			if(elevator_ == collidedFixture->GetBody())
@@ -250,83 +174,40 @@ void ParkerStateOnGround::EndContact(ContactPoint* contact, b2Fixture* contactFi
 }
 
 
-
 //=============================================================================
 //								MoveLeft
 //
 ///
-void ParkerStateOnGround::MoveLeft()
+void HoltStatePlacingPlatform::MoveLeft()
 {
 
-	if(isJumping_ == false)
-	{
-		moveLeftDown_ = true;
-		double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
-
-		if(driver_->body_->GetLinearVelocity().x > -driver_->maximumRunningVelocity_)
-		{
-			driver_->body_->ApplyForce(b2Vec2(-driver_->runningForce_ * timeSinceLastFrame,0), driver_->body_->GetPosition());
-		}
-	}
-
 }
-
-
 
 //=============================================================================
 //								MoveRight
 //
 /// 
-void ParkerStateOnGround::MoveRight()
+void HoltStatePlacingPlatform::MoveRight()
 {
-	if(isJumping_ == false)
-	{
-		moveRightDown_ = true;
-		double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
-		
-		if(driver_->body_->GetLinearVelocity().x < driver_->maximumRunningVelocity_)
-		{
-			driver_->body_->ApplyForce(b2Vec2(driver_->runningForce_ * timeSinceLastFrame,0), driver_->body_->GetPosition());
-		}
-	}
 
 }
-
 
 
 //=============================================================================
 //								Jump
 ///
 /// Jump!
-void ParkerStateOnGround::Jump()
+void HoltStatePlacingPlatform::Jump()
 {
 
-	if(jumpTimer_ > 0)
-	{
-	
-	}
-	else
-	{
-
-		driver_->body_->ApplyImpulse(b2Vec2(0,driver_->jumpingForce_), driver_->body_->GetPosition());
-
-		driver_->animationBlender_->Blend("jump", AnimationBlender::BlendWhileAnimating, 0.2, false, 0.6);
-		driver_->animationBlender_->GetTarget()->setTimePosition(0.3);
-
-		isJumping_ = true;
-
-		jumpTimer_ = driver_->timeBetweenJump_;
-	}
-
 }
-
-
 
 //=============================================================================
 //								UpdateAnimation
 //
-void ParkerStateOnGround::UpdateAnimation()
+void HoltStatePlacingPlatform::UpdateAnimation()
 {
+	
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
 	b2Vec2 lv = driver_->body_->GetLinearVelocity();
@@ -336,7 +217,7 @@ void ParkerStateOnGround::UpdateAnimation()
 		lv -= driver_->elevator_->GetLinearVelocity();
 	}
 
-	if(abs(lv.x)  < .1 && isJumping_ == false)
+	if(abs(lv.x)  < .1 )
 	{
 		if(blendingIdle_ == false)
 		{
@@ -347,7 +228,7 @@ void ParkerStateOnGround::UpdateAnimation()
 
 		driver_->animationBlender_->AddTime(timeSinceLastFrame);
 	}
-	else if(isJumping_ == false)
+	else
 	{
 		double ratio = driver_->maximumRunningVelocity_ / lv.x;
 		
@@ -367,4 +248,35 @@ void ParkerStateOnGround::UpdateAnimation()
 			driver_->animationBlender_->AddTime(timeSinceLastFrame);
 		}
 	}
+}
+
+
+bool HoltStatePlacingPlatform::SpawnBox()
+{
+	box_[incrimenter_%3] = new HoltBox(driver_->sceneManager_, 
+		b2Vec2((float32)driver_->mousePicking_->GetPosition().x, (float32)driver_->mousePicking_->GetPosition().y),
+		driver_->mousePicking_->boxSize_/2);
+	incrimenter_++;
+	return true;
+}
+
+bool HoltStatePlacingPlatform::SpawnPlatform()
+{
+	float tempLength = sqrt((startPosition_.x - endPosition_.x) * (startPosition_.x - endPosition_.x) + (startPosition_.y - endPosition_.y) * (startPosition_.y - endPosition_.y));
+	if(tempLength < .5)
+	{
+		return false;
+	}
+	else if(tempLength <= 5)
+	{
+		platform_ = new Platform(driver_->sceneManager_, b2Vec2(startPosition_.x, startPosition_.y), b2Vec2(endPosition_.x, endPosition_.y), 1);
+		return true;
+	}
+	else if(tempLength > 5)
+	{
+		platform_ = new Platform(driver_->sceneManager_, b2Vec2(startPosition_.x, startPosition_.y), b2Vec2(endPosition_.x, endPosition_.y), 1);
+		return true;
+	}
+
+	return false;
 }

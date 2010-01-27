@@ -12,11 +12,14 @@
 #include "Character.h"
 #include "ParkerStateOnGround.h"
 #include "ParkerStateInAir.h"
+#include "HoltStatePlacingPlatform.h"
+#include "HoltStatePlacingGravityVector.h"
 #include "PhysicsState.h"
 
 #include "FSMStateMachine.h"
 
 #include "Box2DXMLLoader.h"
+
 
 /// Parkers class
 class CharacterParker : public Character, public b2RayCastCallback
@@ -24,10 +27,12 @@ class CharacterParker : public Character, public b2RayCastCallback
 	friend class ParkerStateOnGround;
 	friend class ParkerStateInAir;
 	friend class ParkerStateLedgeGrab;
+	friend class HoltStatePlacingPlatform;
+	friend class HoltStatePlacingGravityVector;
 
 public:
 
-	CharacterParker(Ogre::SceneManager* sceneManager);
+	CharacterParker(Ogre::SceneManager* sceneManager, MousePicking* mousePicking);
 
 	~CharacterParker(){}
 
@@ -64,8 +69,10 @@ private:
 
 	FSMStateMachine<CharacterParker>*	stateMachine_;
 
-	ParkerStateOnGround*	onGroundState_;
-	ParkerStateInAir*		inAirState_;
+	ParkerStateOnGround*			onGroundState_;
+	ParkerStateInAir*				inAirState_;
+	HoltStatePlacingPlatform*		placingPlatform_;
+	HoltStatePlacingGravityVector*	placingGravityVector_;
 
 	b2Fixture*			feetSensor_;
 
@@ -87,6 +94,7 @@ private:
 	int					thighSensorHitCount_;
 	int					torsoSensorHitCount_;
 	int					feetSensorHitCount_;
+	MousePicking*		mousePicking_;
 
 	double boundingBoxHeight_;
 	double boundingBoxWidth_;

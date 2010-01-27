@@ -21,6 +21,7 @@ public:
 
 	Platform();
 	Platform(Ogre::SceneManager* sceneManager, b2Vec2 p1, b2Vec2 p2);
+	Platform(Ogre::SceneManager* sceneManager, b2Vec2 p1, b2Vec2 p2, int temp);
 	~Platform();
 
 	bool Update(double timeSinceLastFrame)
@@ -30,6 +31,7 @@ public:
 
 	virtual bool Initialize();
 	virtual bool Initialize(Ogre::String str);
+	bool InitializePlaceable();
 
 protected:
 
