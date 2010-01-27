@@ -4,9 +4,14 @@
 #include "AppState.hpp"
 #include "OgreGpuCommandBufferFlush.h"
 #include "MessageDispatcher.h"
+#include <map>
+
 class AppStateManager : public AppStateListener
 {
 public:
+
+	typedef std::map<Ogre::String, AppState*> AppMap;
+
 	typedef struct
 	{
 		Ogre::String name;
@@ -29,6 +34,8 @@ public:
 protected:
 
 	void init(AppState *state);
+
+	AppMap							m_AppMap;
 
 	std::vector<AppState*>			m_ActiveStateStack;
 	std::vector<state_info>			m_States;

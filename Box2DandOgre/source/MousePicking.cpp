@@ -71,21 +71,57 @@ void MousePicking::MouseMoved(const OIS::MouseEvent &arg)
 	entity_->getParentSceneNode()->setScale( boxSize_, boxSize_, boxSize_);
 }
 
-void MousePicking::UpdateMouse()
+void MousePicking::UpdateMouse(const KGBMessage message)
 {
-
-	/*
-	Ray mouseRay = m_pCamera_->getCameraToViewportRay(rayPositionX_, rayPositionY_);
-	m_pRSQ_ = sceneManager_->createRayQuery(Ray());
-	m_pRSQ_->setRay(mouseRay);
-	std::pair<bool, Real> hit = mouseRay.intersects(*pickingPlane_);
-	if(hit.first)
+	if(message.messageData.empty())
 	{
-		position_ = Ogre::Vector3(mouseRay.getPoint(hit.second).x, mouseRay.getPoint(hit.second).y, 0);
-		entity_->getParentSceneNode()->setPosition(position_);
+		Ogre::Ray mouseRay = m_pCamera_->getCameraToViewportRay(  rayPositionX_, rayPositionY_ );
+		m_pRSQ_ = sceneManager_->createRayQuery(Ogre::Ray());
+		m_pRSQ_->setRay(mouseRay);
+		std::pair<bool, Ogre::Real> hit = mouseRay.intersects(*pickingPlane_);
+		if(hit.first)
+		{
+			position_ = Ogre::Vector3(mouseRay.getPoint(hit.second).x, mouseRay.getPoint(hit.second).y, 0);
+			entity_->getParentSceneNode()->setPosition(position_);
+		}
 	}
-	*/
+	else
+	{
+		const OIS::MouseEvent* tempMouse_ = boost::any_cast<const OIS::MouseEvent*>(message.messageData);
+		
+		//OIS::MouseEvent* tempMouse_ = any_cast<OIS::MouseEvent>(message.messageData);
 
+		rayPositionX_ = tempMouse_->state.X.abs/float (tempMouse_->state.width);
+		rayPositionY_ = tempMouse_->state.Y.abs/float (tempMouse_->state.height);
+		//UpdateMouse();
+
+		Ogre::Ray mouseRay = m_pCamera_->getCameraToViewportRay(rayPositionX_, rayPositionY_);
+		m_pRSQ_ = sceneManager_->createRayQuery(Ogre::Ray());
+		m_pRSQ_->setRay(mouseRay);
+		std::pair<bool, Ogre::Real> hit = mouseRay.intersects(*pickingPlane_);
+		if(hit.first)
+		{
+			position_ = Ogre::Vector3(mouseRay.getPoint(hit.second).x, mouseRay.getPoint(hit.second).y, 0);
+			entity_->getParentSceneNode()->setPosition(position_);
+		}
+
+		if(tempMouse_->state.Z.rel > 0)
+		{
+			if(boxSize_ > boxMinSize_)
+			{
+				boxSize_ -= boxSizeIncrement_;
+			}
+		}
+
+		if(tempMouse_->state.Z.rel < 0)
+		{
+			if(boxSize_ < boxMaxSize_)
+			{
+				boxSize_ += boxSizeIncrement_;
+			}
+		}
+		entity_->getParentSceneNode()->setScale( boxSize_, boxSize_, boxSize_);
+	}
 }
 
 
@@ -99,71 +135,28 @@ bool MousePicking::HandleMessage(const KGBMessage message)
 {
 	switch(message.messageType)
 	{
-		case CREATE_BOX:
-			{
-				if(box_[incrementer_%3] != 0)
-				{
-					delete box_[incrementer_ % 3];
-				}
-				box_[incrementer_%3] = new HoltBox(sceneManager_, b2Vec2(position_.x, position_.y), boxSize_/2);
-				incrementer_++;
-				return true;
-			}
 		case UPDATE_MOUSE:
 			{
-				if(message.messageData.empty())
-				{
-					Ogre::Ray mouseRay = m_pCamera_->getCameraToViewportRay(  rayPositionX_, rayPositionY_ );
-					m_pRSQ_ = sceneManager_->createRayQuery(Ogre::Ray());
-					m_pRSQ_->setRay(mouseRay);
-					std::pair<bool, Ogre::Real> hit = mouseRay.intersects(*pickingPlane_);
-					if(hit.first)
-					{
-						position_ = Ogre::Vector3(mouseRay.getPoint(hit.second).x, mouseRay.getPoint(hit.second).y, 0);
-						entity_->getParentSceneNode()->setPosition(position_);
-					}
-				}
-				else
-				{
-
-					const OIS::MouseEvent* tempMouse_ = boost::any_cast<const OIS::MouseEvent*>(message.messageData);
-					
-					//OIS::MouseEvent* tempMouse_ = any_cast<OIS::MouseEvent>(message.messageData);
-
-					rayPositionX_ = tempMouse_->state.X.abs/float (tempMouse_->state.width);
-					rayPositionY_ = tempMouse_->state.Y.abs/float (tempMouse_->state.height);
-					//UpdateMouse();
-
-					Ogre::Ray mouseRay = m_pCamera_->getCameraToViewportRay(rayPositionX_, rayPositionY_);
-					m_pRSQ_ = sceneManager_->createRayQuery(Ogre::Ray());
-					m_pRSQ_->setRay(mouseRay);
-					std::pair<bool, Ogre::Real> hit = mouseRay.intersects(*pickingPlane_);
-					if(hit.first)
-					{
-						position_ = Ogre::Vector3(mouseRay.getPoint(hit.second).x, mouseRay.getPoint(hit.second).y, 0);
-						entity_->getParentSceneNode()->setPosition(position_);
-					}
-
-					if(tempMouse_->state.Z.rel > 0)
-					{
-						if(boxSize_ > boxMinSize_)
-						{
-							boxSize_ -= boxSizeIncrement_;
-						}
-					}
-
-					if(tempMouse_->state.Z.rel < 0)
-					{
-						if(boxSize_ < boxMaxSize_)
-						{
-							boxSize_ += boxSizeIncrement_;
-						}
-					}
-					entity_->getParentSceneNode()->setScale( boxSize_, boxSize_, boxSize_);
-				}
+				UpdateMouse(message);
 				return true;
 			}
 	}
 
 	return false;
+}
+
+bool MousePicking::SpawnBox()
+{
+	if(box_[incrementer_ % 3] != 0)
+	{
+		delete box_[incrementer_ % 3];
+	}
+	box_[incrementer_%3] = new HoltBox(sceneManager_, b2Vec2(position_.x, position_.y), boxSize_/2);
+	incrementer_++;
+	return true;
+}
+
+void MousePicking::SetVisibility(bool visible)
+{
+	sceneNode_->setVisible(visible);
 }

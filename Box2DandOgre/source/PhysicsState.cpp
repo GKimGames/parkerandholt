@@ -172,9 +172,7 @@ void PhysicsState::createPhysics()
 	//myCharacter_ = new Character(sceneManager_);
 	//myCharacter_->Initialize();
 	
-	parker_  = new CharacterParker(sceneManager_);
-	parker_->Initialize();
-	parker_->InitializeDebugDraw();
+	
 
 	for(int i = 0; i < 3;i++)
 	{
@@ -182,17 +180,25 @@ void PhysicsState::createPhysics()
 		//bb->Initialize();
 	}
 
+	myMouse_ = new MousePicking(sceneManager_, camera_);
+	parker_  = new CharacterParker(sceneManager_, myMouse_);
+	parker_->Initialize();
+	parker_->InitializeDebugDraw();
+
 	new MovingPlatform(sceneManager_, b2Vec2(10.0f, 1.0f), b2Vec2(0.0f, 1.0f), b2Vec2(5.0f, 1.0f), b2Vec2(0.0f, 5.0f), 2);
 	PressureSwitch* ps = new PressureSwitch(sceneManager_);
+
 	ps->AddToMessageList(parker_->GetId(), CREATE_BOX);
-	myMouse_ = new MousePicking(sceneManager_, camera_);
 
 	myKeyHandler_ = new KeyHandler(GameFramework::getSingletonPtr()->keyboard_);
 
 	myKeyHandler_->AddKey(OIS::KC_RIGHT, std::make_pair(CHARACTER_MOVE_RIGHT_PLUS, CHARACTER_MOVE_RIGHT_MINUS));
 	myKeyHandler_->AddKey(OIS::KC_LEFT, std::make_pair(CHARACTER_MOVE_LEFT_PLUS, CHARACTER_MOVE_LEFT_MINUS));
 	myKeyHandler_->AddKey(OIS::KC_UP, std::make_pair(CHARACTER_JUMP_PLUS, CHARACTER_JUMP_MINUS));
-
+	myKeyHandler_->AddKey(OIS::KC_1, CHARACTER_ENTER_PLATFORMSTATE);
+	myKeyHandler_->AddKey(OIS::KC_2, CHARACTER_ENTER_GRAVITYSTATE);
+	myKeyHandler_->AddKey(OIS::KC_Q, CHARACTER_EXIT_PLACINGSTATE);
+	
 #if DEBUG_DRAW_ON
 	debugDraw_ = new OgreB2DebugDraw(sceneManager_, "debugDraw", 0);
 	debugDraw_->SetFlags(
@@ -516,17 +522,22 @@ bool PhysicsState::mouseMoved(const OIS::MouseEvent &evt)
 bool PhysicsState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
 	myGUI->injectMousePress(evt, id);
-	Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, myMouse_->GetId(), CREATE_BOX, NULL);
+
 	//myPicking_->MousePressed(evt, id);
 
 	if(id == OIS::MB_Left)
 	{
+		Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, LEFT_MOUSE_PLUS, NULL);
 		m_bLMouseDown = true;
 	} 
 	else if(id == OIS::MB_Right)
 	{
 		m_bRMouseDown = true;
 	} 
+	else if(id == OIS::MB_Middle)
+	{
+		Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, CREATE_BOX, NULL);
+	}
 
 	return true;
 }
@@ -542,6 +553,7 @@ bool PhysicsState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID 
 	myGUI->injectMouseRelease(evt, id);
 	if(id == OIS::MB_Left)
 	{
+		Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, LEFT_MOUSE_MINUS, NULL);
 		m_bLMouseDown = false;
 	} 
 	else if(id == OIS::MB_Right)

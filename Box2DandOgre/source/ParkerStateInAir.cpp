@@ -29,7 +29,7 @@ ParkerStateInAir::ParkerStateInAir(
 //
 void ParkerStateInAir::Enter()
 {
-
+	driver_->feetSensorHitCount_ = 0;
 }
 
 

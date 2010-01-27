@@ -5,15 +5,18 @@
 //=============================================================================
 //								Constructor
 //
-CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager)
+CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager, MousePicking* mousePicking)
 :Character(sceneManager)
 {
+	mousePicking_ = mousePicking;
 	parkerId_ = objectId_;
 
 	stateMachine_ = new FSMStateMachine<CharacterParker>(this);
 
 	onGroundState_ = new ParkerStateOnGround(this,stateMachine_);
 	inAirState_ = new ParkerStateInAir(this,stateMachine_);
+	placingPlatform_ = new HoltStatePlacingPlatform(this, stateMachine_);
+	placingGravityVector_ = new HoltStatePlacingGravityVector(this, stateMachine_);
 
 	stateMachine_->SetCurrentState(onGroundState_);
 	stateMachine_->ChangeState(onGroundState_);

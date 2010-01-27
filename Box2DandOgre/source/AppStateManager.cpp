@@ -42,6 +42,10 @@ AppStateManager::~AppStateManager()
 //
 void AppStateManager::manageAppState(Ogre::String stateName, AppState* state)
 {
+
+	m_AppMap[stateName] = state;
+
+	/*
 	try
 	{
 		state_info new_state_info;
@@ -54,6 +58,7 @@ void AppStateManager::manageAppState(Ogre::String stateName, AppState* state)
 		delete state;
 		throw Ogre::Exception(Ogre::Exception::ERR_INTERNAL_ERROR, "Error while trying to manage a new AppState\n" + Ogre::String(e.what()), "AppStateManager.cpp " + __LINE__);
 	}
+	*/
 }
 
 
@@ -64,6 +69,14 @@ void AppStateManager::manageAppState(Ogre::String stateName, AppState* state)
 /// 
 AppState* AppStateManager::findByName(Ogre::String stateName)
 {
+	AppMap::iterator iter = m_AppMap.find(stateName);
+
+	if(iter != m_AppMap.end())
+	{
+		return iter->second;
+	}
+	
+	/*
 	std::vector<state_info>::iterator itr;
 
 	for(itr=m_States.begin();itr!=m_States.end();itr++)
@@ -71,6 +84,7 @@ AppState* AppStateManager::findByName(Ogre::String stateName)
 		if(itr->name==stateName)
 			return itr->state;
 	}
+	*/
 
 	return 0;
 }

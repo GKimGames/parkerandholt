@@ -100,16 +100,16 @@ void GameObjectFactory::AddObjectCreators()
 
 b2Body*	GameObjectFactory::GetBody(Ogre::String id)
 {
-	box2DLoader_->GetBody(id);
+	return box2DLoader_->GetBody(id);
 }
 
 
 b2Fixture* GameObjectFactory::GetFixture(Ogre::String id)
 {
-	box2DLoader_->GetFixture(id);
+	return box2DLoader_->GetFixture(id);
 }
 
 b2Joint* GameObjectFactory::GetJoint(Ogre::String id)
 {
-	box2DLoader_->GetJoint(id);
+	return box2DLoader_->GetJoint(id);
 }

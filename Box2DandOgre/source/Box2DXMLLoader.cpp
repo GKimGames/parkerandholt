@@ -73,6 +73,14 @@ bool Box2DXMLLoader::Initialize()
 			{
 				Createb2PrismaticJoint(jointElement);
 			}
+			else if(str.compare("weld") == 0)
+			{
+				Createb2WeldJoint(jointElement);
+			}
+			else if(str.compare("pulley") == 0)
+			{
+				Createb2PulleyJoint(jointElement);
+			}
 
 		}
 		else

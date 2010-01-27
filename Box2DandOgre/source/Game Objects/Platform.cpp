@@ -14,6 +14,18 @@ Platform::Platform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2)
 	Initialize();
 }
 
+Platform::Platform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2, int temp)
+{
+	sceneManager_ = sceneManager;
+
+	point1.x = p1.x;
+	point1.y = p1.y;
+	point2.x = p2.x;
+	point2.y = p2.y;
+	
+	InitializePlaceable();
+}
+
 Platform::Platform()
 {
 	// do nothing
@@ -169,3 +181,41 @@ Platform::~Platform()
 	delete plane;
 }
 
+
+bool Platform::InitializePlaceable()
+{
+	gameObjectType_ = GOType_Platform;
+
+	if(point1.x > point2.x)
+	{
+		b2Vec2 holder = point2;
+		point2 = point1;
+		point1 = holder;
+	}
+
+	
+	// Create body and fixture
+	b2BodyDef bd;
+	bd.position.Set((point1.x + point2.x) / 2.0, (point1.y + point2.y) / 2.0);
+	bd.type = b2_dynamicBody;
+	bd.fixedRotation = false;
+	body_= world_->CreateBody(&bd);
+
+	float tempLength = sqrt((point2.x - point1.x) * (point2.x - point1.x) + (point2.y - point1.y) * (point2.y - point1.y));
+	float platformHeight = 0.1f;
+
+	b2PolygonShape bodyShapeDef;
+	bodyShapeDef.SetAsBox(tempLength/2.0f, platformHeight/2.0f);
+	b2FixtureDef fd;
+	fd.shape = &bodyShapeDef;
+
+	fd.density = 5;
+	fd.friction = DEFAULT_FRICTION;
+	//fd.filter.groupIndex = STATIC_MAP_GROUP;
+
+	body_->CreateFixture(&fd);
+	body_->SetTransform(body_->GetPosition(), atan2(point2.y - point1.y, point2.x - point1.x));
+	
+
+	return true;
+}
