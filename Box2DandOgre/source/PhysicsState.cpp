@@ -523,8 +523,6 @@ bool PhysicsState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID i
 {
 	myGUI->injectMousePress(evt, id);
 
-	//myPicking_->MousePressed(evt, id);
-
 	if(id == OIS::MB_Left)
 	{
 		Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, LEFT_MOUSE_PLUS, NULL);
@@ -536,7 +534,7 @@ bool PhysicsState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID i
 	} 
 	else if(id == OIS::MB_Middle)
 	{
-		Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, CREATE_BOX, NULL);
+		Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, MIDDLE_MOUSE_PLUS, NULL);
 	}
 
 	return true;
@@ -559,6 +557,10 @@ bool PhysicsState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID 
 	else if(id == OIS::MB_Right)
 	{
 		m_bRMouseDown = false;
+	}
+	else if(id == OIS::MB_Middle)
+	{
+		Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, MIDDLE_MOUSE_MINUS, NULL);
 	}
 
 	return true;

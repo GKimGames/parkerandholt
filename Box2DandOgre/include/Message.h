@@ -41,6 +41,8 @@ enum KGBMessageType
 	UPDATE_MOUSE,
 	LEFT_MOUSE_PLUS,
 	LEFT_MOUSE_MINUS,
+	MIDDLE_MOUSE_PLUS,
+	MIDDLE_MOUSE_MINUS,
 	MESSAGE_TYPE_COUNT
 };  
 
@@ -65,7 +67,9 @@ const static char* KGBMessageTypeString[MESSAGE_TYPE_COUNT] =
 	"Create Box",
 	"Update Mouse",
 	"Left Mouse Plus",
-	"Left Mouse Minus"
+	"Left Mouse Minus",
+	"Middle Mouse Plus",
+	"Middle Mouse Minus"
 };
 
 struct KGBMessage

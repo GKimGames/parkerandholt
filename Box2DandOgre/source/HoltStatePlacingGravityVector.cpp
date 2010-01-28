@@ -23,6 +23,8 @@ void HoltStatePlacingGravityVector::Enter()
 	blendingRun_ = false;
 	blendingIdle_ = false;
 
+	//feetContactCount_ = driver_->feetSensorHitCount_;
+	feetContactCount_ = driver_->onGroundState_->GetFeetContactCount();
 	if(driver_->initialized_)
 	{
 		driver_->animationBlender_->Blend("run", AnimationBlender::BlendWhileAnimating, 0.2, true);
@@ -42,17 +44,40 @@ void HoltStatePlacingGravityVector::Enter()
 bool HoltStatePlacingGravityVector::Update()
 {
 
+	if(driver_->moveLeft_)
+	{
+		MoveLeft();
+	}
+
+	if(driver_->moveRight_)
+	{
+		MoveRight();
+	}
+
+	if(driver_->jump_)
+	{
+		Jump();
+	}
+
 	static Ogre::Vector3 direction;
-	
+
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 	
 	if(driver_->feetSensorHitCount_ == 0)
 	{
-		driver_->stateMachine_->ChangeState(driver_->inAirState_);
+		stateMachine_->ChangeState(driver_->inAirState_);
 	}
 	else
 	{
 
+		//if(moveRightDown_ || moveLeftDown_)
+		{
+			driver_->ApplyWalkingFriction(timeSinceLastFrame);
+		}
+
+		//moveRightDown_ = false;
+		//moveLeftDown_ = false;
+		
 
 		if(driver_->body_->GetLinearVelocity().x > 0.1)
 		{
@@ -68,7 +93,14 @@ bool HoltStatePlacingGravityVector::Update()
 		b2Vec2 v = driver_->body_->GetPosition();
 		driver_->sceneNode_->setPosition(Ogre::Real(v.x),Ogre::Real(v.y),0);
 		driver_->sceneNode_->setDirection(direction,Ogre::Node::TS_WORLD);
+
+		if(driver_->debugDrawOn_)
+		{
+			driver_->UpdateDebugDraw();
+		}
 	}
+
+	//end of testcode
 	if(deleteVector_)
 	{
 		delete gravityVector_;
@@ -119,6 +151,42 @@ bool HoltStatePlacingGravityVector::HandleMessage(const KGBMessage message)
 			createVector_ = true;
 			return true;
 		}
+		case CHARACTER_MOVE_LEFT_PLUS:
+		{
+			driver_->moveLeft_ = true;
+			return true;
+		}
+		case CHARACTER_MOVE_RIGHT_PLUS:
+		{
+			driver_->moveRight_ = true;
+			return true;
+		}
+		case CHARACTER_JUMP_PLUS:
+		{
+			driver_->jump_ = true;
+			return true;
+		}
+		case CHARACTER_MOVE_LEFT_MINUS:
+		{
+
+			driver_->moveLeft_ = false;
+			return true;
+		}
+		case CHARACTER_MOVE_RIGHT_MINUS:
+		{
+			driver_->moveRight_ = false;
+			return true;
+		}
+		case CHARACTER_JUMP_MINUS:
+		{
+			driver_->jump_ = false;
+			return true;
+		}
+		case CHARACTER_ENTER_PLATFORMSTATE:
+		{
+			driver_->stateMachine_->ChangeState(driver_->placingPlatform_);
+			return true;
+		}
 	}
 
 	return false;
@@ -130,7 +198,8 @@ bool HoltStatePlacingGravityVector::HandleMessage(const KGBMessage message)
 //
 void HoltStatePlacingGravityVector::Exit()
 {
-	driver_->mousePicking_->SetVisibility(false);                                                                           
+	driver_->mousePicking_->SetVisibility(false);    
+	//driver_->elevator_ = NULL;
 }
 
 //=============================================================================
@@ -143,6 +212,7 @@ void HoltStatePlacingGravityVector::BeginContact(ContactPoint* contact, b2Fixtur
 	{
 		if(contactFixture == driver_->feetSensor_)
 		{
+			driver_->feetSensorHitCount_;
 			feetContactCount_++;
 
 			if(collidedFixture->GetBody()->GetUserData())
@@ -175,9 +245,10 @@ void HoltStatePlacingGravityVector::EndContact(ContactPoint* contact, b2Fixture*
 		{
 			feetContactCount_--;
 
+			//if(feetContactCount_ == 0)
 			if(feetContactCount_ == 0)
 			{
-				driver_->stateMachine_->ChangeState(driver_->inAirState_);
+				stateMachine_->ChangeState(driver_->inAirState_);
 			}
 
 			if(elevator_ == collidedFixture->GetBody())
@@ -196,7 +267,7 @@ void HoltStatePlacingGravityVector::EndContact(ContactPoint* contact, b2Fixture*
 ///
 void HoltStatePlacingGravityVector::MoveLeft()
 {
-
+	driver_->stateMachine_->ChangeState(driver_->onGroundState_);
 }
 
 //=============================================================================
@@ -205,7 +276,7 @@ void HoltStatePlacingGravityVector::MoveLeft()
 /// 
 void HoltStatePlacingGravityVector::MoveRight()
 {
-
+	driver_->stateMachine_->ChangeState(driver_->onGroundState_);
 }
 
 
@@ -215,7 +286,7 @@ void HoltStatePlacingGravityVector::MoveRight()
 /// Jump!
 void HoltStatePlacingGravityVector::Jump()
 {
-
+	driver_->stateMachine_->ChangeState(driver_->onGroundState_);
 }
 
 //=============================================================================
@@ -223,7 +294,6 @@ void HoltStatePlacingGravityVector::Jump()
 //
 void HoltStatePlacingGravityVector::UpdateAnimation()
 {
-	
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
 	b2Vec2 lv = driver_->body_->GetLinearVelocity();

@@ -49,6 +49,12 @@ void ParkerStateOnGround::Enter()
 		driver_->animationBlender_->GetSource()->setTimePosition(0.6);
 		driver_->animationBlender_->Blend("run", AnimationBlender::BlendWhileAnimating, 0.2, true);
 	}
+
+	if(driver_->stateMachine_->GetPreviousState() == driver_->inAirState_)
+	{
+		feetContactCount_ = 0;
+	}
+
 }
 
 
@@ -189,7 +195,7 @@ bool ParkerStateOnGround::HandleMessage(const KGBMessage message)
 //
 void ParkerStateOnGround::Exit()
 {
-	driver_->elevator_ = NULL;                                                                        
+	                                                                       
 }
 
 
@@ -367,4 +373,9 @@ void ParkerStateOnGround::UpdateAnimation()
 			driver_->animationBlender_->AddTime(timeSinceLastFrame);
 		}
 	}
+}
+
+int ParkerStateOnGround::GetFeetContactCount()
+{
+	return feetContactCount_;
 }

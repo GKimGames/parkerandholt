@@ -40,6 +40,7 @@ public:
 	/// This will execute when the state is exited.
 	virtual void Exit();
 	
+	int GetFeetContactCount();
 	
 
 protected:
@@ -49,7 +50,7 @@ protected:
 	void Jump();
 	void UpdateAnimation();
 
-	int feetContactCount_;
+	
 
 	bool isJumping_;
 
@@ -60,6 +61,8 @@ protected:
 
 	bool moveLeftDown_;
 	bool moveRightDown_;
+
+	int feetContactCount_;
 
 	/// This is an object that will be moving the character
 	/// when the character is on it.
