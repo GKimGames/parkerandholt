@@ -40,17 +40,40 @@ void HoltStatePlacingPlatform::Enter()
 bool HoltStatePlacingPlatform::Update()
 {
 
+	if(driver_->moveLeft_)
+	{
+		MoveLeft();
+	}
+
+	if(driver_->moveRight_)
+	{
+		MoveRight();
+	}
+
+	if(driver_->jump_)
+	{
+		Jump();
+	}
+
 	static Ogre::Vector3 direction;
-	
+
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 	
 	if(driver_->feetSensorHitCount_ == 0)
 	{
-		driver_->stateMachine_->ChangeState(driver_->inAirState_);
+		stateMachine_->ChangeState(driver_->inAirState_);
 	}
 	else
 	{
 
+		//if(moveRightDown_ || moveLeftDown_)
+		{
+			driver_->ApplyWalkingFriction(timeSinceLastFrame);
+		}
+
+		//moveRightDown_ = false;
+		//moveLeftDown_ = false;
+		
 
 		if(driver_->body_->GetLinearVelocity().x > 0.1)
 		{
@@ -66,7 +89,13 @@ bool HoltStatePlacingPlatform::Update()
 		b2Vec2 v = driver_->body_->GetPosition();
 		driver_->sceneNode_->setPosition(Ogre::Real(v.x),Ogre::Real(v.y),0);
 		driver_->sceneNode_->setDirection(direction,Ogre::Node::TS_WORLD);
+
+		if(driver_->debugDrawOn_)
+		{
+			driver_->UpdateDebugDraw();
+		}
 	}
+
 
 	return true;
 }
@@ -98,11 +127,47 @@ bool HoltStatePlacingPlatform::HandleMessage(const KGBMessage message)
 			SpawnPlatform();
 			return true;
 		}
-		case CREATE_BOX:
+		case MIDDLE_MOUSE_MINUS:
 		{
 			SpawnBox();
 			return true;
-		}		
+		}
+		case CHARACTER_MOVE_LEFT_PLUS:
+		{
+			driver_->moveLeft_ = true;
+			return true;
+		}
+		case CHARACTER_MOVE_RIGHT_PLUS:
+		{
+			driver_->moveRight_ = true;
+			return true;
+		}
+		case CHARACTER_JUMP_PLUS:
+		{
+			driver_->jump_ = true;
+			return true;
+		}
+		case CHARACTER_MOVE_LEFT_MINUS:
+		{
+
+			driver_->moveLeft_ = false;
+			return true;
+		}
+		case CHARACTER_MOVE_RIGHT_MINUS:
+		{
+			driver_->moveRight_ = false;
+			return true;
+		}
+		case CHARACTER_JUMP_MINUS:
+		{
+			driver_->jump_ = false;
+			return true;
+		}
+		case CHARACTER_ENTER_GRAVITYSTATE:
+		{
+			driver_->stateMachine_->ChangeState(driver_->placingGravityVector_);
+			return true;
+		}
 	}
 
 	return false;
@@ -114,7 +179,8 @@ bool HoltStatePlacingPlatform::HandleMessage(const KGBMessage message)
 //
 void HoltStatePlacingPlatform::Exit()
 {
-	driver_->mousePicking_->SetVisibility(false);                                                                           
+	driver_->mousePicking_->SetVisibility(false); 
+	driver_->elevator_ = NULL;
 }
 
 //=============================================================================
@@ -159,9 +225,9 @@ void HoltStatePlacingPlatform::EndContact(ContactPoint* contact, b2Fixture* cont
 		{
 			feetContactCount_--;
 
-			if(feetContactCount_ == 0)
+			if(feetContactCount_ <= 0)
 			{
-				driver_->stateMachine_->ChangeState(driver_->inAirState_);
+				stateMachine_->ChangeState(driver_->inAirState_);
 			}
 
 			if(elevator_ == collidedFixture->GetBody())
@@ -180,7 +246,7 @@ void HoltStatePlacingPlatform::EndContact(ContactPoint* contact, b2Fixture* cont
 ///
 void HoltStatePlacingPlatform::MoveLeft()
 {
-
+	driver_->stateMachine_->ChangeState(driver_->onGroundState_);
 }
 
 //=============================================================================
@@ -189,7 +255,7 @@ void HoltStatePlacingPlatform::MoveLeft()
 /// 
 void HoltStatePlacingPlatform::MoveRight()
 {
-
+	driver_->stateMachine_->ChangeState(driver_->onGroundState_);
 }
 
 
@@ -199,7 +265,7 @@ void HoltStatePlacingPlatform::MoveRight()
 /// Jump!
 void HoltStatePlacingPlatform::Jump()
 {
-
+	driver_->stateMachine_->ChangeState(driver_->onGroundState_);
 }
 
 //=============================================================================
@@ -207,7 +273,6 @@ void HoltStatePlacingPlatform::Jump()
 //
 void HoltStatePlacingPlatform::UpdateAnimation()
 {
-	
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
 	b2Vec2 lv = driver_->body_->GetLinearVelocity();
