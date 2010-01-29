@@ -1,4 +1,10 @@
+/*=============================================================================
 
+		PhysicsState.cpp
+
+		Author: Matt King
+
+=============================================================================*/
 
 #include "PhysicsState.h"
 #include "GameObjectFactory.h"
@@ -62,7 +68,7 @@ void PhysicsState::enter()
 	camera_ = sceneManager_->createCamera("GameCamera");
 	camera_->setPosition(Vector3(camPosition.x, camPosition.y, camPosition.z));
 	camera_->lookAt(Vector3(camLook.x, camLook.y, camLook.z));
-	camera_->setNearClipDistance(5);
+	camera_->setNearClipDistance(1);
 
 	camera_->setAspectRatio(Real(GameFramework::getSingletonPtr()->viewport_->getActualWidth()) / 
 		Real(GameFramework::getSingletonPtr()->viewport_->getActualHeight()));
@@ -304,18 +310,21 @@ void PhysicsState::createScene()
 {
 
 	sceneManager_->getRootSceneNode()->setPosition(0,0,0);
-	GameFramework::getSingletonPtr()->viewport_->setBackgroundColour(Ogre::ColourValue(1,1,1));
+	GameFramework::getSingletonPtr()->viewport_->setBackgroundColour(Ogre::ColourValue(0,0,0));
 	//sceneManager_->setSkyBox(true, "Examples/SpaceSkyBox");
 	//sceneManager_->setSkyBox(true, "Examples/WhiteSkyBox");
 	float mCurvature = 1;
 	float mTiling = 15;
 	//sceneManager_->setSkyDome(true, "Examples/CloudySky", mCurvature, mTiling);
+	
 	Ogre::Light* light = sceneManager_->createLight("Light");
 	
 	light->setType(Light::LT_SPOTLIGHT);
 	light->setPosition(0,25,0);
 	light->setDirection(0,-1,0);
 	light->setSpotlightRange(Degree(35), Degree(50));
+	
+
 
 	Ogre::Light* light2 = sceneManager_->createLight("Light2");
 	
@@ -332,8 +341,9 @@ void PhysicsState::createScene()
 	light3->setSpotlightRange(Degree(35), Degree(50));
 
 	sceneManager_->setAmbientLight(ColourValue(0.09, 0.09, 0.09));
-	sceneManager_->setAmbientLight(ColourValue(0.7, 0.7, 0.7));
+	//sceneManager_->setAmbientLight(ColourValue(0.7, 0.7, 0.7));
 	sceneManager_->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
+
 	myGUI = new MyGUI::Gui();
 	myGUI->initialise(GAMEFRAMEWORK->renderWindow_);
 	
@@ -379,7 +389,7 @@ void PhysicsState::createScene()
 	*/
 	
 	
-	
+	/*
 	// Create background rectangle covering the whole screen
 	Rectangle2D* rect = new Rectangle2D(true);
 	rect->setCorners(-1.0, 1.0, 1.0, -1.0);
@@ -396,7 +406,7 @@ void PhysicsState::createScene()
 	// Attach background to the scene
 	SceneNode* node = sceneManager_->getRootSceneNode()->createChildSceneNode("BackgroundNode");
 	node->attachObject(rect);
-	
+	*/
 	
 
 	// Example of background scrolling

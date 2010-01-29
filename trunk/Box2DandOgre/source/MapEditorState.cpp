@@ -1,7 +1,14 @@
+/*=============================================================================
+
+		MapEditorState.cpp
+
+		Author: Matt King
+
+=============================================================================*/
+
 #include "MapEditorState.h"
 #include "MyGUI.h"
 #include "GameObjectFactory.h"
-#include <direct.h> 
 
 using namespace Ogre;
 
@@ -21,10 +28,7 @@ void MapEditorState::enter()
 {
 
 	GAMEFRAMEWORK->log_->logMessage("Entering MapEditorState...");
-	char CurrentPath[_MAX_PATH];
-	_getcwd(CurrentPath, _MAX_PATH);
 
- 
 	// Load XML 
 	TiXmlDocument configXML_( "..\\MapEditorSettings.xml");
 	configXML_.LoadFile();

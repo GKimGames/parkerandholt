@@ -1,10 +1,10 @@
 /*=============================================================================
 
-	FSMState.h
+			FSMState.h
 
-	Author: Matt King
+			Author: Matt King
 
-	Finite State Machine State
+			Finite State Machine State
 
 =============================================================================*/
 #ifndef FSMSTATE_H

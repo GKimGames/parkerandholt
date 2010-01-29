@@ -1,3 +1,10 @@
+/*=============================================================================
+
+		HoltStatePlacingGravityVector.cpp
+
+		Author: Greg King
+
+=============================================================================*/
 #include "HoltStatePlacingGravityVector.h"
 
 

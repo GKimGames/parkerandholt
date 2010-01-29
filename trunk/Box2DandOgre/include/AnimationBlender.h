@@ -1,4 +1,15 @@
-// Taken from the OGRE wiki, must rewrite as it doesn't seem to work correctly.
+/*=============================================================================
+
+		AnimationBlender.h
+
+		Author: Matt King and [Someone from the OGRE Wiki]
+		
+		Taken from the OGRE wiki.
+
+		+Added being able to play the animation to a certain time and have it
+		loop or stop there.
+=============================================================================*/
+
 
 #ifndef ANIMATONBLENDER_H
 #define ANIMATONBLENDER_H

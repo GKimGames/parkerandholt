@@ -1,8 +1,8 @@
 /*=============================================================================
 
-  MovingPlatform.h
+		  MovingPlatform.h
 
-  Author: Matt King
+		  Author: Matt King
 
 =============================================================================*/
 #ifndef MOVINGPLATFORM_H

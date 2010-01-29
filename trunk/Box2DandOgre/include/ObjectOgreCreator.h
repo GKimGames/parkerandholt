@@ -12,6 +12,7 @@
 #include "GameObjectCreator.h"
 #include "GameObjectOgre.h"
 #include "OgreXMLLoader.h"
+#include "Ogre.h"
 
 class ObjectOgreCreator : public GameObjectCreator
 {
@@ -89,6 +90,7 @@ public:
 		meshCounter++;
 
 		// Get the mesh for the Game Ogre Object
+		Ogre::String type = TinyXMLHelper::GetAttribute(element, "type");
 		Ogre::String meshName = TinyXMLHelper::GetAttribute(element, "mesh");
 		if(!meshName.empty())
 		{
@@ -99,8 +101,14 @@ public:
 
 			// Get the position for the sceneNode of the Game Ogre Object
 			Ogre::Vector3 sceneNodePosition = TinyXMLHelper::GetAttributeVector3(element, "position");
-			Ogre::SceneNode* meshSceneNode = gameObjectOgre->sceneNode_->createChildSceneNode(sceneNodePosition);
-
+			Ogre::SceneNode* meshSceneNode = gameObjectOgre->sceneNode_->createChildSceneNode();
+			
+			Ogre::Vector3 rotation = TinyXMLHelper::GetAttributeVector3(element, "rotation");
+			
+			meshSceneNode->pitch(Ogre::Radian(Ogre::Degree(rotation.x)));
+			meshSceneNode->yaw(Ogre::Radian(Ogre::Degree(rotation.y)));
+			meshSceneNode->roll(Ogre::Radian(Ogre::Degree(rotation.z)));
+			meshSceneNode->setPosition(sceneNodePosition);
 			// Attach the mesh entity.
 			meshSceneNode->attachObject(meshEntity);
 
@@ -109,8 +117,13 @@ public:
 			meshSceneNode->scale(sceneNodeScale);
 
 		}
+		else if(type.compare("platform") == 0)
+		{
+			CreatePlatform(element,gameObjectOgre);
+		}
 		else
 		{
+			
 			Ogre::String s = "ObjectOgreCreator: Failed to initialize GameObjectOgre: no mesh attribute";
 			GAMEFRAMEWORK->log_->logMessage(s);
 			DEBUG_LOG(s);
@@ -119,7 +132,72 @@ public:
 
 	void ParseLight(TiXmlElement* element, GameObjectOgre* gameObjectOgre)
 	{
-		//Ogre::String name = getAttrib(element, "name");
+		Ogre::String name = TinyXMLHelper::GetAttribute(element, "name");
+		Ogre::Light* light = GAMEFRAMEWORK->sceneManager->createLight(name);
+		
+		light->setType(Ogre::Light::LT_SPOTLIGHT);
+		light->setPosition(TinyXMLHelper::GetAttributeVector3(element, "position"));
+		light->setDirection(TinyXMLHelper::GetAttributeVector3(element, "direction"));
+		
+		Ogre::Radian innerAngle(TinyXMLHelper::GetAttributeReal(element, "innerAngle", 35));
+		Ogre::Radian outerAngle(TinyXMLHelper::GetAttributeReal(element, "outerAngle", 50));
+		light->setSpotlightRange(innerAngle, outerAngle);
+	
+		gameObjectOgre->sceneNode_->attachObject(light);
+	}
+
+	void CreatePlatform(TiXmlElement* element, GameObjectOgre* gameObjectOgre)
+	{
+		Ogre::String material = TinyXMLHelper::GetAttribute(element, "material","Matt/Road");
+		b2Vec2 point1, point2;
+		Box2DXMLLoader::GetB2Vec2(element, "point1", &point1);
+		Box2DXMLLoader::GetB2Vec2(element, "point2", &point2);
+
+		if(point1.x > point2.x)
+		{
+			b2Vec2 holder = point2;
+			point2 = point1;
+			point1 = holder;
+		}
+
+
+		Ogre::String planeName("PlatformPlane");
+		Ogre::String planeMeshName("PlatformPlaneMesh");
+		Ogre::String planeEntityName("PlatformPlaneEntity");
+
+		planeName += Ogre::StringConverter::toString(gameObjectOgre->objectId_);
+		planeMeshName += Ogre::StringConverter::toString(gameObjectOgre->objectId_);
+		planeEntityName += Ogre::StringConverter::toString(gameObjectOgre->objectId_);
+
+		Ogre::MovablePlane* plane = new Ogre::MovablePlane(planeName);
+		plane->d = 0; 
+		plane->normal = Ogre::Vector3(0.0, 1.0, 0.0);
+
+		float lengthOfPlane = sqrt((point2.x - point1.x) * (point2.x - point1.x) + (point2.y - point1.y) * (point2.y - point1.y));
+		
+		Ogre::MeshManager::getSingleton().createPlane(planeMeshName, 
+			Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+			*plane,
+			lengthOfPlane,  // X Length
+			15,				// Z Length
+			3 * lengthOfPlane / 15, 5,			// Segments x ,y
+			true,
+			1, 
+			3 * lengthOfPlane / 15,		// Tile x
+			1,							// Tile y
+			Ogre::Vector3::UNIT_Z);
+
+		Ogre::Entity* planeEnt = GAMEFRAMEWORK->sceneManager->createEntity(planeEntityName , planeMeshName);
+		planeEnt->setMaterial(Ogre::MaterialManager::getSingleton().getByName(material));
+
+		Ogre::SceneNode* planeNode = gameObjectOgre->sceneNode_->createChildSceneNode();
+		planeNode->attachObject(planeEnt);
+		
+		// Rotate the node to fit the points
+		planeNode->roll(Ogre::Radian(atan2(point2.y - point1.y, point2.x - point1.x)));
+		
+		// Center the node on the midpoint of the two points
+		planeNode->setPosition(Ogre::Real(point1.x + point2.x) / 2.0, Ogre::Real(point1.y + point2.y) / 2.0, 0.0);
 	}
 
 };

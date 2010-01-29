@@ -1,3 +1,11 @@
+/*=============================================================================
+
+		MousePicking.cpp
+
+		Author: Greg King
+
+=============================================================================*/
+
 #include "MousePicking.h"
 #include <OISEvents.h>
 #include <OISInputManager.h>

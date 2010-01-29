@@ -1,3 +1,14 @@
+/*=============================================================================
+
+		AnimationBlender.cpp
+
+		Author: Matt King and [Someone from the OGRE Wiki]
+		
+		Taken from the OGRE wiki.
+
+		+Added being able to play the animation to a certain time and have it
+		loop or stop there.
+=============================================================================*/
 #include "AnimationBlender.h"
 
 using namespace Ogre;

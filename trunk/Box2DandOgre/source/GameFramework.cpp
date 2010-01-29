@@ -1,3 +1,11 @@
+/*=============================================================================
+
+		GameFramework.cpp
+
+		Author: Matt King
+
+=============================================================================*/
+
 #include "GameFramework.h"
 #include "GameObject.h"
 #include "GameObjectFactory.h"
