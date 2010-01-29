@@ -1,5 +1,12 @@
-#include "LedgeSensor.h"
+/*=============================================================================
 
+	LedgeSensor.cpp
+
+	Author: Matt King
+
+=============================================================================*/
+
+#include "LedgeSensor.h"
 
 LedgeSensor::LedgeSensor() : GameObjectSensor(NO_MESSAGE)
 {

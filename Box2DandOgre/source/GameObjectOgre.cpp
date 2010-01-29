@@ -1,3 +1,11 @@
+/*=============================================================================
+
+  GameObjectOgre.cpp
+
+  Author: Matt King
+
+=============================================================================*/
+
 #include "GameObjectOgre.h"
 
 //=============================================================================
@@ -24,7 +32,8 @@ GameObjectOgre::~GameObjectOgre()
 //
 bool GameObjectOgre::Initialize()
 {
-	initialized_ = true;
+	
+	initialized_ = GameObject::Initialize();
 	return initialized_;
 }
 

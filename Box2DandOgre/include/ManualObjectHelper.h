@@ -1,8 +1,11 @@
 /*=============================================================================
 
-	ManualObjectHelper.h
+		ManualObjectHelper.h
 
-	Author: Matt King
+		Author: Matt King
+
+		This class makes it easy to make manual objects from Box2D bodys and
+		shapes
 
 =============================================================================*/
 

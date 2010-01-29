@@ -1,3 +1,10 @@
+/*=============================================================================
+
+		GpuCommandBufferFlush.cpp
+
+		Author: Taken from OGRE Wiki
+
+=============================================================================*/
 #include "OgreGpuCommandBufferFlush.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"

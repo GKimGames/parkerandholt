@@ -1,4 +1,15 @@
-//|||||||||||||||||||||||||||||||||||||||||||||||
+/*=============================================================================
+
+		AppStateManager.h
+
+		Author: spacegaier
+		This was taken from the Advanced Ogre Framework by spacegaier.
+
+		Updated by: Matt King
+
+		+ Changed from struct and vector of AppStates to std::map.
+		
+=============================================================================*/
 
 #include "AppStateManager.hpp"
 
@@ -29,10 +40,6 @@ AppStateManager::~AppStateManager()
 		m_ActiveStateStack.pop_back();
 	}
 
-	while(!m_States.empty())
-	{
-		m_States.pop_back();
-	}
 }
 
 
@@ -42,23 +49,7 @@ AppStateManager::~AppStateManager()
 //
 void AppStateManager::manageAppState(Ogre::String stateName, AppState* state)
 {
-
 	m_AppMap[stateName] = state;
-
-	/*
-	try
-	{
-		state_info new_state_info;
-		new_state_info.name = stateName;
-		new_state_info.state = state;
-		m_States.push_back(new_state_info);		
-	}
-	catch(std::exception& e)
-	{
-		delete state;
-		throw Ogre::Exception(Ogre::Exception::ERR_INTERNAL_ERROR, "Error while trying to manage a new AppState\n" + Ogre::String(e.what()), "AppStateManager.cpp " + __LINE__);
-	}
-	*/
 }
 
 
@@ -75,16 +66,6 @@ AppState* AppStateManager::findByName(Ogre::String stateName)
 	{
 		return iter->second;
 	}
-	
-	/*
-	std::vector<state_info>::iterator itr;
-
-	for(itr=m_States.begin();itr!=m_States.end();itr++)
-	{
-		if(itr->name==stateName)
-			return itr->state;
-	}
-	*/
 
 	return 0;
 }

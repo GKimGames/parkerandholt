@@ -1,8 +1,8 @@
 /*=============================================================================
 
-  Box2DXMLLoader.cpp
+	Box2DXMLLoader.cpp
 
-  Author: Matt King
+	Author: Matt King
 
 =============================================================================*/
 
@@ -279,9 +279,10 @@ bool Box2DXMLLoader::Createb2RevoluteJoint(TiXmlElement* element)
 			jointDefNode->QueryFloatAttribute("motorSpeed", &jointDef.motorSpeed);
 			jointDefNode->QueryFloatAttribute("upperAngle", &jointDef.upperAngle);
 
-			b2Vec2 worldAnchor;
+			b2Vec2 worldAnchor(0,0);
 			GetB2Vec2(jointDefNode, "worldAnchor", &worldAnchor);
-
+			if(worldAnchor.x == 0 && worldAnchor.y ==0)
+				worldAnchor = bodyB->GetWorldCenter();
 			jointDef.Initialize(bodyA,bodyB, worldAnchor);
 			b2Joint* j = world_->CreateJoint(&jointDef);
 
@@ -456,10 +457,6 @@ bool Box2DXMLLoader::Createb2PulleyJoint(TiXmlElement* element)
 			GetB2Vec2(jointDefNode, "localAnchorB", &jointDef.localAnchorB);
 			GetB2Vec2(jointDefNode, "groundAnchorA", &jointDef.groundAnchorA);
 			GetB2Vec2(jointDefNode, "groundAnchorB", &jointDef.groundAnchorB);
-			jointDefNode->QueryFloatAttribute("lengthA", &jointDef.lengthA);
-			jointDefNode->QueryFloatAttribute("maxLengthA", &jointDef.maxLengthA);
-			jointDefNode->QueryFloatAttribute("lengthB", &jointDef.lengthB);
-			jointDefNode->QueryFloatAttribute("maxLengthB", &jointDef.maxLengthB);
 			jointDefNode->QueryFloatAttribute("ratio", &jointDef.ratio);
 
 			jointDef.Initialize(
@@ -469,6 +466,10 @@ bool Box2DXMLLoader::Createb2PulleyJoint(TiXmlElement* element)
 				jointDef.ratio
 				);
 
+			jointDefNode->QueryFloatAttribute("lengthA", &jointDef.lengthA);
+			jointDefNode->QueryFloatAttribute("maxLengthA", &jointDef.maxLengthA);
+			jointDefNode->QueryFloatAttribute("lengthB", &jointDef.lengthB);
+			jointDefNode->QueryFloatAttribute("maxLengthB", &jointDef.maxLengthB);
 			b2Joint* j = world_->CreateJoint(&jointDef);
 
 			// If the joint has an id we will add it to the map of joints

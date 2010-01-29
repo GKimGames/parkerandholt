@@ -1,4 +1,15 @@
+/*=============================================================================
 
+		AppState.h
+
+		Author: spacegaier
+		This was taken from the Advanced Ogre Framework by spacegaier.
+
+		Updated by: Matt King
+		
+		Included Parker and Holt specific classes
+
+=============================================================================*/
 
 #ifndef APP_STATE_HPP
 #define APP_STATE_HPP
@@ -6,7 +17,6 @@
 
 
 #include "GameFramework.h"
-//#include "boost\bind.hpp"
 #include "Message.h"
 
 class AppState;

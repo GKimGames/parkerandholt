@@ -66,7 +66,7 @@ bool GameObject::Initialize()
 
 	ret = objectNameList.insert(std::make_pair(objectName_,this));
 	
-	if(ret.second == false)
+	if(ret.second == false || objectName_.empty())
 	{
 		Ogre::String s = "ERROR: GameObject creation name conflict: ";
 		s += objectName_;

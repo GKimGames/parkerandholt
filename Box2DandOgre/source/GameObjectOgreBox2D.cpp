@@ -1,14 +1,12 @@
 /*=============================================================================
 
-GameObjectOgreBox2D.cpp
+	GameObjectOgreBox2D.cpp
 
-Author: Matt King
+	Author: Matt King
 
 =============================================================================*/
 
 #include "GameObjectOgreBox2D.h"
-
-
 
 
 /// Constructor grabs the reference from the OgreFramework of the b2World.
@@ -44,9 +42,15 @@ GameObjectOgreBox2D::~GameObjectOgreBox2D()
 
 bool GameObjectOgreBox2D::Initialize()
 {
-	if(body_ != 0)
+	initialized_ = GameObjectOgre::Initialize();
+	
+	if(initialized_)
 	{
-		initialized_ = true;
+		if(body_ != 0)
+		{
+			
+			initialized_ = true;
+		}
 	}
 
 	return initialized_;
@@ -57,7 +61,6 @@ bool GameObjectOgreBox2D::InitializeDebugDraw(Ogre::ColourValue color, Ogre::Str
 	
 	if(body_ != 0)
 	{
-		
 		debugMaterialName_ = materialName;
 		debugColor_ = color;
 

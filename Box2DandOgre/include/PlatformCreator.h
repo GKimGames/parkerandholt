@@ -9,40 +9,63 @@
 #ifndef PLATFORM_CREATOR_H
 #define PLATFORM_CREATOR_H
 
-#include "GameObjectCreator.h"
+#include "GameObjectOgreBox2DCreator.h"
 #include "Platform.h"
+#include "Box2DXMLLoader.h"
 
-class PlatformCreator : public GameObjectCreator
+class PlatformCreator : public GameObjectOgreBox2DCreator
 {
 
 public:
 
-	PlatformCreator(GameObjectFactory* gameObjectFactory):GameObjectCreator(gameObjectFactory){}
+	PlatformCreator(GameObjectFactory* gameObjectFactory):GameObjectOgreBox2DCreator(gameObjectFactory){}
 
 	virtual GameObject* LoadFromXML(TiXmlElement* element)
 	{
-		
-		if(element != 0)
+		Platform* platform = new Platform();
+		CreatorResult result = LoadFromXML(element, platform);
+
+		if(result == CREATOR_OK)
 		{
-			Platform* platform = new Platform();
-
-			std::string str;
-			element->QueryValueAttribute("name", &str);
-			platform->objectName_ = str;
-
-			element->QueryFloatAttribute("px1", &platform->point1.x);
-			element->QueryFloatAttribute("py1", &platform->point1.y);
-			element->QueryFloatAttribute("px2", &platform->point2.x);
-			element->QueryFloatAttribute("py2", &platform->point2.y);
-
-			platform->sceneManager_ = GAMEFRAMEWORK->gameObjectFactory->sceneManager;
-
-			platform->Initialize();
-			
 			return platform;
 		}
+
+		// It didn't get created ok.
+		delete platform;
 		
 		return 0;
+	}
+
+	virtual CreatorResult LoadFromXML(TiXmlElement* element, Platform* platform )
+	{
+		CreatorResult result= CREATOR_OK;
+		if(element != 0)
+		{
+			if(platform != 0)
+			{
+				//result = GameObjectCreator::LoadFromXML(element, platform);
+				if(result == CREATOR_OK)
+				{
+					 
+					TiXmlElement* platformNode = element->FirstChildElement( "Platform" );
+
+					std::string str;
+					platformNode->QueryValueAttribute("name", &str);
+					platform->objectName_ = str;
+			
+					Box2DXMLLoader::GetB2Vec2(platformNode, "point1", &platform->point1);
+					Box2DXMLLoader::GetB2Vec2(platformNode, "point2", &platform->point2);
+
+					platform->sceneManager_ = GAMEFRAMEWORK->gameObjectFactory->sceneManager;
+
+					platform->Initialize();
+				}
+	
+			}
+		}
+
+	
+		return result;
 	}
 
 };

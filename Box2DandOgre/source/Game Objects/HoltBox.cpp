@@ -1,5 +1,12 @@
-#include "HoltBox.h"
+/*=============================================================================
 
+	HoltBox.cpp
+
+	Author: Matt King
+
+=============================================================================*/
+
+#include "HoltBox.h"
 
 HoltBox::HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center)
 {

@@ -1,3 +1,12 @@
+/*=============================================================================
+
+		TinyXMLHelper.h
+
+		Author: Matt King
+		
+		This is a small wrapper to allow easy access to attributes in 
+		TinyXML elements.
+=============================================================================*/
 #ifndef TINYXML_HELPER_H
 #define TINYXML_HELPER_H
 

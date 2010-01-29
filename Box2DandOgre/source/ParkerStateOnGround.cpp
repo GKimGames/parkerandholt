@@ -195,7 +195,7 @@ bool ParkerStateOnGround::HandleMessage(const KGBMessage message)
 //
 void ParkerStateOnGround::Exit()
 {
-	                                                                       
+	driver_->elevator_ = 0;                                                             
 }
 
 
@@ -217,7 +217,7 @@ void ParkerStateOnGround::BeginContact(ContactPoint* contact, b2Fixture* contact
 				GameObject* go = (GameObject*) collidedFixture->GetBody()->GetUserData();
 				int type = go->GetGameObjectType();
 
-				if(driver_->elevator_ == NULL)
+				if(driver_->elevator_ == 0)
 				{
 					driver_->elevator_ = collidedFixture->GetBody();
 				}
@@ -248,7 +248,7 @@ void ParkerStateOnGround::EndContact(ContactPoint* contact, b2Fixture* contactFi
 
 			if(elevator_ == collidedFixture->GetBody())
 			{
-				driver_->elevator_ = NULL;
+				driver_->elevator_ = 0;
 			}
 
 		}
@@ -337,7 +337,7 @@ void ParkerStateOnGround::UpdateAnimation()
 
 	b2Vec2 lv = driver_->body_->GetLinearVelocity();
 	
-	if(driver_->elevator_ != NULL)
+	if(driver_->elevator_ != 0)
 	{
 		lv -= driver_->elevator_->GetLinearVelocity();
 	}
