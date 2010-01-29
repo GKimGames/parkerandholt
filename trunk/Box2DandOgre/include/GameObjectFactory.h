@@ -12,6 +12,8 @@
 #include <Ogre.h>
 #include "Box2DXMLLoader.h"
 
+#include <vector>
+
 class TiXmlElement;
 class GameObjectCreator;
 class GameObject;
@@ -43,6 +45,9 @@ public:
 protected:
 
 	Box2DXMLLoader* box2DLoader_;
+
+	std::vector<TiXmlElement*> sensorList_;
+
 	std::map<std::string, GameObjectCreator*> creatorMap_;
 
 	

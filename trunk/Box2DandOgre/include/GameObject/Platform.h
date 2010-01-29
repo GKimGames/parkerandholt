@@ -26,6 +26,7 @@ public:
 
 	bool Update(double timeSinceLastFrame)
 	{ 
+		UpdateGraphics(timeSinceLastFrame);
 		return true;
 	};
 

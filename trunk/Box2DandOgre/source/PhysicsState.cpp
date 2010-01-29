@@ -1,6 +1,7 @@
 
 
 #include "PhysicsState.h"
+#include "GameObjectFactory.h"
 
 using namespace Ogre;
 
@@ -152,33 +153,25 @@ void PhysicsState::createPhysics()
 
 	// Define the gravity vector.
 	b2Vec2 gravity(0.0f, -gravity_);
-	//b2Vec2 gravity(0.0f, -20);
 
 	// Do we want to let bodies sleep?
 	bool doSleep = true;
 
 	// Construct a world object, which will hold and simulate the rigid bodies.
-	//world = new b2World(worldAABB, gravity, doSleep);
 	world = new b2World(gravity,doSleep);
 	GameFramework::getSingletonPtr()->SetWorld(world);
 	world->SetContactListener(this);
+
+
+	GameObjectFactory* gof = new GameObjectFactory();
+	gof->AddObjectCreators();
+	gof->sceneManager = sceneManager_;
+	gof->LoadFile("..\\SampleLevel.xml");
 
 	new Platform(sceneManager_, b2Vec2(-300.0f, 0.0f), b2Vec2(10.0f, 0.0f));
 	new Platform(sceneManager_, b2Vec2(10.0f, 0.0f),   b2Vec2(20.0f, 3.0f));
 	new Platform(sceneManager_, b2Vec2(25.0f, 5.0f),   b2Vec2(30.0f, 5.0f));
 	new Platform(sceneManager_, b2Vec2(30.0f, 6.4f),   b2Vec2(35.0f, 6.4f));
-
-	// Create myCharacter
-	//myCharacter_ = new Character(sceneManager_);
-	//myCharacter_->Initialize();
-	
-	
-
-	for(int i = 0; i < 3;i++)
-	{
-		//HoltBox* bb = new HoltBox(sceneManager_, b2Vec2(8.0f, 10.0f),1,50);
-		//bb->Initialize();
-	}
 
 	myMouse_ = new MousePicking(sceneManager_, camera_);
 	parker_  = new CharacterParker(sceneManager_, myMouse_);
@@ -212,9 +205,6 @@ void PhysicsState::createPhysics()
 	debugDrawOn_ = true;
 
 #endif
-
-	//myPicking_ = new MousePicking(sceneManager_, world, camera_, pickingPlane);
-
 
 	b2BodyDef bdef;
 	bdef.position.Set(0, -1000);
@@ -313,8 +303,10 @@ void PhysicsState::CreateBox()
 void PhysicsState::createScene()
 {
 
-	GameFramework::getSingletonPtr()->viewport_->setBackgroundColour(Ogre::ColourValue(0,0,0));
+	sceneManager_->getRootSceneNode()->setPosition(0,0,0);
+	GameFramework::getSingletonPtr()->viewport_->setBackgroundColour(Ogre::ColourValue(1,1,1));
 	//sceneManager_->setSkyBox(true, "Examples/SpaceSkyBox");
+	//sceneManager_->setSkyBox(true, "Examples/WhiteSkyBox");
 	float mCurvature = 1;
 	float mTiling = 15;
 	//sceneManager_->setSkyDome(true, "Examples/CloudySky", mCurvature, mTiling);
@@ -387,10 +379,11 @@ void PhysicsState::createScene()
 	*/
 	
 	
+	
 	// Create background rectangle covering the whole screen
 	Rectangle2D* rect = new Rectangle2D(true);
 	rect->setCorners(-1.0, 1.0, 1.0, -1.0);
-	rect->setMaterial("Matt/Skyline");
+	rect->setMaterial("Examples/WhiteSky");
 
 	// Render the background before everything else
 	rect->setRenderQueueGroup(RENDER_QUEUE_BACKGROUND);
@@ -404,40 +397,10 @@ void PhysicsState::createScene()
 	SceneNode* node = sceneManager_->getRootSceneNode()->createChildSceneNode("BackgroundNode");
 	node->attachObject(rect);
 	
+	
 
 	// Example of background scrolling
 	//===================================================================
-
-	
-	Ogre::MovablePlane* plane = new MovablePlane("MyPlane");
-	plane->d = 0; 
-	plane->normal = Vector3(0.0, 1.0, 0.0);
-
-	Ogre::MeshManager::getSingleton().createPlane("HeySteve", 
-		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-		*plane,
-		1000,			// X Length
-		1000,			// Z Length
-		5, 5,			// Segments x ,y
-		true,
-		1, 
-		1,				// Tile x
-		1,				// Tile y
-		Vector3::UNIT_Z);
-
-	Ogre::Entity* planeEnt = sceneManager_->createEntity("butts" , "HeySteve");
-	planeEnt->setMaterial(MaterialManager::getSingleton().getByName("Matt/Black"));
-
-	Ogre::SceneNode* planeNode = sceneManager_->getRootSceneNode()->createChildSceneNode();
-	planeNode->attachObject(planeEnt);
-	
-	planeNode->setPosition(0.0,-0.01,500.0);
-
-	Ogre::SceneNode* buildingNode = sceneManager_->getRootSceneNode()->createChildSceneNode();
-	Ogre::Entity* entity = sceneManager_->createEntity("ABuilding", Ogre::SceneManager::PT_CUBE);
-	entity->setMaterialName("Matt/Black");
-	buildingNode->attachObject(entity);
-	buildingNode->setPosition(0.0,-0.01,0);
 
 	createPhysics();
 	
@@ -503,14 +466,21 @@ bool PhysicsState::keyReleased(const OIS::KeyEvent &keyEventRef)
 //
 bool PhysicsState::mouseMoved(const OIS::MouseEvent &evt)
 {
+	static double angle = 0;
 	Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, myMouse_->GetId(), UPDATE_MOUSE, &evt);
 	myGUI->injectMouseMove(evt);
 	//myPicking_->MouseMoved(evt);
 
 	if(m_bRMouseDown)
 	{
-		camera_->yaw(Degree(evt.state.X.rel * -0.1));
-		camera_->pitch(Degree(evt.state.Y.rel * -0.1));
+		angle+=0.1;
+		Ogre::Vector3 v = parker_->GetPosition();
+		v.x += 10 * cos(angle);
+		v.z += 10 * sin(angle);
+		camera_->setPosition(v);
+
+		//camera_->yaw(Degree(evt.state.X.rel * -0.1));
+		//camera_->pitch(Degree(evt.state.Y.rel * -0.1));
 	}
 
 	return true;
@@ -711,7 +681,7 @@ bool PhysicsState::update(double timeSinceLastFrame)
 		GameObject::UpdateObjectList(timeStep);
 
 		// Update the camera to look at Parker.
-		camera_->setPosition(parker_->GetBodyPosition().x,parker_->GetBodyPosition().y + 3,camera_->getPosition().z);
+		camera_->setPosition(parker_->GetBodyPosition().x,parker_->GetBodyPosition().y + 3, camera_->getPosition().z);
 		camera_->lookAt(parker_->GetBodyPosition().x,parker_->GetBodyPosition().y,0);
 		
 	}

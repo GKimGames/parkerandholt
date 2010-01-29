@@ -48,8 +48,12 @@ public:
 				if(result == CREATOR_OK)
 				{
 					 
-					TiXmlElement* bodys = element->FirstChildElement( "Box2DObject" )->FirstChildElement("Body");
-					gameObjectOgreBox2D->body_ = Box2DXMLLoader::Createb2Body(GAMEFRAMEWORK->world_, bodys);
+					TiXmlElement* bodys = element->FirstChildElement( "Box2DObject" );
+
+					Ogre::String bodyId;
+					bodys->QueryValueAttribute("bodyID", &bodyId);
+					gameObjectOgreBox2D->body_ = gameObjectFactory_->GetBody(bodyId);
+	
 					gameObjectOgreBox2D->Initialize();
 				}
 	

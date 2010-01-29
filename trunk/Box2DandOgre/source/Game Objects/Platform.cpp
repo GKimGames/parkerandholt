@@ -202,7 +202,7 @@ bool Platform::InitializePlaceable()
 	body_= world_->CreateBody(&bd);
 
 	float tempLength = sqrt((point2.x - point1.x) * (point2.x - point1.x) + (point2.y - point1.y) * (point2.y - point1.y));
-	float platformHeight = 0.1f;
+	float platformHeight = 0.2f;
 
 	b2PolygonShape bodyShapeDef;
 	bodyShapeDef.SetAsBox(tempLength/2.0f, platformHeight/2.0f);
@@ -216,6 +216,14 @@ bool Platform::InitializePlaceable()
 	body_->CreateFixture(&fd);
 	body_->SetTransform(body_->GetPosition(), atan2(point2.y - point1.y, point2.x - point1.x));
 	
+	Ogre::String entityName = "Platform";
 
+	// Add the entity number to the HoltBox name to make it unique.
+	entityName += Ogre::StringConverter::toString(objectId_);
+	entity_ = sceneManager_->createEntity(entityName, "cube.1m.mesh");
+	sceneNode_->attachObject(entity_);
+	sceneNode_->scale(tempLength,platformHeight / 1.0, 1.0);
+
+	initialized_ = true;
 	return true;
 }

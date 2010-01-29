@@ -1,4 +1,5 @@
 #include "GravityVector.h"
+
 //=============================================================================
 //								GravityVector
 //
@@ -32,7 +33,39 @@ GravityVector::GravityVector(Ogre::SceneManager *sceneManager, b2Vec2 center, b2
 	tempMagnitude.y = (direction.y - center.y) / (abs(direction.x - center.x) + abs(direction.y - center.y));
 	forceApplied_.x = maxForce_ * tempMagnitude.x;
 	forceApplied_.y = maxForce_ * tempMagnitude.y;
+
 	
+	//sceneNode_ = sceneManager_->getRootSceneNode()->createChild();
+
+	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
+	Ogre::ParticleSystem* ps = sceneManager_->createParticleSystem("Fireworks", "Examples/MattAureola");
+	sceneNode_->attachObject(ps);
+	tempMagnitude.Normalize();
+	ps->getEmitter(0)->setDirection(Ogre::Vector3(tempMagnitude.x,tempMagnitude.y, 0));
+
+	entity_ = sceneManager_->createEntity("GravMesh", "sphere.mesh");
+	
+	entity_->setMaterial(Ogre::MaterialManager::getSingletonPtr()->getByName("TransparentBox/Transparent125"));
+	Ogre::SceneNode* meshNode = sceneNode_->createChildSceneNode();
+	meshNode->attachObject(entity_);
+	meshNode->scale(0.05,0.05,0.05);
+
+
+
+	// Rotate the node to fit the points
+	//sceneNode_->roll(Ogre::Radian(atan2(direction.y, direction.x)));
+	sceneNode_->scale(0.3,0.3,0.3);
+	Initialize();
+	
+}
+
+//=============================================================================
+//								GravityVector
+//
+GravityVector::~GravityVector()
+{	
+	sceneManager_->destroyEntity(entity_);
+	sceneManager_->destroyParticleSystem("Fireworks");
 }
 
 
@@ -80,5 +113,7 @@ bool GravityVector::Update(double timeSinceLastFrame)
 	{
 		bodyList_[i]->ApplyForce(forceApplied_, position_);
 	}
+
+	UpdateGraphics(timeSinceLastFrame);
 	return true;
 }
