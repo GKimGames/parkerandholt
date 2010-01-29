@@ -101,6 +101,12 @@ bool Box2DXMLLoader::Initialize()
 /// Returns a body given its string id
 b2Body*	Box2DXMLLoader::GetBody(Ogre::String id)
 {
+	BodyMap::iterator iter = bodyMap_.find(id);
+	
+	if(iter != bodyMap_.end())
+	{
+		return iter->second;
+	}
 
 	return 0;
 }
@@ -112,6 +118,13 @@ b2Body*	Box2DXMLLoader::GetBody(Ogre::String id)
 /// Returns a fixture given its string id
 b2Fixture* Box2DXMLLoader::GetFixture(Ogre::String id)
 {
+	FixtureMap::iterator iter = fixtureMap_.find(id);
+	
+	if(iter != fixtureMap_.end())
+	{
+		return iter->second;
+	}
+
 	return 0;
 }
 
@@ -122,6 +135,13 @@ b2Fixture* Box2DXMLLoader::GetFixture(Ogre::String id)
 /// Returns a joint given its string id
 b2Joint* Box2DXMLLoader::GetJoint(Ogre::String id)
 {
+	JointMap::iterator iter = jointMap_.find(id);
+	
+	if(iter != jointMap_.end())
+	{
+		return iter->second;
+	}
+
 	return 0;
 }
 

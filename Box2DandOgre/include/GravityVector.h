@@ -8,6 +8,7 @@ class GravityVector : public GameObjectOgreBox2D
 {
 public:
 	GravityVector(Ogre::SceneManager* sceneManager, b2Vec2 center, b2Vec2 direction);
+	~GravityVector();
 	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 	void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 	bool Update(double timeSinceLastFrame);

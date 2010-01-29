@@ -197,7 +197,6 @@ void CharacterParker::CreateGraphics()
 	// Attach Parker's mesh to the node
 	bodyNode_->attachObject(entity_);
 
-
 	// Scale the bodyNode to the apppropriate size.
 	bodyNode_->scale(scaleX_,scaleY_,scaleZ_);
 	bodyNode_->translate(translate_);
@@ -379,7 +378,7 @@ bool CharacterParker::HandleMessage(const KGBMessage message)
 
 	if(message.messageType == CREATE_BOX)
 	{
-		new HoltBox(sceneManager_, b2Vec2(-7, 10), 1, 2000);
+		new HoltBox(sceneManager_, b2Vec2(-7, 10), 1, 20);
 	}
 
 	return stateMachine_->HandleMessage(message); 

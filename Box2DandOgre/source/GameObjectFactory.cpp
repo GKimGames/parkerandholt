@@ -38,7 +38,14 @@ void GameObjectFactory::LoadFile(Ogre::String fileName)
 		CreateGameObject(objectNode);
 		objectNode = objectNode->NextSiblingElement("GameObject");
 	}
+
+	std::vector<TiXmlElement*>::iterator iter = sensorList_.begin();
 	
+	while(iter != sensorList_.end())
+	{
+		CreateGameObject("ObjectSensor", *iter);
+		iter++;
+	}
 }
 
 GameObject* GameObjectFactory::CreateGameObject(std::string creator, TiXmlElement* element)
@@ -61,6 +68,12 @@ GameObject* GameObjectFactory::CreateGameObject(TiXmlElement* element)
 	{
 		std::string creator;
 		int result = element->QueryValueAttribute("type", &creator);
+
+		if(creator.compare("ObjectSensor") == 0)
+		{
+			sensorList_.push_back(element);
+			return 0;
+		}
 
 		std::map<std::string, GameObjectCreator*>::iterator it = creatorMap_.find(creator);
 

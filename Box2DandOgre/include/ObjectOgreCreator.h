@@ -92,31 +92,22 @@ public:
 		Ogre::String meshName = TinyXMLHelper::GetAttribute(element, "mesh");
 		if(!meshName.empty())
 		{
-			if(gameObjectOgre->Initialize())
-			{
-				Ogre::String entityName = gameObjectOgre->objectName_ + "/entity/";
-				entityName += TinyXMLHelper::GetAttribute(element, "name", Ogre::StringConverter::toString(meshCounter));
+			Ogre::String entityName = gameObjectOgre->objectName_ + "/entity/";
+			entityName += TinyXMLHelper::GetAttribute(element, "name", Ogre::StringConverter::toString(meshCounter));
 
-				Ogre::Entity* meshEntity = GAMEFRAMEWORK->sceneManager->createEntity(entityName,meshName);
+			Ogre::Entity* meshEntity = GAMEFRAMEWORK->sceneManager->createEntity(entityName,meshName);
 
-				// Get the position for the sceneNode of the Game Ogre Object
-				Ogre::Vector3 sceneNodePosition = TinyXMLHelper::GetAttributeVector3(element, "position");
-				Ogre::SceneNode* meshSceneNode = gameObjectOgre->sceneNode_->createChildSceneNode(sceneNodePosition);
+			// Get the position for the sceneNode of the Game Ogre Object
+			Ogre::Vector3 sceneNodePosition = TinyXMLHelper::GetAttributeVector3(element, "position");
+			Ogre::SceneNode* meshSceneNode = gameObjectOgre->sceneNode_->createChildSceneNode(sceneNodePosition);
 
-				// Attach the mesh entity.
-				meshSceneNode->attachObject(meshEntity);
+			// Attach the mesh entity.
+			meshSceneNode->attachObject(meshEntity);
 
-				// Get the scaling factor for the mesh
-				Ogre::Vector3 sceneNodeScale = TinyXMLHelper::GetAttributeVector3(element, "scale", Ogre::Vector3::UNIT_SCALE);
-				meshSceneNode->scale(sceneNodeScale);
+			// Get the scaling factor for the mesh
+			Ogre::Vector3 sceneNodeScale = TinyXMLHelper::GetAttributeVector3(element, "scale", Ogre::Vector3::UNIT_SCALE);
+			meshSceneNode->scale(sceneNodeScale);
 
-			}
-			else
-			{
-				Ogre::String s = "ObjectOgreCreator: Failed to initialize GameObjectOgre";
-				GAMEFRAMEWORK->log_->logMessage(s);
-				DEBUG_LOG(s);
-			}
 		}
 		else
 		{
