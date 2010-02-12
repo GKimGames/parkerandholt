@@ -48,6 +48,11 @@ protected:
 	void Jump();
 	void UpdateAnimation();
 
+	double	jumpTimer_;
+	bool	wallJumpedLeft_;
+	bool	justWallJumped_;
+	double	wallJumpTimer_;
+
 };
 
 #endif
