@@ -5,7 +5,7 @@
 		Author: Greg King
 
 =============================================================================*/
-#include "Parker.h"
+#include "Parker.h" 
 
 #include "ParkerStateOnGround.h"
 #include "ParkerStateInAir.h"
@@ -22,7 +22,7 @@ HoltStatePlacingGravityVector::HoltStatePlacingGravityVector(
 	FSMState<CharacterParker>(parker,stateMachine)
 {
 	feetContactCount_ = 0;
-	gravityVector_ = 0;
+	gravityVector_ = new GravityVector(driver_->sceneManager_, b2Vec2(0,0), b2Vec2(1,1));
 	deleteVector_ = false;
 	createVector_ = false;
 }
@@ -82,14 +82,10 @@ bool HoltStatePlacingGravityVector::Update()
 	else
 	{
 
-		//if(moveRightDown_ || moveLeftDown_)
 		{
 			driver_->ApplyWalkingFriction(timeSinceLastFrame);
 		}
 
-		//moveRightDown_ = false;
-		//moveLeftDown_ = false;
-		
 
 		if(driver_->body_->GetLinearVelocity().x > 0.1)
 		{
@@ -115,14 +111,16 @@ bool HoltStatePlacingGravityVector::Update()
 	//end of testcode
 	if(deleteVector_)
 	{
-		delete gravityVector_;
-		gravityVector_ = 0;
+		gravityVector_->Stop();
+		//delete gravityVector_;
+		//gravityVector_ = 0;
 		deleteVector_ = false;
 	}
 
 	if(createVector_)
 	{
 		SpawnGravityVector();
+		//gravityVector_->Start(startPosition_, endPosition_);
 		createVector_ = false;
 	}
 
@@ -358,16 +356,19 @@ bool HoltStatePlacingGravityVector::SpawnGravityVector()
 	{
 		return false;
 	}
-	else if(gravityVector_ == 0)
+	else
 	{
-		gravityVector_ = new GravityVector(driver_->sceneManager_, startPosition_, endPosition_);
-		//platform_ = new Platform(driver_->sceneManager_, b2Vec2(startPosition_.x, startPosition_.y), b2Vec2(endPosition_.x, endPosition_.y), 1);
+		gravityVector_->Start(startPosition_, endPosition_);
+	}
+	/*else if(gravityVector_ == 0)
+	{
+		gravityVector_->Start(startPosition_, endPosition_);
 		return true;
 	}
 	else if(gravityVector_ != 0)
 	{
 		deleteVector_ = true;
-	}
+	}*/
 
 
 	return false;
