@@ -8,6 +8,11 @@
 
 #include "PhysicsState.h"
 #include "GameObjectFactory.h"
+#include "TinyXMLHelper.h"
+#include "CameraStateWatch.h"
+#include "CameraStateGoToPoint.h"
+
+#include "Parker.h"
 
 using namespace Ogre;
 
@@ -28,55 +33,46 @@ PhysicsState::PhysicsState()
 //
 void PhysicsState::enter()
 {
+
+	testing_ = .5;
+
 	gameObject_ = new GameObject("PhysicsState");
 
 	GameFramework::getSingletonPtr()->log_->logMessage("Entering PhysicsState...");
+	
+	TiXmlDocument* settingsDoc = 0;// = new TiXmlDocument("../Settings.xml");
+	TiXmlHandle* root = TinyXMLHelper::GetRootFromFile("../Settings.xml", settingsDoc);
+	
+	TiXmlHandle cameraHandle = root->FirstChildElement("Camera");
+	Ogre::Vector3 camPosition = TinyXMLHelper::GetAttributeVector3(cameraHandle.ToElement(), "position");
+	Ogre::Vector3 camLook = TinyXMLHelper::GetAttributeVector3(cameraHandle.ToElement(), "lookAt");
 
-	// Grabbing settings for the world and camera from a cfg file (ini)
-	std::string settingsFile = "../Settings.cfg";
-	TCHAR buffer[256];
-
-	GetPrivateProfileStringA("Settings", "CameraX", "0", buffer, 256, settingsFile.c_str());
-	camPosition.x = atof(buffer);
-
-	GetPrivateProfileStringA("Settings", "CameraY", "5", buffer, 256, settingsFile.c_str());
-	camPosition.y = atof(buffer);
-
-	GetPrivateProfileStringA("Settings", "CameraZ", "20", buffer, 256, settingsFile.c_str());
-	camPosition.z = atof(buffer);
-
-	GetPrivateProfileStringA("Settings", "LookX", "0", buffer, 256, settingsFile.c_str());
-	camLook.x = atof(buffer);
-
-	GetPrivateProfileStringA("Settings", "LookY", "5", buffer, 256, settingsFile.c_str());
-	camLook.y = atof(buffer);
-
-	GetPrivateProfileStringA("Settings", "LookZ", "0", buffer, 256, settingsFile.c_str());
-	camLook.z = atof(buffer);
-
-	GetPrivateProfileStringA("Settings", "Gravity", "10", buffer, 256, settingsFile.c_str());
-	gravity_ = atof(buffer);
-
-	GetPrivateProfileStringA("Settings", "TimeStep", "0.016666666666667", buffer, 256, settingsFile.c_str());
-	timeStep = atof(buffer);
+	TiXmlHandle box2DHandle = root->FirstChildElement("Box2D");
+	gravity_ = TinyXMLHelper::GetAttributeb2Vec2(box2DHandle.FirstChildElement("Gravity").ToElement(), "direction");
+	timeStep = TinyXMLHelper::GetAttributeFloat(box2DHandle.FirstChildElement("Timestep").ToElement(), "timestep");
+	
+	delete root;
+	delete settingsDoc;
 
 	sceneManager_ = GAMEFRAMEWORK->root_->createSceneManager(ST_GENERIC, "PhysicsSceneMgr");
 	GAMEFRAMEWORK->sceneManager = sceneManager_;
 
 	sceneManager_->setAmbientLight(Ogre::ColourValue(0.7, 0.7, 0.7));		
 
-	camera_ = sceneManager_->createCamera("GameCamera");
-	camera_->setPosition(Vector3(camPosition.x, camPosition.y, camPosition.z));
-	camera_->lookAt(Vector3(camLook.x, camLook.y, camLook.z));
+	camera_ = sceneManager_->createCamera("PhysicsGameCamera");
+	camera_->setPosition(camPosition);
+	camera_->lookAt(camLook);
 	camera_->setNearClipDistance(1);
+	
+	camera_->setAspectRatio(Real(GAMEFRAMEWORK->viewport_->getActualWidth()) / 
+		Real(GAMEFRAMEWORK->viewport_->getActualHeight()));
 
-	camera_->setAspectRatio(Real(GameFramework::getSingletonPtr()->viewport_->getActualWidth()) / 
-		Real(GameFramework::getSingletonPtr()->viewport_->getActualHeight()));
 
-	GameFramework::getSingletonPtr()->viewport_->setCamera(camera_);
 
-	GameFramework::getSingletonPtr()->keyboard_->setEventCallback(this);
-	GameFramework::getSingletonPtr()->mouse_->setEventCallback(this);
+	GAMEFRAMEWORK->viewport_->setCamera(camera_);
+
+	GAMEFRAMEWORK->keyboard_->setEventCallback(this);
+	GAMEFRAMEWORK->mouse_->setEventCallback(this);
 
 	m_bLMouseDown = m_bRMouseDown = false;
 	m_bQuit = false;
@@ -88,6 +84,21 @@ void PhysicsState::enter()
 
 	CompositorManager::getSingleton().addCompositor(GAMEFRAMEWORK->viewport_, "B&W");
 	CompositorManager::getSingleton().setCompositorEnabled(GAMEFRAMEWORK->viewport_, "B&W",true);
+
+	gameCamera_ = new GameCamera(camera_);
+	
+	CameraStateWatchDef def;
+	def.initialPosition = camPosition;
+	def.targetObject = parker_;
+
+	CameraStateGoToPointDef def2;
+	def2.target = Ogre::Vector3(50,-10,100);
+	def2.toleranceDistance = 0.1;
+	def2.factor = 2.5;
+	def2.initialPosition = camPosition;
+
+
+	gameCamera_->InitializeDef(&def);
 }
 
 
@@ -124,8 +135,7 @@ void PhysicsState::exit()
 {
 
 	CompositorManager::getSingleton().setCompositorEnabled(GAMEFRAMEWORK->viewport_, "B&W",false);
-
-	CompositorManager::getSingleton().removeAll();
+	CompositorManager::getSingleton().removeCompositorChain(GAMEFRAMEWORK->viewport_);
 
 	delete world;
 
@@ -158,7 +168,7 @@ void PhysicsState::createPhysics()
 	worldAABB.upperBound.Set(500.0f, 500.0f);
 
 	// Define the gravity vector.
-	b2Vec2 gravity(0.0f, -gravity_);
+	b2Vec2 gravity(gravity_);
 
 	// Do we want to let bodies sleep?
 	bool doSleep = true;
@@ -172,13 +182,17 @@ void PhysicsState::createPhysics()
 	GameObjectFactory* gof = new GameObjectFactory();
 	gof->AddObjectCreators();
 	gof->sceneManager = sceneManager_;
-	gof->LoadFile("..\\SampleLevel.xml");
+	gof->LoadFile("..\\LevelOne.xml");
 
-	new Platform(sceneManager_, b2Vec2(-300.0f, 0.0f), b2Vec2(10.0f, 0.0f));
-	new Platform(sceneManager_, b2Vec2(10.0f, 0.0f),   b2Vec2(20.0f, 3.0f));
-	new Platform(sceneManager_, b2Vec2(25.0f, 5.0f),   b2Vec2(30.0f, 5.0f));
-	new Platform(sceneManager_, b2Vec2(30.0f, 6.4f),   b2Vec2(35.0f, 6.4f));
-
+	TiXmlDocument* configXML_ = 0;
+	TiXmlHandle* handle = TinyXMLHelper::GetRootFromFile("..\\LevelOne.xml",configXML_);
+	
+	TiXmlElement* element = handle->FirstChildElement("LevelInfo").ToElement();
+	curvature_ = TinyXMLHelper::GetAttributeFloat(element, "curvature", 10);
+	
+	delete handle;
+	delete configXML_;
+	
 	myMouse_ = new MousePicking(sceneManager_, camera_);
 	parker_  = new CharacterParker(sceneManager_, myMouse_);
 	parker_->Initialize();
@@ -194,9 +208,22 @@ void PhysicsState::createPhysics()
 	myKeyHandler_->AddKey(OIS::KC_RIGHT, std::make_pair(CHARACTER_MOVE_RIGHT_PLUS, CHARACTER_MOVE_RIGHT_MINUS));
 	myKeyHandler_->AddKey(OIS::KC_LEFT, std::make_pair(CHARACTER_MOVE_LEFT_PLUS, CHARACTER_MOVE_LEFT_MINUS));
 	myKeyHandler_->AddKey(OIS::KC_UP, std::make_pair(CHARACTER_JUMP_PLUS, CHARACTER_JUMP_MINUS));
+	myKeyHandler_->AddKey(OIS::KC_A, std::make_pair(CHARACTER_MOVE_RIGHT_PLUS, CHARACTER_MOVE_RIGHT_MINUS));
+	myKeyHandler_->AddKey(OIS::KC_D, std::make_pair(CHARACTER_MOVE_LEFT_PLUS, CHARACTER_MOVE_LEFT_MINUS));
+	myKeyHandler_->AddKey(OIS::KC_W, std::make_pair(CHARACTER_JUMP_PLUS, CHARACTER_JUMP_MINUS));
 	myKeyHandler_->AddKey(OIS::KC_1, CHARACTER_ENTER_PLATFORMSTATE);
 	myKeyHandler_->AddKey(OIS::KC_2, CHARACTER_ENTER_GRAVITYSTATE);
 	myKeyHandler_->AddKey(OIS::KC_Q, CHARACTER_EXIT_PLACINGSTATE);
+	
+	new CheckPoint(sceneManager_, b2Vec2(-8.0f, 2.0f),2,4);
+	new CheckPoint(sceneManager_, b2Vec2(-16.0f, 2.0f),2,4);
+	myMeter_ = new TraumaMeter();
+	playerInfo_ = new PlayerInfo();
+
+	new PickUp(sceneManager_, b2Vec2(0.0f, 3.0f));
+	new PickUp(sceneManager_, b2Vec2(-3.0f, 3.0f));
+	new PickUp(sceneManager_, b2Vec2(-6.0f, 3.0f));
+	new PickUp(sceneManager_, b2Vec2(-9.0f, 3.0f));
 	
 #if DEBUG_DRAW_ON
 	debugDraw_ = new OgreB2DebugDraw(sceneManager_, "debugDraw", 0);
@@ -212,79 +239,79 @@ void PhysicsState::createPhysics()
 
 #endif
 
-	b2BodyDef bdef;
-	bdef.position.Set(0, -1000);
-	b2PolygonShape bodyShapeDef2;
-	bodyShapeDef2.SetAsBox(3.54/2.0, 0.6/2.0);
+	//b2BodyDef bdef;
+	//bdef.position.Set(0, -1000);
+	//b2PolygonShape bodyShapeDef2;
+	//bodyShapeDef2.SetAsBox(3.54/2.0, 0.6/2.0);
 
-	b2Body* b2 = world->CreateBody(&bdef);
-	b2->CreateFixture(&bodyShapeDef2);
+	//b2Body* b2 = world->CreateBody(&bdef);
+	//b2->CreateFixture(&bodyShapeDef2);
 
-	{
-		b2BodyDef bd;
-		bd.position.Set(22, 3.5);
-		bd.type = b2_dynamicBody;
-		
-		b2PolygonShape bodyShapeDef;
-		bodyShapeDef.SetAsBox(3.54/2.0, 0.6/2.0);
+	//{
+	//	b2BodyDef bd;
+	//	bd.position.Set(22, 3.5);
+	//	bd.type = b2_dynamicBody;
+	//	
+	//	b2PolygonShape bodyShapeDef;
+	//	bodyShapeDef.SetAsBox(3.54/2.0, 0.6/2.0);
 
-		b2FixtureDef fd;
-		fd.shape = &bodyShapeDef;
-		fd.density = 50;
-		fd.friction = DEFAULT_FRICTION;
-		fd.restitution = .2;
+	//	b2FixtureDef fd;
+	//	fd.shape = &bodyShapeDef;
+	//	fd.density = 50;
+	//	fd.friction = DEFAULT_FRICTION;
+	//	fd.restitution = .2;
 
-		b2Body* b = world->CreateBody(&bd);
-		b->CreateFixture(&fd);
+	//	b2Body* b = world->CreateBody(&bd);
+	//	b->CreateFixture(&fd);
 
-		Ogre::Entity* e = sceneManager_->createEntity("Hey Steve", "LeverArm.mesh");
+	//	Ogre::Entity* e = sceneManager_->createEntity("Hey Steve", "LeverArm.mesh");
 
-		GameObjectOgreBox2D* goob = new GameObjectOgreBox2D("Meow meow meow", b,e);
-		goob->GetSceneNode()->attachObject(e);
-		goob->GetSceneNode()->scale(0.1,0.1,0.1);
-		goob->Initialize();
+	//	GameObjectOgreBox2D* goob = new GameObjectOgreBox2D("Meow meow meow", b,e);
+	//	goob->GetSceneNode()->attachObject(e);
+	//	goob->GetSceneNode()->scale(0.1,0.1,0.1);
+	//	goob->Initialize();
 
-		b2RevoluteJointDef jointDef;
-		jointDef.Initialize(b2, b, b->GetWorldCenter());
-		//jointDef.maxMotorTorque = 10.0f;
-		//jointDef.motorSpeed = 0.0f;
-		//jointDef.enableMotor = true;
+	//	b2RevoluteJointDef jointDef;
+	//	jointDef.Initialize(b2, b, b->GetWorldCenter());
+	//	//jointDef.maxMotorTorque = 10.0f;
+	//	//jointDef.motorSpeed = 0.0f;
+	//	//jointDef.enableMotor = true;
 
-		world->CreateJoint(&jointDef);
-	}
-	
-	{
-		b2BodyDef bd;
-		bd.position.Set(-5, 3.5);
-		bd.type = b2_dynamicBody;
-		
-		b2PolygonShape bodyShapeDef;
-		bodyShapeDef.SetAsBox(3.54, 0.6/2.0);
+	//	world->CreateJoint(&jointDef);
+	//}
+	//
+	//{
+	//	b2BodyDef bd;
+	//	bd.position.Set(-5, 3.5);
+	//	bd.type = b2_dynamicBody;
+	//	
+	//	b2PolygonShape bodyShapeDef;
+	//	bodyShapeDef.SetAsBox(3.54, 0.6/2.0);
 
-		b2FixtureDef fd;
-		fd.shape = &bodyShapeDef;
-		fd.density = 50;
-		fd.friction = DEFAULT_FRICTION;
-		fd.restitution = .2;
+	//	b2FixtureDef fd;
+	//	fd.shape = &bodyShapeDef;
+	//	fd.density = 50;
+	//	fd.friction = DEFAULT_FRICTION;
+	//	fd.restitution = .2;
 
-		b2Body* b = world->CreateBody(&bd);
-		b->CreateFixture(&fd);
+	//	b2Body* b = world->CreateBody(&bd);
+	//	b->CreateFixture(&fd);
 
-		Ogre::Entity* e = sceneManager_->createEntity("Hey Steve2", "LeverArm.mesh");
+	//	Ogre::Entity* e = sceneManager_->createEntity("Hey Steve2", "LeverArm.mesh");
 
-		GameObjectOgreBox2D* goob = new GameObjectOgreBox2D("Meow meow meow2", b,e);
-		goob->GetSceneNode()->attachObject(e);
-		goob->GetSceneNode()->scale(0.2,0.1,0.1);
-		goob->Initialize();
+	//	GameObjectOgreBox2D* goob = new GameObjectOgreBox2D("Meow meow meow2", b,e);
+	//	goob->GetSceneNode()->attachObject(e);
+	//	goob->GetSceneNode()->scale(0.2,0.1,0.1);
+	//	goob->Initialize();
 
-		b2RevoluteJointDef jointDef;
-		jointDef.Initialize(b2, b, b->GetWorldCenter());
-		//jointDef.maxMotorTorque = 10.0f;
-		//jointDef.motorSpeed = 0.0f;
-		//jointDef.enableMotor = true;
+	//	b2RevoluteJointDef jointDef;
+	//	jointDef.Initialize(b2, b, b->GetWorldCenter());
+	//	//jointDef.maxMotorTorque = 10.0f;
+	//	//jointDef.motorSpeed = 0.0f;
+	//	//jointDef.enableMotor = true;
 
-		world->CreateJoint(&jointDef);
-	}
+	//	world->CreateJoint(&jointDef);
+	//}
 
 
 
@@ -312,10 +339,11 @@ void PhysicsState::createScene()
 	sceneManager_->getRootSceneNode()->setPosition(0,0,0);
 	GameFramework::getSingletonPtr()->viewport_->setBackgroundColour(Ogre::ColourValue(0,0,0));
 	//sceneManager_->setSkyBox(true, "Examples/SpaceSkyBox");
-	//sceneManager_->setSkyBox(true, "Examples/WhiteSkyBox");
-	float mCurvature = 1;
-	float mTiling = 15;
-	//sceneManager_->setSkyDome(true, "Examples/CloudySky", mCurvature, mTiling);
+	//sceneManager_->setSkyBox(true, "Examples/WhiteSkyBox", 10000);
+	float mCurvature = 45;
+	float mTiling = 5;
+	//sceneManager_->setSkyDome(true, "Examples/WhiteSkyBox", mCurvature, mTiling);
+	sceneManager_->setSkyDome(true, "Examples/CloudySky", 4, 4);
 	
 	Ogre::Light* light = sceneManager_->createLight("Light");
 	
@@ -340,8 +368,8 @@ void PhysicsState::createScene()
 	light3->setDirection(0,-1,0);
 	light3->setSpotlightRange(Degree(35), Degree(50));
 
-	sceneManager_->setAmbientLight(ColourValue(0.09, 0.09, 0.09));
-	//sceneManager_->setAmbientLight(ColourValue(0.7, 0.7, 0.7));
+	//sceneManager_->setAmbientLight(ColourValue(0.09, 0.09, 0.09));
+	sceneManager_->setAmbientLight(ColourValue(0.7, 0.7, 0.7));
 	sceneManager_->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
 
 	myGUI = new MyGUI::Gui();
@@ -413,7 +441,6 @@ void PhysicsState::createScene()
 	//===================================================================
 
 	createPhysics();
-	
 }
 
 
@@ -428,14 +455,41 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 		pause_ = true;
 	}
 
+if(keyEventRef.key == OIS::KC_0)
+	{
+		
+		testing_ -= 0.05;
 
+		if(testing_ < 0.00)
+		{
+			testing_ = .5;
+		}
+		if(testing_ <= 0.05)
+		{
+			myMeter_->HideOverlay();
+			testing_ = 0.0;
+		}
+		else
+		{
+			myMeter_->DrawTrauma(testing_);
+		}
+	}
 	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_ESCAPE))
 	{
 		m_bQuit = true;
 		return true;
 	}
+	
+	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_LBRACKET))
+	{
+		CompositorManager::getSingleton().setCompositorEnabled(GAMEFRAMEWORK->viewport_, "B&W",false);
+	}
 
-
+	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_RBRACKET))
+	{
+		CompositorManager::getSingleton().setCompositorEnabled(GAMEFRAMEWORK->viewport_, "B&W",true);
+	}
+	
 	GameFramework::getSingletonPtr()->KeyPressed(keyEventRef);
 
 
@@ -483,14 +537,14 @@ bool PhysicsState::mouseMoved(const OIS::MouseEvent &evt)
 
 	if(m_bRMouseDown)
 	{
-		angle+=0.1;
+	/*	angle+=0.1;
 		Ogre::Vector3 v = parker_->GetPosition();
 		v.x += 10 * cos(angle);
 		v.z += 10 * sin(angle);
-		camera_->setPosition(v);
+		camera_->setPosition(v);*/
 
-		//camera_->yaw(Degree(evt.state.X.rel * -0.1));
-		//camera_->pitch(Degree(evt.state.Y.rel * -0.1));
+		camera_->yaw(Degree(evt.state.X.rel * -0.1));
+		camera_->pitch(Degree(evt.state.Y.rel * -0.1));
 	}
 
 	return true;
@@ -553,13 +607,29 @@ bool PhysicsState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID 
 //
 void PhysicsState::moveCamera()
 {
-	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_LSHIFT)) 
-		camera_->moveRelative(m_TranslateVector);
 
-	camera_->moveRelative(m_TranslateVector / 10);
+	static b2Vec2 oldPosition;
+	static b2Vec2 diff;
+	
+	diff = oldPosition - parker_->GetBodyPosition();
+	
+	if(abs(diff.x) > 0.01 || abs(diff.y) > 0.01)
+	{
+		//camera_->setPosition(parker_->GetBodyPosition().x,parker_->GetBodyPosition().y + 3, camera_->getPosition().z);
+		//camera_->lookAt(parker_->GetBodyPosition().x,parker_->GetBodyPosition().y,0);
+		myMouse_->UpdateMouseFromCamera();
+		//camera_->roll(Ogre::Radian(45));
+	}
+	
+	oldPosition = parker_->GetBodyPosition();
+
+	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_LSHIFT)) ;
+		//camera_->moveRelative(m_TranslateVector);
+
+	//camera_->moveRelative(m_TranslateVector / 10);
 
 	
-	Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, myMouse_->GetId(), UPDATE_MOUSE, boost::any());
+
 }
 
 
@@ -611,7 +681,7 @@ void PhysicsState::getInput()
 
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_Y))
 		{
-			parker_->SetBodyPosition(b2Vec2(0, 10));
+			parker_->ReturnToCheckPoint(playerInfo_->GetCheckPoint());
 		}
 
 		/*
@@ -689,10 +759,8 @@ bool PhysicsState::update(double timeSinceLastFrame)
 
 		// Update all the game objects.
 		GameObject::UpdateObjectList(timeStep);
-
-		// Update the camera to look at Parker.
-		camera_->setPosition(parker_->GetBodyPosition().x,parker_->GetBodyPosition().y + 3, camera_->getPosition().z);
-		camera_->lookAt(parker_->GetBodyPosition().x,parker_->GetBodyPosition().y,0);
+		
+		moveCamera();
 		
 	}
 

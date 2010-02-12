@@ -14,6 +14,7 @@
 #include "GameObjectCreator.h"
 #include "ObjectOgreCreator.h"
 #include "GameObjectOgreBox2DCreator.h"
+#include "GameObjectSensorCreator.h"
 
 #include "PlatformCreator.h"
 #include "MovingPlatformCreator.h"
@@ -116,6 +117,7 @@ void GameObjectFactory::AddObjectCreators()
 	AddCreator("OgreBox2D",			new GameObjectOgreBox2DCreator(this));
 	AddCreator("Platform",			new PlatformCreator(this));
 	AddCreator("MovingPlatform",	new MovingPlatformCreator(this));
+	AddCreator("ObjectSensor",		new GameObjectSensorCreator(this));
 }
 
 

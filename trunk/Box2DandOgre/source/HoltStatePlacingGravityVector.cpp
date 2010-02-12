@@ -5,7 +5,12 @@
 		Author: Greg King
 
 =============================================================================*/
+#include "Parker.h"
+
+#include "ParkerStateOnGround.h"
+#include "ParkerStateInAir.h"
 #include "HoltStatePlacingGravityVector.h"
+#include "HoltStatePlacingPlatform.h"
 
 
 //=============================================================================

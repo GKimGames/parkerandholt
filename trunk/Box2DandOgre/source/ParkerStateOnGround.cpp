@@ -10,6 +10,10 @@
 
 #include "ParkerStateOnGround.h"
 
+#include "ParkerStateInAir.h"
+#include "HoltStatePlacingGravityVector.h"
+#include "HoltStatePlacingPlatform.h"
+
 #include "Parker.h"
 #include "Message.h"
 
@@ -42,13 +46,6 @@ void ParkerStateOnGround::Enter()
 	moveRightDown_ = false;
 
 	jumpTimer_ = driver_->timeBetweenJump_;
-
-	if(driver_->initialized_)
-	{
-		driver_->animationBlender_->Blend("jump", AnimationBlender::BlendSwitch, 0.0, false);
-		driver_->animationBlender_->GetSource()->setTimePosition(0.6);
-		driver_->animationBlender_->Blend("run", AnimationBlender::BlendWhileAnimating, 0.2, true);
-	}
 
 	if(driver_->stateMachine_->GetPreviousState() == driver_->inAirState_)
 	{
@@ -83,7 +80,8 @@ bool ParkerStateOnGround::Update()
 	
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 	
-	if(driver_->feetSensorHitCount_ == 0)
+	//if(driver_->feetSensorHitCount_ == 0)
+	if(driver_->feetSensorHit_ == false)
 	{
 		stateMachine_->ChangeState(driver_->inAirState_);
 	}
@@ -210,7 +208,8 @@ void ParkerStateOnGround::BeginContact(ContactPoint* contact, b2Fixture* contact
 	{
 		if(contactFixture == driver_->feetSensor_)
 		{
-			feetContactCount_++;
+			if(collidedFixture != driver_->feetCircle_)
+				feetContactCount_++;
 
 			if(collidedFixture->GetBody()->GetUserData())
 			{
@@ -309,15 +308,16 @@ void ParkerStateOnGround::Jump()
 
 	if(jumpTimer_ > 0)
 	{
-	
+		b2Vec2 force(b2Vec2(0, (driver_->jumpingAfterForce_)));
+		driver_->body_->ApplyForce(force, driver_->body_->GetPosition());
 	}
 	else
 	{
 
-		driver_->body_->ApplyImpulse(b2Vec2(0,driver_->jumpingForce_), driver_->body_->GetPosition());
+		driver_->body_->ApplyImpulse(b2Vec2(0,driver_->jumpingForce_/5), driver_->body_->GetPosition());
 
 		driver_->animationBlender_->Blend("jump", AnimationBlender::BlendWhileAnimating, 0.2, false, 0.6);
-		driver_->animationBlender_->GetTarget()->setTimePosition(0.3);
+		//driver_->animationBlender_->GetTarget()->setTimePosition(0.3);
 
 		isJumping_ = true;
 
@@ -335,42 +335,45 @@ void ParkerStateOnGround::UpdateAnimation()
 {
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
-	b2Vec2 lv = driver_->body_->GetLinearVelocity();
+	if(isJumping_ == false)
+	{
+		b2Vec2 lv = driver_->body_->GetLinearVelocity();
 	
-	if(driver_->elevator_ != 0)
-	{
-		lv -= driver_->elevator_->GetLinearVelocity();
-	}
-
-	if(abs(lv.x)  < .1 && isJumping_ == false)
-	{
-		if(blendingIdle_ == false)
+		if(driver_->elevator_ != 0)
 		{
-			blendingIdle_ = true;
-			blendingRun_ = false;
-			driver_->animationBlender_->Blend("idle", AnimationBlender::BlendWhileAnimating, 0.3, true);
+			lv -= driver_->elevator_->GetLinearVelocity();
 		}
 
-		driver_->animationBlender_->AddTime(timeSinceLastFrame);
-	}
-	else if(isJumping_ == false)
-	{
-		double ratio = driver_->maximumRunningVelocity_ / lv.x;
-		
-		if(blendingRun_ == false)
+		if(abs(lv.x)  < .1)
 		{
-			blendingRun_ = true;
-			blendingIdle_ = false;
-			driver_->animationBlender_->Blend("run", AnimationBlender::BlendWhileAnimating, 0.3, true);
-		}
+			if(blendingIdle_ == false)
+			{
+				blendingIdle_ = true;
+				blendingRun_ = false;
+				driver_->animationBlender_->Blend("idle", AnimationBlender::BlendWhileAnimating, 0.2, true);
+			}
 
-		if(driver_->animationBlender_->timeleft_ == 0)
-		{
-			driver_->animationBlender_->AddTime(timeSinceLastFrame / abs(ratio));
+			driver_->animationBlender_->AddTime(timeSinceLastFrame);
 		}
 		else
 		{
-			driver_->animationBlender_->AddTime(timeSinceLastFrame);
+			double ratio = driver_->maximumRunningVelocity_ / lv.x;
+
+			if(blendingRun_ == false)
+			{
+				blendingRun_ = true;
+				blendingIdle_ = false;
+				driver_->animationBlender_->Blend("run", AnimationBlender::BlendWhileAnimating, 0.2, true);
+			}
+
+			if(driver_->animationBlender_->timeleft_ == 0)
+			{
+				driver_->animationBlender_->AddTime(timeSinceLastFrame / abs(ratio));
+			}
+			else
+			{
+				driver_->animationBlender_->AddTime(timeSinceLastFrame);
+			}
 		}
 	}
 }

@@ -13,6 +13,9 @@
 #include "Parker.h"
 #include "Message.h"
 
+#include "ParkerStateOnGround.h"
+#include "ParkerStateInAir.h"
+
 
 //=============================================================================
 //								Constructor

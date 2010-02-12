@@ -9,6 +9,7 @@
 #include "Box2DXMLLoader.h"
 #include "GameObjectOgreBox2D.h"
 #include "HelperFunctions.h"
+#include "TinyXMLHelper.h"
 
 std::vector<b2Shape*> Box2DXMLLoader::shapeVector;
 
@@ -307,8 +308,89 @@ bool Box2DXMLLoader::Createb2RevoluteJoint(TiXmlElement* element)
 	return true;
 }
 
+//=============================================================================
+//							Createb2DistanceJoint
+//
+bool Box2DXMLLoader::Createb2DistanceJoint(TiXmlElement* element)
+{
+	if(element != 0)
+	{
+		TiXmlElement* jointDefNode = element->FirstChildElement("JointDef");
+
+		if(jointDefNode != 0)
+		{
+			Ogre::String strA;
+			Ogre::String strB;
 
 
+			if(jointDefNode->QueryValueAttribute("bodyA", &strA) != TIXML_SUCCESS)
+			{
+				DEBUG_LOG("Createb2DistanceJoint Error: bodyA not found");
+				return false;
+			}
+
+			if(jointDefNode->QueryValueAttribute("bodyB", &strB) != TIXML_SUCCESS)
+			{
+				DEBUG_LOG("Createb2DistanceJoint Error: bodyB not found");
+				return false;
+			}
+
+			b2DistanceJointDef jointDef;
+
+			// Find the bodys for the joint
+			BodyMap::iterator iter;
+			iter = bodyMap_.find(strA);
+
+			if(iter == bodyMap_.end())
+			{
+				DEBUG_LOG("Createb2DistanceJoint Error: bodyA not found in map");
+				return false;
+			}
+
+			b2Body* bodyA = iter->second;
+
+			iter = bodyMap_.find(strB);
+			if(iter == bodyMap_.end())
+			{
+				DEBUG_LOG("Createb2DistanceJoint Error: bodyB not found in map");
+				return false;
+			}
+
+			b2Body* bodyB = iter->second;
+			
+			// Now load all the jointDef's properties
+
+			jointDefNode->QueryBoolAttribute("collideConnected", &jointDef.collideConnected);
+			GetB2Vec2(jointDefNode, "localAnchorA", &jointDef.localAnchorA);
+			GetB2Vec2(jointDefNode, "localAnchorB", &jointDef.localAnchorA);
+			
+			jointDef.dampingRatio = TinyXMLHelper::GetAttributeFloat(jointDefNode, "dampingRatio", jointDef.dampingRatio);
+			jointDef.frequencyHz = TinyXMLHelper::GetAttributeFloat(jointDefNode, "frequencyHz", jointDef.frequencyHz);;
+			jointDef.length = TinyXMLHelper::GetAttributeFloat(jointDefNode, "length", jointDef.length);
+
+			jointDef.Initialize(bodyA,bodyB, jointDef.localAnchorA, jointDef.localAnchorB);
+			b2Joint* j = world_->CreateJoint(&jointDef);
+
+			// If the joint has an id we will add it to the map of joints
+			if(element->Attribute("id") != NULL)
+			{
+				Ogre::String id = Ogre::String(element->Attribute("id"));
+				jointMap_.insert(std::make_pair(id, j));
+			}
+		}
+		else
+		{
+			DEBUG_LOG("Createb2DistanceJoint Error: Element contained no JointDef");
+		}
+	}
+	else
+	{
+		DEBUG_LOG("Createb2DistanceJoint Error: Element is zero");
+		return false;
+	}
+
+	return true;
+}
 //=============================================================================
 //								Createb2PrismaticJoint
 //
@@ -790,6 +872,9 @@ bool Box2DXMLLoader::Getb2FixtureDefAttributes(b2FixtureDef* fixtureDef, TiXmlEl
 
 				polyDef->SetAsEdge(point1,point2);
 
+				//fixtureDef->filter.maskBits = 0x0001;
+				//fixtureDef->filter.categoryBits = 0x0100;
+				fixtureDef->filter.groupIndex = STATIC_MAP_GROUP;
 				fixtureDef->shape = polyDef;
 			}
 			else if(str.compare("circle") == 0)
@@ -917,4 +1002,3 @@ void Box2DXMLLoader::GetB2Vec2(TiXmlElement* element, const char* name, b2Vec2* 
 		DEBUG_LOG("GetB2Vec2 Error: Element is zero");
 	}
 }
-

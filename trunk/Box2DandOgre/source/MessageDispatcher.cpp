@@ -55,7 +55,7 @@ void KGBMessageDispatcher::Discharge(const KGBMessage& pMsg)
 }
 
 //=============================================================================
-//						Discharge
+//						DischargeWithLog
 ///
 ///	Discharges a message to the Entitys.
 void KGBMessageDispatcher::DischargeWithLog(const KGBMessage& pMsg)
@@ -185,7 +185,7 @@ void KGBMessageDispatcher::DispatchMessage(double			pDelay,
 //						DispatchDelayedMessages
 //
 /// This function dispatches any KGBMessages with a timestamp that has
-/// expired. Any dispatched KGBMessages are removed from the queue
+/// expired. Any dispatched KGBMessages are removed from the queue.
 void KGBMessageDispatcher::DispatchDelayedMessages()
 {
   
@@ -194,7 +194,7 @@ void KGBMessageDispatcher::DispatchDelayedMessages()
 
 	// Now peek at the queue to see if any KGBMessages need dispatching.
 	// Remove all KGBMessages from the front of the queue that have gone
-	// past their sell by date
+	// past their send time
 	while( !messageQueue_.empty() &&
 		(  messageQueue_.begin()->dispatchTime < CurrentTime) && 
 		(  messageQueue_.begin()->dispatchTime > 0) )

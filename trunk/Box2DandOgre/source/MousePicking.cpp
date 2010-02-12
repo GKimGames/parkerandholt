@@ -13,6 +13,9 @@
 #include <OISMouse.h>
 #include <boost/any.hpp>
 
+#include "Message.h"
+#include "MessageDispatcher.h"
+
 MousePicking::MousePicking(Ogre::SceneManager* sceneManager, Ogre::Camera* camera)
 {
 	boxSize_ = 1;
@@ -79,61 +82,63 @@ void MousePicking::MouseMoved(const OIS::MouseEvent &arg)
 	entity_->getParentSceneNode()->setScale( boxSize_, boxSize_, boxSize_);
 }
 
-void MousePicking::UpdateMouse(const KGBMessage message)
+
+void MousePicking::UpdateMouseFromCamera()
 {
-	if(message.messageData.empty())
+
+	Ogre::Ray mouseRay = m_pCamera_->getCameraToViewportRay(  rayPositionX_, rayPositionY_ );
+	m_pRSQ_ = sceneManager_->createRayQuery(Ogre::Ray());
+	m_pRSQ_->setRay(mouseRay);
+	std::pair<bool, Ogre::Real> hit = mouseRay.intersects(*pickingPlane_);
+	if(hit.first)
 	{
-		Ogre::Ray mouseRay = m_pCamera_->getCameraToViewportRay(  rayPositionX_, rayPositionY_ );
-		m_pRSQ_ = sceneManager_->createRayQuery(Ogre::Ray());
-		m_pRSQ_->setRay(mouseRay);
-		std::pair<bool, Ogre::Real> hit = mouseRay.intersects(*pickingPlane_);
-		if(hit.first)
-		{
-			position_ = Ogre::Vector3(mouseRay.getPoint(hit.second).x, mouseRay.getPoint(hit.second).y, 0);
-			entity_->getParentSceneNode()->setPosition(position_);
-		}
-	}
-	else
-	{
-		const OIS::MouseEvent* tempMouse_ = boost::any_cast<const OIS::MouseEvent*>(message.messageData);
-		
-		//OIS::MouseEvent* tempMouse_ = any_cast<OIS::MouseEvent>(message.messageData);
-
-		rayPositionX_ = tempMouse_->state.X.abs/float (tempMouse_->state.width);
-		rayPositionY_ = tempMouse_->state.Y.abs/float (tempMouse_->state.height);
-		//UpdateMouse();
-
-		Ogre::Ray mouseRay = m_pCamera_->getCameraToViewportRay(rayPositionX_, rayPositionY_);
-		m_pRSQ_ = sceneManager_->createRayQuery(Ogre::Ray());
-		m_pRSQ_->setRay(mouseRay);
-		std::pair<bool, Ogre::Real> hit = mouseRay.intersects(*pickingPlane_);
-		if(hit.first)
-		{
-			position_ = Ogre::Vector3(mouseRay.getPoint(hit.second).x, mouseRay.getPoint(hit.second).y, 0);
-			entity_->getParentSceneNode()->setPosition(position_);
-		}
-
-		if(tempMouse_->state.Z.rel > 0)
-		{
-			if(boxSize_ > boxMinSize_)
-			{
-				boxSize_ -= boxSizeIncrement_;
-			}
-		}
-
-		if(tempMouse_->state.Z.rel < 0)
-		{
-			if(boxSize_ < boxMaxSize_)
-			{
-				boxSize_ += boxSizeIncrement_;
-			}
-		}
-		entity_->getParentSceneNode()->setScale( boxSize_, boxSize_, boxSize_);
+		position_ = Ogre::Vector3(mouseRay.getPoint(hit.second).x, mouseRay.getPoint(hit.second).y, 0);
+		entity_->getParentSceneNode()->setPosition(position_);
 	}
 }
 
+void MousePicking::UpdateMouse(const KGBMessage message)
+{
+	const OIS::MouseEvent* tempMouse_ = boost::any_cast<const OIS::MouseEvent*>(message.messageData);
 
-Ogre::Vector3 MousePicking::GetPosition()
+	//OIS::MouseEvent* tempMouse_ = any_cast<OIS::MouseEvent>(message.messageData);
+
+	rayPositionX_ = tempMouse_->state.X.abs/float (tempMouse_->state.width);
+	rayPositionY_ = tempMouse_->state.Y.abs/float (tempMouse_->state.height);
+	//UpdateMouse();
+
+	Ogre::Ray mouseRay = m_pCamera_->getCameraToViewportRay(rayPositionX_, rayPositionY_);
+	m_pRSQ_ = sceneManager_->createRayQuery(Ogre::Ray());
+	m_pRSQ_->setRay(mouseRay);
+	std::pair<bool, Ogre::Real> hit = mouseRay.intersects(*pickingPlane_);
+	if(hit.first)
+	{
+		position_ = Ogre::Vector3(mouseRay.getPoint(hit.second).x, mouseRay.getPoint(hit.second).y, 0);
+		entity_->getParentSceneNode()->setPosition(position_);
+	}
+
+	if(tempMouse_->state.Z.rel > 0)
+	{
+		if(boxSize_ > boxMinSize_)
+		{
+			boxSize_ -= boxSizeIncrement_;
+		}
+	}
+
+	if(tempMouse_->state.Z.rel < 0)
+	{
+		if(boxSize_ < boxMaxSize_)
+		{
+			boxSize_ += boxSizeIncrement_;
+		}
+	}
+
+	entity_->getParentSceneNode()->setScale( boxSize_, boxSize_, boxSize_);
+
+}
+
+
+const Ogre::Vector3 MousePicking::GetPosition()
 {
 	return position_;
 }
