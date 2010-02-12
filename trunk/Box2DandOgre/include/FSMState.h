@@ -12,9 +12,10 @@
 
 #include <Box2D\Box2D.h>
 
+
+template <class T> class FSMStateMachine;
 struct KGBMessage;
 struct ContactPoint;
-template <class T> class FSMStateMachine;
 
 /// This represents a state in a state machine. It has Enter, Update, Exit
 /// functions so that the state can be entered, left, and updated by the
@@ -29,6 +30,8 @@ class FSMState
 {
 
 public:
+
+
 	FSMState(T* driver, FSMStateMachine<T>* stateMachine):
 	  driver_(driver), stateMachine_(stateMachine){}
 

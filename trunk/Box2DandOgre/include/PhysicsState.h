@@ -38,14 +38,19 @@
 #include "GameFramework.h"
 #include "MessageDispatcher.h"
 #include "PressureSwitch.h"
-#include "Parker.h"
+
 
 #include "MyGUI.h"
 
 #include "MousePicking.h"
+#include "GameCamera.h"
+#include "CheckPoint.h"
+#include "TraumaMeter.h"
+#include "PlayerInfo.h"
+#include "PickUp.h"
 
 #define DEBUG_DRAW_ON 1
-
+class CharacterParker;
 
 class PhysicsState : public AppState, public b2ContactListener, public b2DestructionListener
 {
@@ -114,11 +119,11 @@ protected:
 	CharacterParker* parker_;
 
 	b2World* world;
-	Ogre::Vector3 camPosition;
-	Ogre::Vector3 camLook;
 	double timeStep; 
 
 	Character* myCharacter_;
+	TraumaMeter* myMeter_;
+	float testing_;
 
 
 #ifdef DEBUG_DRAW_ON
@@ -144,14 +149,19 @@ private:
 
 	MousePicking*				myMouse_;
 	KeyHandler*					myKeyHandler_;
-
-	double						gravity_;
+	PlayerInfo*					playerInfo_;
+	
+	b2Vec2						gravity_;
+	
+	int							curvature_;
 
 	ContactList beginContactList_;
 	ContactList endContactList_;
 
 	//ContactPoint m_points[k_maxContactPoints];
 	int32 m_pointCount;
+
+	GameCamera* gameCamera_;
 
 };
 

@@ -10,18 +10,16 @@
 
 #include "AppState.hpp"
 #include <Ogre.h>
-#include <tinyxml.h>
 
 #include <Box2D\Box2D.h>
 
-#include "AnimationBlender.h"
 #include "GameObjectOgreBox2D.h"
 #include "HoltBox.h"
-#include "Message.h"
-#include "MessageDispatcher.h"
 
 
 
+
+struct KGBMessage;
 
 class MousePicking : public GameObjectOgreBox2D
 {
@@ -33,13 +31,13 @@ public:
 	void MousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id); 
 	void MouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
 	void UpdateMouse(const KGBMessage message);
+	void UpdateMouseFromCamera();
 	bool HandleMessage(const KGBMessage message);
 	bool SpawnBox();
 	void SetVisibility(bool visible);
-
-
-	Ogre::Vector3 GetPosition();
-	double						boxSize_;
+	const Ogre::Vector3 GetPosition();
+	
+	double		boxSize_;
 
 protected:
 	Ogre::SceneManager*			sceneManager_;

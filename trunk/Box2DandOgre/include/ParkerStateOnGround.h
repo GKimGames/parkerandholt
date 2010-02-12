@@ -18,6 +18,8 @@ class ParkerStateOnGround : public FSMState<CharacterParker>
 
 public:
 
+	friend class ParkerStateInAir;
+
 	ParkerStateOnGround(CharacterParker* parker, FSMStateMachine<CharacterParker>* stateMachine);
 
 	~ParkerStateOnGround(){}

@@ -22,6 +22,7 @@ public:
 
 	virtual GameObject* LoadFromXML(TiXmlElement* element)
 	{
+
 		Platform* platform = new Platform();
 		CreatorResult result = LoadFromXML(element, platform);
 

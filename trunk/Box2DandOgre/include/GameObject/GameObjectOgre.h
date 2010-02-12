@@ -26,6 +26,8 @@ public:
 	virtual ~GameObjectOgre();
 
 	virtual bool Initialize();
+
+	/// Initialize this objecti with a mesh.
 	virtual bool Initialize(Ogre::String meshName);
 
 	/// Update calls UpdataGraphics
@@ -33,12 +35,16 @@ public:
 
 	virtual bool UpdateGraphics(double timeSinceLastFrame);
 
-/*=============================================================================
-			Getter / Setter methods
-=============================================================================*/
+	virtual bool HandleMessage(const KGBMessage message){return false;}
+
+//===========================================================================//
+//																			 //
+//						Start Getters and Setters							 //
+//																			 //
+//===========================================================================//
 
 	/// Returns the position of the scene node 
-	virtual Ogre::Vector3 GetPosition()
+	virtual const Ogre::Vector3 GetPosition()
 	{
 		return sceneNode_->getPosition();
 	}

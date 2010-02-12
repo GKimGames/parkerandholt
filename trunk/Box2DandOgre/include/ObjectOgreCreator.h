@@ -92,6 +92,7 @@ public:
 		// Get the mesh for the Game Ogre Object
 		Ogre::String type = TinyXMLHelper::GetAttribute(element, "type");
 		Ogre::String meshName = TinyXMLHelper::GetAttribute(element, "mesh");
+		// If there is a mesh name we load that, if not we check type of Object Ogre this is
 		if(!meshName.empty())
 		{
 			Ogre::String entityName = gameObjectOgre->objectName_ + "/entity/";
@@ -153,6 +154,12 @@ public:
 		Box2DXMLLoader::GetB2Vec2(element, "point1", &point1);
 		Box2DXMLLoader::GetB2Vec2(element, "point2", &point2);
 
+		Ogre::Real zLength = TinyXMLHelper::GetAttributeReal(element, "zLength", 15);
+		Ogre::Real xTile = TinyXMLHelper::GetAttributeReal(element, "xTile", 1);
+		Ogre::Real yTile = TinyXMLHelper::GetAttributeReal(element, "yTile", 1);
+		Ogre::Real xSegments = TinyXMLHelper::GetAttributeReal(element, "xSegments", 1);
+		Ogre::Real ySegments = TinyXMLHelper::GetAttributeReal(element, "ySegments", 1);
+
 		if(point1.x > point2.x)
 		{
 			b2Vec2 holder = point2;
@@ -179,12 +186,12 @@ public:
 			Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
 			*plane,
 			lengthOfPlane,  // X Length
-			15,				// Z Length
-			3 * lengthOfPlane / 15, 5,			// Segments x ,y
+			zLength,				// Z Length
+			xSegments, ySegments,			// Segments x ,y
 			true,
 			1, 
-			3 * lengthOfPlane / 15,		// Tile x
-			1,							// Tile y
+			xTile,		// Tile x
+			yTile,							// Tile y
 			Ogre::Vector3::UNIT_Z);
 
 		Ogre::Entity* planeEnt = GAMEFRAMEWORK->sceneManager->createEntity(planeEntityName , planeMeshName);

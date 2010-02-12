@@ -106,6 +106,7 @@ protected:
 	bool Createb2PrismaticJoint(TiXmlElement* element);
 	bool Createb2WeldJoint(TiXmlElement* element);
 	bool Createb2PulleyJoint(TiXmlElement* element);
+	bool Createb2DistanceJoint(TiXmlElement* element);
 
 	b2World*		world_;
 	TiXmlElement*	element_;
