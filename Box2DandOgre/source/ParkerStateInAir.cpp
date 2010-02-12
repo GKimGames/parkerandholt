@@ -1,3 +1,4 @@
+
 /*=============================================================================
 
 	ParkerStateInAir.cpp
@@ -8,6 +9,7 @@
 
 =============================================================================*/
 #include "ParkerStateInAir.h"
+#include "ParkerStateOnGround.h"
 
 #include "Parker.h"
 #include "Message.h"
@@ -30,7 +32,17 @@ ParkerStateInAir::ParkerStateInAir(
 void ParkerStateInAir::Enter()
 {
 	driver_->feetSensorHitCount_ = 0;
-	driver_->elevator_ = NULL; 
+	jumpTimer_ = 0.0;
+	if(driver_->onGroundState_->isJumping_)
+	{
+		driver_->animationBlender_->Blend("jump_idle", AnimationBlender::BlendThenAnimate, 1.0, true);
+	}
+	else
+	{
+		driver_->animationBlender_->Blend("jump_idle", AnimationBlender::BlendWhileAnimating, 0.3, true);
+	}
+	wallJumpedLeft_ = false;
+	justWallJumped_ = false;
 }
 
 
@@ -40,6 +52,10 @@ void ParkerStateInAir::Enter()
 //
 bool ParkerStateInAir::Update()
 {
+	static Ogre::Vector3 direction;
+	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
+	
+	
 	if(driver_->moveLeft_)
 	{
 		MoveLeft();
@@ -48,15 +64,19 @@ bool ParkerStateInAir::Update()
 	{
 		MoveRight();
 	}
+
 	if(driver_->jump_)
 	{
 		Jump();
 	}
-	static Ogre::Vector3 direction;
-	
-	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
-	if(driver_->feetSensorHitCount_ > 0)
+	if(jumpTimer_ != -1.0)
+	{
+		jumpTimer_ += timeSinceLastFrame;
+	}
+
+	//if(driver_->feetSensorHitCount_ > 0)
+	if(driver_->feetSensorHit_ == true)
 	{
 		stateMachine_->ChangeState(driver_->onGroundState_);
 	}
@@ -67,16 +87,43 @@ bool ParkerStateInAir::Update()
 		driver_->sceneNode_->setPosition(v.x, v.y,0);
 
 		// Make the sceneNode face the direction the body is moving
-		if(driver_->body_->GetLinearVelocity().x > 0.1)
+		if(driver_->body_->GetLinearVelocity().x > 0.3)
 		{
 			direction = Ogre::Vector3(0,0,1);
 		}
-		else if(driver_->body_->GetLinearVelocity().x < -0.1)
+		else if(driver_->body_->GetLinearVelocity().x < -0.3)
 		{
 			direction = Ogre::Vector3(0,0,-1);
 		}
 
 		driver_->sceneNode_->setDirection(direction,Ogre::Node::TS_WORLD);
+
+		if(justWallJumped_)
+		{
+			wallJumpTimer_ += GAMEFRAMEWORK->GetTimeSinceLastFrame();
+			if(wallJumpedLeft_)
+			{
+				driver_->sceneNode_->setDirection(Ogre::Vector3(0,0,-1),Ogre::Node::TS_WORLD);
+			}
+			else
+			{	
+				driver_->sceneNode_->setDirection(Ogre::Vector3(0,0,1),Ogre::Node::TS_WORLD);
+			}
+			if(wallJumpTimer_ > 0.2)
+			{
+				justWallJumped_ = false;
+
+				driver_->body_->SetLinearVelocity(b2Vec2(0,driver_->body_->GetLinearVelocity().y)); 
+				if(wallJumpedLeft_)
+				{
+					driver_->body_->ApplyImpulse(b2Vec2(driver_->jumpingForce_/3,driver_->jumpingForce_/2), driver_->body_->GetPosition());
+				}
+				else
+				{
+					driver_->body_->ApplyImpulse(b2Vec2(-driver_->jumpingForce_/3,driver_->jumpingForce_/2), driver_->body_->GetPosition());
+				}
+			}
+		}
 
 		UpdateAnimation();
 
@@ -212,87 +259,49 @@ void ParkerStateInAir::MoveRight()
 /// height to the jump.
 void ParkerStateInAir::Jump()
 {
-
+	if(jumpTimer_ > 0.5)
+	{
+		jumpTimer_ = -1.0;
+	}
+	else if(jumpTimer_ != -1.0)
+	{
+		b2Vec2 force(b2Vec2(0, (driver_->jumpingAfterForce_ * ((0.5*2) - jumpTimer_)) * GAMEFRAMEWORK->GetTimeSinceLastFrame()));
+		driver_->body_->ApplyImpulse(force, driver_->body_->GetPosition());
+	}
 	double timeLeft = (driver_->animationState_->getLength() - driver_->animationState_->getTimePosition()) / driver_->animationState_->getLength();
-	driver_->body_->ApplyForce(b2Vec2(0,driver_->jumpingAfterForce_ * timeLeft), driver_->body_->GetPosition());
+	//driver_->body_->ApplyForce(b2Vec2(0,driver_->jumpingAfterForce_ * timeLeft), driver_->body_->GetPosition());
 
 	
-	b2ContactEdge* contacts = driver_->body_->GetContactList();
-	bool shinHitRight = false, torsoHitRight = false;
-	bool shinHitLeft = false, torsoHitLeft = false;
-
-	while(contacts != 0 && !shinHitRight && !torsoHitRight && !shinHitLeft && !torsoHitLeft)
-	{
-		if(contacts->contact->GetFixtureA() == driver_->shinSensorRight_)
-		{
-			shinHitRight = true;
-		}
-		else if (contacts->contact->GetFixtureA() == driver_->torsoSensorRight_)
-		{
-			torsoHitRight = true;
-		}
-
-		if(contacts->contact->GetFixtureB() == driver_->shinSensorRight_)
-		{
-			shinHitRight = true;
-		}
-		else if (contacts->contact->GetFixtureB() == driver_->torsoSensorRight_)
-		{
-			torsoHitRight = true;
-		}
-
-
-		if(contacts->contact->GetFixtureA() == driver_->shinSensorLeft_)
-		{
-			shinHitLeft = true;
-		}
-		else if (contacts->contact->GetFixtureA() == driver_->torsoSensorLeft_)
-		{
-			torsoHitLeft = true;
-		}
-
-		if(contacts->contact->GetFixtureB() == driver_->shinSensorLeft_)
-		{
-			shinHitLeft = true;
-		}
-		else if (contacts->contact->GetFixtureB() == driver_->torsoSensorLeft_)
-		{
-			torsoHitLeft = true;
-		}
-
-		contacts = contacts->next;
-
-	}
 	
-
-	/*
 	// Code to wall jump
+	if(justWallJumped_ == false)
+	{
+		if(driver_->shinRightHit_ && driver_->torsoRightHit_)
+		{
+			
+			driver_->animationBlender_->Blend("clip7", AnimationBlender::BlendSwitch, 0.1, false);
+			driver_->animationBlender_->Blend("jump_idle", AnimationBlender::BlendWhileAnimating, 0.7, false);
+
+
+			wallJumpTimer_ = 0.0;
+			justWallJumped_ = true;
+			wallJumpedLeft_ = false;
+		}
+		else if(driver_->shinLeftHit_ && driver_->torsoLeftHit_)
+		{
+			driver_->animationBlender_->Blend("clip7", AnimationBlender::BlendSwitch, 0.1, false);
+			driver_->animationBlender_->Blend("jump_idle", AnimationBlender::BlendWhileAnimating, 0.7, false);
+			
+
+			wallJumpTimer_ = 0.0;
+			justWallJumped_ = true;
+			wallJumpedLeft_ = true;
+		}
+	}
+
+
+
 	
-	if(shinHitRight && torsoHitRight)
-	{
-		driver_->body_->SetLinearVelocity(b2Vec2(0,driver_->body_->GetLinearVelocity().y)); 
-		driver_->body_->ApplyImpulse(b2Vec2(-driver_->jumpingForce_/2,driver_->jumpingForce_), driver_->body_->GetPosition());
-		//justWallJumped_ = true;
-
-		driver_->animationState_->setEnabled(false);
-		driver_->animationState_ = driver_->entity_->getAnimationState("JumpNoHeight");
-		driver_->animationState_->setTimePosition(Ogre::Real(0));
-		driver_->animationState_->setLoop(false);
-		driver_->animationState_->setEnabled(true);
-	}
-	else if(shinHitLeft && torsoHitLeft)
-	{
-		driver_->body_->SetLinearVelocity(b2Vec2(0,driver_->body_->GetLinearVelocity().y)); 
-		driver_->body_->ApplyImpulse(b2Vec2(driver_->jumpingForce_/2,driver_->jumpingForce_), driver_->body_->GetPosition());
-		//justWallJumped_ = true;
-
-		driver_->animationState_->setEnabled(false);
-		driver_->animationState_ = driver_->entity_->getAnimationState("JumpNoHeight");
-		driver_->animationState_->setTimePosition(Ogre::Real(0));
-		driver_->animationState_->setLoop(false);
-		driver_->animationState_->setEnabled(true);
-	}
-	*/
 	
 
 }
@@ -304,7 +313,7 @@ void ParkerStateInAir::UpdateAnimation()
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
 	driver_->animationBlender_->AddTime(timeSinceLastFrame);
-	//driver_->animationState_->addTime(timeSinceLastFrame);
+	
 }
 
 
