@@ -8,7 +8,6 @@
 		All objects have the method HandleMessage
 
 =============================================================================*/
-
 #ifndef KGBMESSAGE_H
 #define KGBMESSAGE_H
 
@@ -43,33 +42,40 @@ enum KGBMessageType
 	LEFT_MOUSE_MINUS,
 	MIDDLE_MOUSE_PLUS,
 	MIDDLE_MOUSE_MINUS,
+	UPDATE_CHECKPOINT,
+	RETURN_TO_CHECKPOINT,
+	ADD_ITEM,
 	MESSAGE_TYPE_COUNT
 };  
 
 /// An array allowing easy conversion of KGBMessageType to a c string.
 const static char* KGBMessageTypeString[MESSAGE_TYPE_COUNT] = 
 {
-	"MESSAGE ZERO",
-	"Message Null",
-	"No Message",
-	"Character Move Left Plus",
-	"Character Move Left Minus",
-	"Character Move Right Plus",
-	"Character Move Right Minus",
-	"Character Jump Plus",
-	"Character Jump Minus",
-	"Character Enter Platformstate",
-	"Character Enter Gravitystate",
-	"Character Exit Placingstate",
-	"Game Sensor On",
-	"Game Sensor Off",
-	"Stupid Message",
-	"Create Box",
-	"Update Mouse",
-	"Left Mouse Plus",
-	"Left Mouse Minus",
-	"Middle Mouse Plus",
-	"Middle Mouse Minus"
+	"message zero",
+	"message null",
+	"no message",
+	"character move left plus",
+	"character move left minus",
+	"character move right plus",
+	"character move right minus",
+	"character jump plus",
+	"character jump minus",
+	"character enter platformstate",
+	"character enter gravitystate",
+	"character exit placingstate",
+	"game sensor on",
+	"game sensor off",
+	"stupid message",
+	"create box",
+	"update mouse",
+	"left mouse plus",
+	"left mouse minus",
+	"middle mouse plus",
+	"middle mouse minus"
+	"update checkpoint",
+	"return to checkpoint",
+	"add item",
+	"MESSAGE_TYPE_COUNT"
 };
 
 struct KGBMessage
@@ -115,12 +121,7 @@ struct KGBMessage
 };
 
 
-// These Messages will be stored in a priority queue. Therefore the <
-// operator needs to be overloaded so that the queue can sort the Messages
-// by time priority. Note how the times must be smaller than
-// SmallestDelay apart before two Messages are considered unique.
 const double SmallestDelay = 0.25;
-
 
 inline bool operator == (const KGBMessage& t1, const KGBMessage& t2)
 {
@@ -155,7 +156,7 @@ static Ogre::String MessageToString(KGBMessageType message)
 		return KGBMessageTypeString[message];
 	}
 
-	return Ogre::String("Message Not Found");
+	return KGBMessageTypeString[MESSAGE_NULL];
 }
 
 
@@ -163,102 +164,22 @@ static Ogre::String MessageToString(KGBMessageType message)
 //=============================================================================
 //						StringToMessage
 //
-/// This returns an Ogre::Stringas a KGBMessageType
-static KGBMessageType StringToMessage(const Ogre::String str)
+/// This returns an Ogre::String as a KGBMessageType
+static KGBMessageType StringToMessage(Ogre::String str)
 {
-	if(str.compare("CHARACTER_MOVE_LEFT_PLUS") == 0)
+	Ogre::StringUtil::toLowerCase(str);
+	
+	for(int i = 0; i < MESSAGE_TYPE_COUNT; i++)
 	{
-		return CHARACTER_MOVE_LEFT_PLUS;
-	}
-	else if(str.compare("CHARACTER_MOVE_RIGHT_PLUS") == 0)
-	{
-		return CHARACTER_MOVE_RIGHT_PLUS;
-	}
-	else if(str.compare("CHARACTER_JUMP_PLUS") == 0)
-	{
-		return CHARACTER_JUMP_PLUS;
-	}
-	else if(str.compare("CHARACTER_MOVE_LEFT_MINUS") == 0)
-	{
-		return CHARACTER_MOVE_LEFT_MINUS;
-	}
-	else if(str.compare("CHARACTER_MOVE_RIGHT_MINUS") == 0)
-	{
-		return CHARACTER_MOVE_RIGHT_MINUS;
-	}
-	else if(str.compare("CHARACTER_JUMP_MINUS") == 0)
-	{
-		return CHARACTER_JUMP_MINUS;
-	}
-	else if(str.compare("CREATE_BOX") == 0)
-	{
-		return CREATE_BOX;
-	}
-	else if(str.compare("UPDATE_MOUSE") == 0)
-	{
-		return UPDATE_MOUSE;
+		if(str.compare(KGBMessageTypeString[i]) == 0)
+		{
+			return (KGBMessageType) i;
+		}
 	}
 
 	return NO_MESSAGE;
 
 }
-
-
-/*
-//=============================================================================
-//						MessageToString
-//
-/// This returns a KGBMessageType as an Ogre::String
-static Ogre::String MessageToString(KGBMessageType message)
-{
-
-	switch(message)
-	{
-	case CHARACTER_MOVE_LEFT_PLUS:
-		{
-			return Ogre::String("CHARACTER_MOVE_LEFT_PLUS");
-		}
-	case CHARACTER_MOVE_RIGHT_PLUS:
-		{
-			return Ogre::String("CHARACTER_MOVE_RIGHT_PLUS");
-		}
-	case CHARACTER_JUMP_PLUS:
-		{
-			return Ogre::String("CHARACTER_JUMP_PLUS");
-		}
-	case CHARACTER_MOVE_LEFT_MINUS:
-		{
-			return Ogre::String("CHARACTER_MOVE_LEFT_MINUS");
-		}
-	case CHARACTER_MOVE_RIGHT_MINUS:
-		{
-			return Ogre::String("CHARACTER_MOVE_RIGHT_MINUS");
-		}
-	case CHARACTER_JUMP_MINUS:
-		{
-			return Ogre::String("CHARACTER_JUMP_MINUS");
-		}
-	case GAME_SENSOR_ON:
-		{
-			return Ogre::String("GAME_SENSOR_ON");
-		}
-	case GAME_SENSOR_OFF:
-		{
-			return Ogre::String("GAME_SENSOR_OFF");
-		}
-	case CREATE_BOX:
-		{
-			return Ogre::String("CREATE_BOX");
-		}
-	case UPDATE_MOUSE:
-		{
-			return Ogre::String("UPDATE_MOUSE");
-		}
-	}
-
-	return Ogre::String("Unrecognized message type");
-}
-*/
 
 
 #endif

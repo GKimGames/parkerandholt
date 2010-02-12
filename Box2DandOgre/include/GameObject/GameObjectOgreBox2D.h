@@ -47,6 +47,8 @@ public:
 
 	virtual bool Update(double timeSinceLastFrame);
 
+	virtual bool HandleMessage(const KGBMessage message){return false;}
+
 	virtual bool Initialize();
 	virtual bool InitializeDebugDraw(Ogre::ColourValue color = Ogre::ColourValue(1,1,1,1), Ogre::String materialName = "debugDraw");
 
@@ -70,6 +72,7 @@ public:
 	virtual bool UpdateGraphics(double timeSinceLastFrame);
 
 	virtual void RedrawDebug();
+
 
 	virtual void CreatePhysics(){}
 

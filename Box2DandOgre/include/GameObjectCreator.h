@@ -70,13 +70,13 @@ public:
 		CreatorResult result;
 		if(element != 0 && gameObject != 0)
 		{
-			TiXmlElement* gameObjectElement = element->FirstChild( "GameObject" )->ToElement();
+			TiXmlElement* gameObjectElement = element->FirstChild( "Object" )->ToElement();
 			if(gameObjectElement != 0)
 			{
 				Ogre::String str = "GameObject_" + Ogre::StringConverter::toString(gameObject->objectId_);
 
 	
-				gameObject->objectName_ = TinyXMLHelper::GetAttribute(element, "name", str);
+				gameObject->objectName_ = TinyXMLHelper::GetAttribute(gameObjectElement, "name", str);
 				gameObject->Initialize();
 
 

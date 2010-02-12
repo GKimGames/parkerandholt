@@ -19,6 +19,7 @@ class GameObjectSensor : public GameObjectOgreBox2D
 {
 public:
 
+	friend class GameObjectSensorCreator;
 	/// Constructor takes a message to send to all GameObjects registered
 	/// to this sensor. Shapes for the sensor can be added using the 
 	/// AddShape function, this must be done or optionally a body already
@@ -39,7 +40,24 @@ public:
 
 	virtual ~GameObjectSensor(){}
 
-	bool Update(double timeSinceLastFrame){ return true;}
+	bool Update(double timeSinceLastFrame)
+	{ 
+		GameObjectOgreBox2D::Update(timeSinceLastFrame);
+
+		return true;
+	}
+
+	bool HandleMessage(const KGBMessage message)
+	{
+		if(message.messageType == defaultMessageOff_)
+		{
+			if(message.sender == objectId_)
+			{
+				body_->ApplyImpulse(b2Vec2(-10,50), body_->GetWorldCenter());
+			}
+		}
+		return false;
+	}
 
 	/// Adds a shape to this sensor. This will initialize a static body if it is
 	/// not already done so. 
@@ -67,6 +85,8 @@ public:
 		{
 			return;
 		}
+
+		SendOnMessageToList();
 	}
 
 	/// Called when two fixtures cease to touch.
@@ -74,8 +94,10 @@ public:
 	{
 		if(ignoreSensors_ && collidedFixture->IsSensor())
 		{
-			return;
+			return; 
 		}
+
+		SendOffMessageToList();
 	}
 
 	/// Send out a message to all the Objects in messageList_.

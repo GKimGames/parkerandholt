@@ -52,8 +52,9 @@ public:
 
 					Ogre::String bodyId;
 					bodys->QueryValueAttribute("bodyID", &bodyId);
+
 					gameObjectOgreBox2D->body_ = gameObjectFactory_->GetBody(bodyId);
-	
+					gameObjectOgreBox2D->body_->SetUserData(gameObjectOgreBox2D);
 					gameObjectOgreBox2D->Initialize();
 				}
 	

@@ -42,6 +42,8 @@
 #include "PressureSwitch.h"
 #include "DynamicLines.h"
 
+#include "MyGUI.h"
+
 #define DEBUG_DRAW_ON 1
 
 
