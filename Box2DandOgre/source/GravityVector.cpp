@@ -12,6 +12,7 @@
 //
 GravityVector::GravityVector(Ogre::SceneManager *sceneManager, b2Vec2 center, b2Vec2 direction)
 {
+	active_ = false;
 	maxForce_ = 300;
 	sceneManager_ = sceneManager;
 	position_ = center;
@@ -50,6 +51,7 @@ GravityVector::GravityVector(Ogre::SceneManager *sceneManager, b2Vec2 center, b2
 	tempMagnitude.Normalize();
 	ps->getEmitter(0)->setDirection(Ogre::Vector3(tempMagnitude.x,tempMagnitude.y, 0));
 
+
 	entity_ = sceneManager_->createEntity("GravMesh", "sphere.mesh");
 	
 	entity_->setMaterial(Ogre::MaterialManager::getSingletonPtr()->getByName("TransparentBox/Transparent125"));
@@ -63,6 +65,7 @@ GravityVector::GravityVector(Ogre::SceneManager *sceneManager, b2Vec2 center, b2
 	//sceneNode_->roll(Ogre::Radian(atan2(direction.y, direction.x)));
 	sceneNode_->scale(0.3,0.3,0.3);
 	Initialize();
+	Stop();
 	
 }
 
@@ -93,19 +96,20 @@ void GravityVector::BeginContact(ContactPoint* contact, b2Fixture* contactFixtur
 //
 void GravityVector::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
+  if(active_)
+  {
 	if(contactFixture == gravitySensor_)
 	{
-		int temp;
 		for(int i = 0; i < bodyList_.size(); i++)
 		{
 			if(bodyList_[i] == collidedFixture->GetBody())
 			{
-				temp = i;
+				bodyList_.erase(bodyList_.begin()+i);
+				break;
 			}
 		}
-		bodyList_.erase(bodyList_.begin()+temp);
-
 	}
+  }
 }
 
 
@@ -114,11 +118,61 @@ void GravityVector::EndContact(ContactPoint* contact, b2Fixture* contactFixture,
 //
 bool GravityVector::Update(double timeSinceLastFrame)
 {
+  if(active_)
+  {
 	for(int i = 0; i < bodyList_.size(); i++)
 	{
 		bodyList_[i]->ApplyForce(forceApplied_, position_);
 	}
-
 	UpdateGraphics(timeSinceLastFrame);
+  }
+  else
+  {
+	  bodyList_.clear();
+  }
+
+	
+	return true;
+}
+
+
+//=============================================================================
+//								Stop
+//
+bool GravityVector::Stop()
+{ 
+	active_ = false;
+	sceneNode_->setVisible(false);
+	Ogre::ParticleSystem* tempPS;
+	tempPS = (Ogre::ParticleSystem*)sceneNode_->getAttachedObject("Fireworks");
+	return true;
+}
+
+
+//=============================================================================
+//								Start
+//
+bool GravityVector::Start(b2Vec2 newPosition, b2Vec2 newDirection)
+{
+	position_ = newPosition;
+	SetBodyPosition(position_);
+
+	b2Vec2 tempMagnitude; 
+	tempMagnitude.x = (newDirection.x - position_.x) / (abs(newDirection.x - position_.x) + abs(newDirection.y - position_.y));
+	tempMagnitude.y = (newDirection.y - position_.y) / (abs(newDirection.x - position_.x) + abs(newDirection.y - position_.y));
+	forceApplied_.x = maxForce_ * tempMagnitude.x;
+	forceApplied_.y = maxForce_ * tempMagnitude.y;
+
+
+
+	Ogre::ParticleSystem* tempPS;
+	tempPS = (Ogre::ParticleSystem*)sceneNode_->getAttachedObject("Fireworks");
+	tempMagnitude.Normalize();
+	tempPS->getEmitter(0)->setDirection(Ogre::Vector3(tempMagnitude.x,tempMagnitude.y, 0));
+	
+
+	active_ = true;
+	sceneNode_->setVisible(true);
+
 	return true;
 }
