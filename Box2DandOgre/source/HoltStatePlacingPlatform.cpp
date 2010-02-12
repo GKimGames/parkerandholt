@@ -8,6 +8,11 @@
 
 #include "HoltStatePlacingPlatform.h"
 
+#include "ParkerStateOnGround.h"
+#include "ParkerStateInAir.h"
+#include "HoltStatePlacingGravityVector.h"
+
+
 //=============================================================================
 //								Constructor
 //

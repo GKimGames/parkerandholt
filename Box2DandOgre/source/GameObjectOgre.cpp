@@ -1,8 +1,8 @@
 /*=============================================================================
 
-  GameObjectOgre.cpp
+	  GameObjectOgre.cpp
 
-  Author: Matt King
+	  Author: Matt King
 
 =============================================================================*/
 
@@ -20,7 +20,7 @@ GameObject(name)
 
 
 //=============================================================================
-//							GameObjectOgre::Constructor
+//							GameObjectOgre::Destructor
 //
 GameObjectOgre::~GameObjectOgre()
 {
@@ -40,9 +40,12 @@ bool GameObjectOgre::Initialize()
 //=============================================================================
 //							Initialize
 //
+/// Initialize the object with a mesh.
 bool GameObjectOgre::Initialize(Ogre::String meshName)
 {
-	
+	objectName_ = meshName;
+	initialized_ = GameObject::Initialize();
+
 	Ogre::String entityName = objectName_;
 	entityName += "_Entity_";
 	entityName += Ogre::StringConverter::toString(objectId_);

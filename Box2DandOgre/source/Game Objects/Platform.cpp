@@ -164,8 +164,9 @@ bool Platform::Initialize(Ogre::String materialName)
 	Ogre::SceneNode* planeNode = sceneManager_->getRootSceneNode()->createChildSceneNode();
 	planeNode->attachObject(planeEnt);
 	
+	Ogre::Radian rollBy = Ogre::Radian(atan2(point2.y - point1.y, point2.x - point1.x));
 	// Rotate the node to fit the points
-	planeNode->roll(Ogre::Radian(atan2(point2.y - point1.y, point2.x - point1.x)));
+	planeNode->roll(rollBy);
 	
 	// Center the node on the midpoint of the two points
 	planeNode->setPosition(Real(point1.x + point2.x) / 2.0, Real(point1.y + point2.y) / 2.0, 0.0);
@@ -215,7 +216,7 @@ bool Platform::InitializePlaceable()
 	body_= world_->CreateBody(&bd);
 
 	float tempLength = sqrt((point2.x - point1.x) * (point2.x - point1.x) + (point2.y - point1.y) * (point2.y - point1.y));
-	float platformHeight = 0.2f;
+	float platformHeight = 0.1f;
 
 	b2PolygonShape bodyShapeDef;
 	bodyShapeDef.SetAsBox(tempLength/2.0f, platformHeight/2.0f);

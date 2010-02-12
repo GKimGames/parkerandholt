@@ -7,10 +7,10 @@
 =============================================================================*/
 
 
-#ifndef MOVING_PLATFORM_CREATOR_H
-#define MOVING_PLATFORM_CREATOR_H
+#ifndef GAME_OBJECT_SENSOR_CREATOR_H
+#define GAME_OBJECT_SENSOR_CREATOR_H
 
-#include "GameObjectOgreBox2DCreator.h
+#include "GameObjectOgreBox2DCreator.h"
 #include "GameObjectSensor.h"
 
 class GameObjectSensorCreator : public GameObjectOgreBox2DCreator
@@ -43,13 +43,33 @@ public:
 		{
 			if(gameObjectSensor != 0)
 			{
-				result = ObjectOgreBox2DCreator::LoadFromXML(element, gameObjectSensor);
+				result = GameObjectOgreBox2DCreator::LoadFromXML(element, gameObjectSensor);
+				
 				if(result == CREATOR_OK)
-				{
-					 
-					TiXmlElement* bodys = element->FirstChildElement( "Box2DObject" )->FirstChildElement("Body");
-					gameObjectSensor->body_ = Box2DXMLLoader::Createb2Body(GAMEFRAMEWORK->world_, bodys);
+				{ 
 					gameObjectSensor->Initialize();
+					gameObjectSensor->body_->SetUserData(gameObjectSensor);
+					
+					TiXmlElement* objects = element->FirstChildElement( "ObjectSensor" )->FirstChildElement("Object");
+
+					if(objects != 0)
+					{
+						Ogre::String objectID = TinyXMLHelper::GetAttribute(objects, "objectID", "");
+						KGBMessageType onMessage = TinyXMLHelper::GetMessage(objects, "on", MESSAGE_NULL);
+						KGBMessageType offMessage = TinyXMLHelper::GetMessage(objects, "off", MESSAGE_NULL);
+						GameObject* go = GameObject::GetObjectById(objectID);
+						
+						if(go)
+						{
+							GameObjectId id = go->GetId();
+							gameObjectSensor->AddToMessageList(id, onMessage, offMessage);
+						}
+
+						objects = objects->NextSiblingElement("Object");
+					}
+					
+
+					
 				}
 	
 			}// end if(gameObjectOgreBox2D != 0)

@@ -83,7 +83,6 @@ void GravityVector::BeginContact(ContactPoint* contact, b2Fixture* contactFixtur
 {
 	if(contactFixture == gravitySensor_)
 	{
-		//collidedFixture->GetBody()->ApplyForce(b2Vec2(0.0f, 2000.0f), position_);
 		bodyList_.push_back(collidedFixture->GetBody());
 	}
 }
@@ -97,7 +96,6 @@ void GravityVector::EndContact(ContactPoint* contact, b2Fixture* contactFixture,
 	if(contactFixture == gravitySensor_)
 	{
 		int temp;
-		//collidedFixture->GetBody()->ApplyForce(b2Vec2(0.0f, 2000.0f), position_);
 		for(int i = 0; i < bodyList_.size(); i++)
 		{
 			if(bodyList_[i] == collidedFixture->GetBody())

@@ -10,6 +10,11 @@
 #include "GameFramework.h"
 #include "GameObjectFactory.h"
 
+#include "ParkerStateOnGround.h"
+#include "ParkerStateInAir.h"
+#include "HoltStatePlacingPlatform.h"
+#include "HoltStatePlacingGravityVector.h"
+
 //=============================================================================
 //								Constructor
 //
@@ -99,13 +104,7 @@ void CharacterParker::CreatePhysics()
 	// The extents are the half-widths of the box.
 
 	b2Vec2 bodyVecs[4];
-	bodyVecs[0].Set(-boundingBoxWidth_/2, -boundingBoxHeight_/4);
-	bodyVecs[1].Set(boundingBoxWidth_/2, -boundingBoxHeight_/4);
-	bodyVecs[2].Set(boundingBoxWidth_/2, boundingBoxHeight_/2);
-	bodyVecs[3].Set(-boundingBoxWidth_/2, boundingBoxHeight_/2);
-	bodyShapeDef.Set(bodyVecs,4);
-
-	bodyShapeDef.SetAsBox(boundingBoxWidth_/2, boundingBoxHeight_/2);
+	bodyShapeDef.SetAsBox(boundingBoxWidth_/2, boundingBoxHeight_/2.3, b2Vec2(0,.1),0);
 
 	b2FixtureDef fd;
 	fd.shape = &bodyShapeDef;
@@ -118,6 +117,13 @@ void CharacterParker::CreatePhysics()
 	fd.filter.categoryBits = 0x0100;
 
 	body_->CreateFixture(&fd);
+
+	b2CircleShape circleShape;
+	circleShape.m_radius = boundingBoxWidth_ ;
+	circleShape.m_p = b2Vec2(0,-boundingBoxHeight_/2 + boundingBoxWidth_/2 + 0.1 );
+	fd.shape = &circleShape;
+	fd.density = (boundingBoxWidth_ * boundingBoxHeight_) * mass_;
+	feetCircle_ = body_->CreateFixture(&fd);
 
 	//body_->SetLinearDamping(linearDamping_);
 
@@ -320,6 +326,7 @@ bool CharacterParker::ReadXMLConfig()
 
 //=============================================================================
 //								CharacterParker
+//
 /// Applies "friction" to the character if they are on a surface.
 /// It applies a force in the opposite direction the character's velocity is
 /// going. 
@@ -330,19 +337,19 @@ void CharacterParker::ApplyWalkingFriction(double timeSinceLastFrame)
 	b2Vec2 frictionVector(0,0);
 	b2Vec2 lv = body_->GetLinearVelocity();
 
-	if(elevator_ != NULL)
+	if(elevator_ != 0)
 	{
 		lv -= elevator_->GetLinearVelocity();
 	}
 
 	// Set the velocity of the character to 0 if the velocity is less than 0.1.
-	if(lv.x < 0.1 && lv.x > -0.1)
+	if(lv.x < 0.132 && lv.x > -0.132)
 	{
 		//body_->SetLinearVelocity(b2Vec2(0.0f,body_->GetLinearVelocity().y));
 	}
 	else
 	{
-		// Determine which way the friction should be applied.
+		// Determine which direction the friction should be applied.
 		// It has to be in the opposite direction the character is travelling.
 		if(lv.x > 0)
 		{
@@ -396,23 +403,89 @@ bool CharacterParker::HandleMessage(const KGBMessage message)
 
 bool CharacterParker::Update(double timeSinceLastFrame)
 {
-	/*
+	
 	static b2Color color(1,1,0);
-	bodyVec1 = body_->GetWorldPoint(b2Vec2(-boundingBoxWidth_/2,	0));
-	bodyVec2 = body_->GetWorldPoint(b2Vec2(boundingBoxWidth_/2,	0));
-	feetVec1 = body_->GetWorldPoint(b2Vec2(-boundingBoxWidth_/2,	-boundingBoxHeight_/2));
-	feetVec2 = body_->GetWorldPoint(b2Vec2(boundingBoxWidth_/2,	-boundingBoxHeight_/2));
+	//bodyVec1 = body_->GetWorldPoint(b2Vec2(-boundingBoxWidth_/2,	0));
+	//bodyVec2 = body_->GetWorldPoint(b2Vec2(boundingBoxWidth_/2,	0));
+	//feetVec1 = body_->GetWorldPoint(b2Vec2(-boundingBoxWidth_/2,	-boundingBoxHeight_/2 - .3));
+	//feetVec2 = body_->GetWorldPoint(b2Vec2(boundingBoxWidth_/2,	-boundingBoxHeight_/2  - .3));
+
+
+	/*bodyVec1 = body_->GetWorldPoint(b2Vec2(-boundingBoxWidth_/2 - .1,	-boundingBoxHeight_/2));
+	bodyVec2 = body_->GetWorldPoint(b2Vec2(boundingBoxWidth_/2 + .1,	-boundingBoxHeight_/2));
+	feetVec1 = body_->GetWorldPoint(b2Vec2(-boundingBoxWidth_/2 - .1,	-boundingBoxHeight_/2 - .1));
+	feetVec2 = body_->GetWorldPoint(b2Vec2(boundingBoxWidth_/2 + .1,	-boundingBoxHeight_/2  - .1));
 
 	world_->RayCast(this, bodyVec1, feetVec1);
+	rayCastId = 0;
 	world_->RayCast(this, bodyVec2, feetVec2);
+	rayCastId = 1;
 
 	if(GAMEFRAMEWORK->GetDebugDraw())
 	{
-	GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec1, feetVec1, color);
-	GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec2, feetVec2, color);
-	}
-	*/
+		GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec1, feetVec1, color);
+		GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec2, feetVec2, color);
+	}*/
+	
+	feetSensorHit_ = false;
+	shinRightHit_ = false;
+	shinLeftHit_ = false;
+	torsoLeftHit_ = false;
+	torsoRightHit_ = false;
 
+	b2ContactEdge* contacts = body_->GetContactList();
+	while(contacts)
+	{
+		if(contacts->contact->IsTouching())
+		{
+			b2Fixture* A = contacts->contact->GetFixtureA();
+			b2Fixture* B = contacts->contact->GetFixtureB();
+
+			if(A == feetSensor_ && !B->IsSensor())
+			{
+				feetSensorHit_ = true;
+			}
+			else if(B == feetSensor_ && !A->IsSensor())
+			{
+				feetSensorHit_ = true;
+			}
+			else if(A == shinSensorRight_ && !B->IsSensor())
+			{
+				shinRightHit_ = true;
+			}
+			else if(A == shinSensorLeft_ && !B->IsSensor())
+			{
+				shinLeftHit_ = true;
+			}
+			else if(A == torsoSensorRight_ && !B->IsSensor())
+			{
+				torsoRightHit_ = true;
+			}
+			else if(A == torsoSensorLeft_ && !B->IsSensor())
+			{
+				torsoLeftHit_ = true;
+			}
+			else if(B == shinSensorRight_ && !A->IsSensor())
+			{
+				shinRightHit_ = true;
+			}
+			else if(B == shinSensorLeft_ && !A->IsSensor())
+			{
+				shinLeftHit_ = true;
+			}
+			else if(B == torsoSensorRight_ && !A->IsSensor())
+			{
+				torsoRightHit_ = true;
+			}
+			else if(B == torsoSensorLeft_ && !A->IsSensor())
+			{
+				torsoLeftHit_ = true;
+			}
+
+		}
+
+		contacts = contacts->next;
+	}
 
 
 	return stateMachine_->Update();
@@ -421,24 +494,29 @@ bool CharacterParker::Update(double timeSinceLastFrame)
 float32 CharacterParker::ReportFixture(b2Fixture* fixture, const b2Vec2& point,
 									   const b2Vec2& normal, float32 fraction)
 {
-	/*
-	static bool oneTwo = true;
-	static b2Color color(1,0,234.0/255.0);
+	
+	//static b2Color color(1,0,234.0/255.0);
 
-	if(oneTwo == false)
-	{
-	GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec1, point, color);
-	oneTwo = true;
-	}
-	else
-	{
-	GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec2, point, color);
-	oneTwo = false;
-	}
+	//if(rayCastId == 0)
+	//{
+	//	GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec1, point, color);
+	//}
+	//else
+	//{
+	//	GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec2, point, color);
+	//}
 
-	body_->ApplyForce(b2Vec2(0,abs(body_->GetMass() * world_->GetGravity().y * 2)), body_->GetPosition());
-	body_->SetLinearVelocity(b2Vec2(0,0));
-	*/
+	//if(fixture != feetSensor_)
+	//{
+	//	this->SetBodyPosition(b2Vec2(body_->GetPosition().x, point.y + boundingBoxHeight_/2 + .1 ));
+
+	//	//body_->ApplyForce(b2Vec2(0,abs(body_->GetMass() * world_->GetGravity().y * 2)), body_->GetPosition());
+	//	body_->SetLinearVelocity(b2Vec2(body_->GetLinearVelocity().x,0));
+	//	b2Vec2 force((body_->GetLinearVelocity().x + 0.01) * body_->GetMass() * world_->GetGravity().x,
+	//				 (body_->GetLinearVelocity().y + 0.01) * body_->GetMass() * world_->GetGravity().y);
+	//	fixture->GetBody()->ApplyImpulse(force, point);
+	//}
+
 	return 0;
 
 }
@@ -448,7 +526,7 @@ void CharacterParker::BeginContact(ContactPoint* contact, b2Fixture* contactFixt
 {
 	if(collidedFixture->IsSensor() == false)
 	{
-		if(contactFixture == feetSensor_ )
+		if(contactFixture == feetSensor_ && collidedFixture != feetCircle_)
 		{
 			feetSensorHitCount_++;
 		}
@@ -462,12 +540,17 @@ void CharacterParker::EndContact(ContactPoint* contact, b2Fixture* contactFixtur
 {
 	if(collidedFixture->IsSensor() == false)
 	{
-		if(contactFixture == feetSensor_ )
+		if(contactFixture == feetSensor_ && collidedFixture != feetCircle_)
 		{
 			feetSensorHitCount_--;
 		}
 	}
 
 	stateMachine_->EndContact(contact,contactFixture, collidedFixture);
+}
 
+void CharacterParker::ReturnToCheckPoint(b2Vec2 checkPoint)
+{
+	body_->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
+	SetBodyPosition(checkPoint);
 }

@@ -143,9 +143,11 @@ void AppStateManager::start(AppState* state)
 				GAMEFRAMEWORK->keyboard_->capture();
 				GAMEFRAMEWORK->mouse_->capture();
 
-				if(m_ActiveStateStack.back()->update(timeStep) && m_bShutdown == false)
+				if(m_bShutdown == false)
 				{
 						Dispatch->DispatchDelayedMessages();
+
+						m_ActiveStateStack.back()->update(timeStep);
 
 						GAMEFRAMEWORK->UpdateOgre(timeStep);
 						GAMEFRAMEWORK->root_->renderOneFrame();

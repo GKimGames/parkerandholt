@@ -13,6 +13,35 @@ using namespace Ogre;
 
 
 //=============================================================================
+//								GetRootFromFile
+//
+/// Returns a handle to the root node of a file or 0 if it can't find it.
+TiXmlHandle* TinyXMLHelper::GetRootFromFile(Ogre::String fileName, TiXmlDocument* configXML_)
+{
+	configXML_ = new TiXmlDocument(fileName.c_str());
+	configXML_->LoadFile();
+	
+	// If there was an error loading the file return 0.
+	if(configXML_->Error())
+	{
+		return 0;
+	}
+
+	TiXmlHandle hDoc(configXML_);
+
+	TiXmlElement* rootElement = hDoc.FirstChildElement().Element();
+
+	// If we couldn't get an element we return 0.
+	if (rootElement == 0) 
+	{
+		return 0;
+	}
+
+
+	return new TiXmlHandle(rootElement);
+}
+
+//=============================================================================
 //								GetAttribute
 //
 /// Returns a String from "element" from attribute "attrib"
@@ -26,6 +55,15 @@ String TinyXMLHelper::GetAttribute(TiXmlElement* element, const String& attrib, 
 	{
 		return defaultValue;
 	}
+}
+
+//=============================================================================
+//								GetMessage
+//
+/// Returns a String from "element" from attribute "attrib"
+KGBMessageType TinyXMLHelper::GetMessage(TiXmlElement* element, const Ogre::String& name, KGBMessageType defaultValue)
+{
+	return StringToMessage(GetAttribute(element, name, MessageToString(defaultValue)));
 }
 
 
@@ -102,4 +140,20 @@ Vector3 TinyXMLHelper::GetAttributeVector3(TiXmlElement* element, const String& 
 	{
 		return defaultValue;
 	}
+}
+
+//=============================================================================
+//								GetAttributeb2Vec2
+//
+/// Returns a b2Veec2 from "element" from attribute "name"
+b2Vec2 TinyXMLHelper::GetAttributeb2Vec2(TiXmlElement* element, const Ogre::String& name, b2Vec2 defaultValue)
+{
+	if(element->Attribute(name.c_str()))
+	{
+		Ogre::Vector2 vector = StringConverter::parseVector2(element->Attribute(name.c_str()));
+		return b2Vec2(vector.x,vector.y);
+	}
+
+	return defaultValue;
+	
 }
