@@ -278,24 +278,29 @@ void ParkerStateInAir::Jump()
 	{
 		if(driver_->shinRightHit_ && driver_->torsoRightHit_)
 		{
-			
-			driver_->animationBlender_->Blend("clip7", AnimationBlender::BlendSwitch, 0.1, false);
-			driver_->animationBlender_->Blend("jump_idle", AnimationBlender::BlendWhileAnimating, 0.7, false);
+			if(driver_->moveLeft_)
+			{
+				driver_->animationBlender_->Blend("clip7", AnimationBlender::BlendSwitch, 0.1, false);
+				driver_->animationBlender_->Blend("jump_idle", AnimationBlender::BlendWhileAnimating, 0.7, false);
 
 
-			wallJumpTimer_ = 0.0;
-			justWallJumped_ = true;
-			wallJumpedLeft_ = false;
+				wallJumpTimer_ = 0.0;
+				justWallJumped_ = true;
+				wallJumpedLeft_ = false;
+			}
 		}
 		else if(driver_->shinLeftHit_ && driver_->torsoLeftHit_)
 		{
-			driver_->animationBlender_->Blend("clip7", AnimationBlender::BlendSwitch, 0.1, false);
-			driver_->animationBlender_->Blend("jump_idle", AnimationBlender::BlendWhileAnimating, 0.7, false);
-			
+			if(driver_->moveRight_)
+			{
+				driver_->animationBlender_->Blend("clip7", AnimationBlender::BlendSwitch, 0.1, false);
+				driver_->animationBlender_->Blend("jump_idle", AnimationBlender::BlendWhileAnimating, 0.7, false);
+				
 
-			wallJumpTimer_ = 0.0;
-			justWallJumped_ = true;
-			wallJumpedLeft_ = true;
+				wallJumpTimer_ = 0.0;
+				justWallJumped_ = true;
+				wallJumpedLeft_ = true;
+			}
 		}
 	}
 

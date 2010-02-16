@@ -119,7 +119,7 @@ void CharacterParker::CreatePhysics()
 	body_->CreateFixture(&fd);
 
 	b2CircleShape circleShape;
-	circleShape.m_radius = boundingBoxWidth_ ;
+	circleShape.m_radius = boundingBoxWidth_/2;
 	circleShape.m_p = b2Vec2(0,-boundingBoxHeight_/2 + boundingBoxWidth_/2 + 0.1 );
 	fd.shape = &circleShape;
 	fd.density = (boundingBoxWidth_ * boundingBoxHeight_) * mass_;

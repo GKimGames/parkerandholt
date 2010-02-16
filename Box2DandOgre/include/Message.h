@@ -169,8 +169,7 @@ static KGBMessageType StringToMessage(Ogre::String str)
 {
 	Ogre::StringUtil::toLowerCase(str);
 	
-	for(int i = 0; i < MESSAGE_TYPE_COUNT; i++)
-	{
+	for(int i = 0; i < MESSAGE_TYPE_COUNT; i++) {
 		if(str.compare(KGBMessageTypeString[i]) == 0)
 		{
 			return (KGBMessageType) i;
