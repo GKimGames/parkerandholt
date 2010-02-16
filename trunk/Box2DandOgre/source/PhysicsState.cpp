@@ -83,7 +83,7 @@ void PhysicsState::enter()
 	createScene();
 
 	CompositorManager::getSingleton().addCompositor(GAMEFRAMEWORK->viewport_, "B&W");
-	CompositorManager::getSingleton().setCompositorEnabled(GAMEFRAMEWORK->viewport_, "B&W",true);
+	//CompositorManager::getSingleton().setCompositorEnabled(GAMEFRAMEWORK->viewport_, "B&W",true);
 
 	gameCamera_ = new GameCamera(camera_);
 	
@@ -208,8 +208,8 @@ void PhysicsState::createPhysics()
 	myKeyHandler_->AddKey(OIS::KC_RIGHT, std::make_pair(CHARACTER_MOVE_RIGHT_PLUS, CHARACTER_MOVE_RIGHT_MINUS));
 	myKeyHandler_->AddKey(OIS::KC_LEFT, std::make_pair(CHARACTER_MOVE_LEFT_PLUS, CHARACTER_MOVE_LEFT_MINUS));
 	myKeyHandler_->AddKey(OIS::KC_UP, std::make_pair(CHARACTER_JUMP_PLUS, CHARACTER_JUMP_MINUS));
-	myKeyHandler_->AddKey(OIS::KC_A, std::make_pair(CHARACTER_MOVE_RIGHT_PLUS, CHARACTER_MOVE_RIGHT_MINUS));
-	myKeyHandler_->AddKey(OIS::KC_D, std::make_pair(CHARACTER_MOVE_LEFT_PLUS, CHARACTER_MOVE_LEFT_MINUS));
+	myKeyHandler_->AddKey(OIS::KC_D, std::make_pair(CHARACTER_MOVE_RIGHT_PLUS, CHARACTER_MOVE_RIGHT_MINUS));
+	myKeyHandler_->AddKey(OIS::KC_A, std::make_pair(CHARACTER_MOVE_LEFT_PLUS, CHARACTER_MOVE_LEFT_MINUS));
 	myKeyHandler_->AddKey(OIS::KC_W, std::make_pair(CHARACTER_JUMP_PLUS, CHARACTER_JUMP_MINUS));
 	myKeyHandler_->AddKey(OIS::KC_1, CHARACTER_ENTER_PLATFORMSTATE);
 	myKeyHandler_->AddKey(OIS::KC_2, CHARACTER_ENTER_GRAVITYSTATE);
@@ -217,6 +217,7 @@ void PhysicsState::createPhysics()
 	
 	new CheckPoint(sceneManager_, b2Vec2(-8.0f, 2.0f),2,4);
 	new CheckPoint(sceneManager_, b2Vec2(-16.0f, 2.0f),2,4);
+	new CheckPoint(sceneManager_, b2Vec2(122.0f, -8.0f),2,4);
 	myMeter_ = new TraumaMeter();
 	playerInfo_ = new PlayerInfo();
 
@@ -235,7 +236,7 @@ void PhysicsState::createPhysics()
 
 	world->SetDebugDraw(debugDraw_);
 	GAMEFRAMEWORK->SetDebugDraw(debugDraw_);
-	debugDrawOn_ = true;
+	debugDrawOn_ = false;
 
 #endif
 
