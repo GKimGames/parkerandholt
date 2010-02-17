@@ -27,6 +27,7 @@ HoltStatePlacingPlatform::HoltStatePlacingPlatform(
 	box_[1] = 0;
 	box_[2] = 0;
 	incrimenter_ = 0;
+	gravityVector_ = new GravityVector(driver_->sceneManager_, b2Vec2(0,0), b2Vec2(1,1));
 }
 
 //=============================================================================
@@ -179,6 +180,21 @@ bool HoltStatePlacingPlatform::HandleMessage(const KGBMessage message)
 		case CHARACTER_ENTER_GRAVITYSTATE:
 		{
 			driver_->stateMachine_->ChangeState(driver_->placingGravityVector_);
+			return true;
+		}
+		case RIGHT_MOUSE_PLUS:
+		{
+			startPosition_.x = driver_->mousePicking_->GetPosition().x;
+			startPosition_.y = driver_->mousePicking_->GetPosition().y;
+			gravityVector_->Stop();
+			return true;
+		}
+
+		case RIGHT_MOUSE_MINUS:
+		{
+			endPosition_.x = driver_->mousePicking_->GetPosition().x;
+			endPosition_.y = driver_->mousePicking_->GetPosition().y;
+			SpawnGravityVector();
 			return true;
 		}
 	}
@@ -354,6 +370,24 @@ bool HoltStatePlacingPlatform::SpawnPlatform()
 	{
 		platform_ = new Platform(driver_->sceneManager_, b2Vec2(startPosition_.x, startPosition_.y), b2Vec2(endPosition_.x, endPosition_.y), 1);
 		return true;
+	}
+
+	return false;
+}
+
+//=============================================================================
+//								SpawnGravityVector
+//
+bool HoltStatePlacingPlatform::SpawnGravityVector()
+{
+	float tempLength = sqrt((startPosition_.x - endPosition_.x) * (startPosition_.x - endPosition_.x) + (startPosition_.y - endPosition_.y) * (startPosition_.y - endPosition_.y));
+	if(tempLength < .5)
+	{
+		return false;
+	}
+	else
+	{
+		gravityVector_->Start(startPosition_, endPosition_);
 	}
 
 	return false;
