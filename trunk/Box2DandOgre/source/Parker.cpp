@@ -15,6 +15,8 @@
 #include "HoltStatePlacingPlatform.h"
 #include "HoltStatePlacingGravityVector.h"
 
+#include "TinyXMLHelper.h"
+
 //=============================================================================
 //								Constructor
 //
@@ -121,8 +123,8 @@ void CharacterParker::CreatePhysics()
 	body_->CreateFixture(&fd);
 
 	b2CircleShape circleShape;
-	circleShape.m_radius = boundingBoxWidth_/2;
-	circleShape.m_p = b2Vec2(0,-boundingBoxHeight_/2 + boundingBoxWidth_/2 + 0.1 );
+	circleShape.m_radius = boundingBoxWidth_/2 + 0.05;
+	circleShape.m_p = b2Vec2(0,-boundingBoxHeight_/2 + boundingBoxWidth_/2);
 	fd.shape = &circleShape;
 	fd.density = (boundingBoxWidth_ * boundingBoxHeight_) * mass_;
 	feetCircle_ = body_->CreateFixture(&fd);
@@ -260,11 +262,6 @@ bool CharacterParker::ReadXMLConfig()
 	shapeDefNode->QueryDoubleAttribute("mass", &mass_);
 	shapeDefNode->QueryDoubleAttribute("linearDamping", &linearDamping_);
 
-	// Get the walking and running information
-	TiXmlElement* movementNode = hRoot.FirstChild( "MovementInfo" ).FirstChildElement( "WalkingInfo" ).Element();
-	movementNode->QueryDoubleAttribute("walkingForce", &walkingForce_);
-	movementNode->QueryDoubleAttribute("maximumVelocity", &maximumWalkingVelocity_);
-
 	// Running force and running maximum velocity
 	TiXmlElement* runningNode = hRoot.FirstChild( "MovementInfo" ).FirstChildElement( "RunningInfo" ).Element();
 	runningNode->QueryDoubleAttribute("runningForce", &runningForce_);
@@ -282,7 +279,7 @@ bool CharacterParker::ReadXMLConfig()
 
 	// The force Parker can jump off the wall with
 	TiXmlElement* wallJumpNode = hRoot.FirstChild( "MovementInfo" ).FirstChildElement( "WallJumpInfo" ).Element();
-	wallJumpNode->QueryDoubleAttribute("jumpingForce", &wallJumpForce_);
+	wallJumpForce_ = TinyXMLHelper::GetAttributeb2Vec2(wallJumpNode, "jumpingForce");
 
 
 	TiXmlElement* objectOgreElement = hRoot.FirstChild( "Object3" ).Element();
