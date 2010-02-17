@@ -18,7 +18,7 @@
 //=============================================================================
 //								Constructor
 //
-CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager, MousePicking* mousePicking)
+CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager, MousePicking* mousePicking, PlayerInfo* info)
 :Character(sceneManager)
 {
 	mousePicking_ = mousePicking;
@@ -36,7 +36,9 @@ CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager, MousePicking*
 
 	elevator_ = NULL;
 
+	traumaMeter_ = new TraumaMeter();
 	objectName_ = "Parker";
+	playerInfo_ = info;
 }
 
 //=============================================================================
@@ -487,6 +489,12 @@ bool CharacterParker::Update(double timeSinceLastFrame)
 		contacts = contacts->next;
 	}
 
+	traumaMeter_->Update();
+	if(traumaMeter_->GetTrauma() > .5)
+	{
+		traumaMeter_->ResetTrauma();
+		ReturnToCheckPoint(b2Vec2(0,5));
+	}
 
 	return stateMachine_->Update();
 }
@@ -552,5 +560,43 @@ void CharacterParker::EndContact(ContactPoint* contact, b2Fixture* contactFixtur
 void CharacterParker::ReturnToCheckPoint(b2Vec2 checkPoint)
 {
 	body_->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
-	SetBodyPosition(checkPoint);
+	SetBodyPosition(playerInfo_->GetCheckPoint());
+}
+
+void CharacterParker::PostSolve(b2Contact *contact, const b2ContactImpulse *impulse)
+{
+	if(contact->GetFixtureA()->GetBody()->GetUserData() != NULL)
+	{
+		GameObject* object = (GameObject*) contact->GetFixtureA()->GetBody()->GetUserData();
+		GameObjectOgreBox2D* contactableA;
+
+		contactableA = dynamic_cast<GameObjectOgreBox2D*> (object);
+		if(contactableA == this)
+		{
+			float totalImpulse = abs(impulse->normalImpulses[0]);
+			if(totalImpulse > 600 && totalImpulse < 500000)
+			{
+				float tempTrauma = (totalImpulse-600)/1000;
+				traumaMeter_->AddTrauma(tempTrauma*2);
+			}
+			
+		}
+	}
+
+	if(contact->GetFixtureB()->GetBody()->GetUserData() != NULL)
+	{
+		GameObject* object = (GameObject*) contact->GetFixtureB()->GetBody()->GetUserData();
+		GameObjectOgreBox2D* contactableB;
+
+		contactableB = dynamic_cast<GameObjectOgreBox2D*> (object);
+		if(contactableB == this)
+		{
+			float totalImpulse = abs(impulse->normalImpulses[0]);
+			if(totalImpulse > 600 && totalImpulse < 500000)
+			{
+				float tempTrauma = (totalImpulse-600)/1000;
+				traumaMeter_->AddTrauma(tempTrauma*2);
+			}
+		}
+	}
 }

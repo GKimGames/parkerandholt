@@ -14,6 +14,8 @@
 #include "FSMStateMachine.h"
 
 #include "Box2DXMLLoader.h"
+#include "TraumaMeter.h"
+#include "PlayerInfo.h"
 
 class MousePicking;
 
@@ -28,7 +30,7 @@ class CharacterParker : public Character, public b2RayCastCallback
 
 public:
 
-	CharacterParker(Ogre::SceneManager* sceneManager, MousePicking* mousePicking);
+	CharacterParker(Ogre::SceneManager* sceneManager, MousePicking* mousePicking, PlayerInfo* info);
 
 	~CharacterParker(){}
 
@@ -45,6 +47,7 @@ public:
 	/// Called when two fixtures cease to touch.
 	void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 	
+	void PostSolve(b2Contact* contact, const b2ContactImpulse *impulse);
 	void ReturnToCheckPoint(b2Vec2);
 	bool Initialize();
 
@@ -105,7 +108,9 @@ private:
 	double wallJumpForce_;
 
 	double timeBetweenJump_;
-
+	
+	TraumaMeter*		traumaMeter_;
+	PlayerInfo*			playerInfo_;
 };
 
 
