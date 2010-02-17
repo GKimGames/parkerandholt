@@ -43,6 +43,7 @@ void ParkerStateInAir::Enter()
 	}
 	wallJumpedLeft_ = false;
 	justWallJumped_ = false;
+	wallJumpTimer_ = -1.0;
 }
 
 
@@ -75,7 +76,6 @@ bool ParkerStateInAir::Update()
 		jumpTimer_ += timeSinceLastFrame;
 	}
 
-	//if(driver_->feetSensorHitCount_ > 0)
 	if(driver_->feetSensorHit_ == true)
 	{
 		stateMachine_->ChangeState(driver_->onGroundState_);
@@ -109,18 +109,21 @@ bool ParkerStateInAir::Update()
 			{	
 				driver_->sceneNode_->setDirection(Ogre::Vector3(0,0,1),Ogre::Node::TS_WORLD);
 			}
+
 			if(wallJumpTimer_ > 0.2)
 			{
+				wallJumpTimer_ = -1;
 				justWallJumped_ = false;
 
 				driver_->body_->SetLinearVelocity(b2Vec2(0,driver_->body_->GetLinearVelocity().y)); 
+
 				if(wallJumpedLeft_)
 				{
-					driver_->body_->ApplyImpulse(b2Vec2(driver_->jumpingForce_/3,driver_->jumpingForce_/2), driver_->body_->GetPosition());
+					driver_->body_->ApplyImpulse(driver_->wallJumpForce_, driver_->body_->GetPosition());
 				}
 				else
 				{
-					driver_->body_->ApplyImpulse(b2Vec2(-driver_->jumpingForce_/3,driver_->jumpingForce_/2), driver_->body_->GetPosition());
+					driver_->body_->ApplyImpulse(-driver_->wallJumpForce_, driver_->body_->GetPosition());
 				}
 			}
 		}
@@ -131,6 +134,7 @@ bool ParkerStateInAir::Update()
 		{
 			driver_->UpdateDebugDraw();
 		}
+
 	}
 
 	// We've successfully updated.
@@ -274,7 +278,7 @@ void ParkerStateInAir::Jump()
 	
 	
 	// Code to wall jump
-	if(justWallJumped_ == false)
+	if(justWallJumped_ == false && wallJumpTimer_ == -1)
 	{
 		if(driver_->shinRightHit_ && driver_->torsoRightHit_)
 		{

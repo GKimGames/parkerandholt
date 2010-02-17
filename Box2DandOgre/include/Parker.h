@@ -105,7 +105,8 @@ private:
 
 	double boundingBoxHeight_;
 	double boundingBoxWidth_;
-	double wallJumpForce_;
+
+	b2Vec2 wallJumpForce_;
 
 	double timeBetweenJump_;
 	

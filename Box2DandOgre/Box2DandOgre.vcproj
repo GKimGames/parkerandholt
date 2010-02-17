@@ -189,7 +189,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Copying exe to samples bin directory ..."
-				CommandLine="copyRelease.bat"
+				CommandLine=""
 			/>
 		</Configuration>
 	</Configurations>
