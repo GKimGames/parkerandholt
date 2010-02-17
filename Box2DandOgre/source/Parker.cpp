@@ -4,7 +4,7 @@
 
 		Author: Matt King
 
-=============================================================================*/
+==================== =========================================================*/
 
 #include "Parker.h"
 #include "GameFramework.h"
@@ -489,10 +489,12 @@ bool CharacterParker::Update(double timeSinceLastFrame)
 	traumaMeter_->Update();
 	if(traumaMeter_->GetTrauma() > .5)
 	{
-		traumaMeter_->ResetTrauma();
 		ReturnToCheckPoint(b2Vec2(0,5));
 	}
-
+	if(body_->GetLinearVelocity().Length() > 40)
+	{
+		traumaMeter_->AddTrauma(0.01);
+	}
 	return stateMachine_->Update();
 }
 
@@ -556,6 +558,7 @@ void CharacterParker::EndContact(ContactPoint* contact, b2Fixture* contactFixtur
 
 void CharacterParker::ReturnToCheckPoint(b2Vec2 checkPoint)
 {
+	traumaMeter_->ResetTrauma();
 	body_->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
 	SetBodyPosition(playerInfo_->GetCheckPoint());
 }

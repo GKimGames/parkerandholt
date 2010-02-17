@@ -45,6 +45,8 @@ enum KGBMessageType
 	UPDATE_CHECKPOINT,
 	RETURN_TO_CHECKPOINT,
 	ADD_ITEM,
+	RIGHT_MOUSE_PLUS,
+	RIGHT_MOUSE_MINUS,
 	MESSAGE_TYPE_COUNT
 };  
 
@@ -75,6 +77,8 @@ const static char* KGBMessageTypeString[MESSAGE_TYPE_COUNT] =
 	"update checkpoint",
 	"return to checkpoint",
 	"add item",
+	"right mouse plus",
+	"right mouse minus",
 	"MESSAGE_TYPE_COUNT"
 };
 

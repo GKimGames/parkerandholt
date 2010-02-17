@@ -214,7 +214,6 @@ void PhysicsState::createPhysics()
 	myKeyHandler_->AddKey(OIS::KC_A, std::make_pair(CHARACTER_MOVE_LEFT_PLUS, CHARACTER_MOVE_LEFT_MINUS));
 	myKeyHandler_->AddKey(OIS::KC_W, std::make_pair(CHARACTER_JUMP_PLUS, CHARACTER_JUMP_MINUS));
 	myKeyHandler_->AddKey(OIS::KC_1, CHARACTER_ENTER_PLATFORMSTATE);
-	myKeyHandler_->AddKey(OIS::KC_2, CHARACTER_ENTER_GRAVITYSTATE);
 	myKeyHandler_->AddKey(OIS::KC_Q, CHARACTER_EXIT_PLACINGSTATE);
 	
 	new CheckPoint(sceneManager_, b2Vec2(-8.0f, 2.0f),2,4);
@@ -546,6 +545,7 @@ bool PhysicsState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID i
 	} 
 	else if(id == OIS::MB_Right)
 	{
+		Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, RIGHT_MOUSE_PLUS, NULL);
 		m_bRMouseDown = true;
 	} 
 	else if(id == OIS::MB_Middle)
@@ -572,6 +572,7 @@ bool PhysicsState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID 
 	} 
 	else if(id == OIS::MB_Right)
 	{
+		Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, RIGHT_MOUSE_MINUS, NULL);
 		m_bRMouseDown = false;
 	}
 	else if(id == OIS::MB_Middle)

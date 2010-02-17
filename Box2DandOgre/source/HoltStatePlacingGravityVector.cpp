@@ -22,7 +22,7 @@ HoltStatePlacingGravityVector::HoltStatePlacingGravityVector(
 	FSMState<CharacterParker>(parker,stateMachine)
 {
 	feetContactCount_ = 0;
-	gravityVector_ = new GravityVector(driver_->sceneManager_, b2Vec2(0,0), b2Vec2(1,1));
+	//gravityVector_ = new GravityVector(driver_->sceneManager_, b2Vec2(0,0), b2Vec2(1,1));
 	deleteVector_ = false;
 	createVector_ = false;
 }

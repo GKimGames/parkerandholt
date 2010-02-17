@@ -38,6 +38,7 @@ public:
 
 	bool SpawnBox();
 	bool SpawnPlatform();
+	bool SpawnGravityVector();
 	
 	
 
@@ -58,7 +59,7 @@ protected:
 	HoltBox*		box_[3];
 	Platform*		platform_;
 	int				incrimenter_;
-
+	GravityVector*	gravityVector_;
 };
 
 #endif
