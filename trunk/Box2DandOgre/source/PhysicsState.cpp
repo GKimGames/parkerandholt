@@ -193,8 +193,10 @@ void PhysicsState::createPhysics()
 	delete handle;
 	delete configXML_;
 	
+	playerInfo_ = new PlayerInfo();
 	myMouse_ = new MousePicking(sceneManager_, camera_);
-	parker_  = new CharacterParker(sceneManager_, myMouse_);
+
+	parker_  = new CharacterParker(sceneManager_, myMouse_, playerInfo_);
 	parker_->Initialize();
 	parker_->InitializeDebugDraw();
 
@@ -218,8 +220,6 @@ void PhysicsState::createPhysics()
 	new CheckPoint(sceneManager_, b2Vec2(-8.0f, 2.0f),2,4);
 	new CheckPoint(sceneManager_, b2Vec2(-16.0f, 2.0f),2,4);
 	new CheckPoint(sceneManager_, b2Vec2(122.0f, -8.0f),2,4);
-	myMeter_ = new TraumaMeter();
-	playerInfo_ = new PlayerInfo();
 
 	new PickUp(sceneManager_, b2Vec2(0.0f, 3.0f));
 	new PickUp(sceneManager_, b2Vec2(-3.0f, 3.0f));
@@ -456,25 +456,6 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 		pause_ = true;
 	}
 
-if(keyEventRef.key == OIS::KC_0)
-	{
-		
-		testing_ -= 0.05;
-
-		if(testing_ < 0.00)
-		{
-			testing_ = .5;
-		}
-		if(testing_ <= 0.05)
-		{
-			myMeter_->HideOverlay();
-			testing_ = 0.0;
-		}
-		else
-		{
-			myMeter_->DrawTrauma(testing_);
-		}
-	}
 	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_ESCAPE))
 	{
 		m_bQuit = true;
@@ -776,6 +757,13 @@ void PhysicsState::setBufferedMode()
 void PhysicsState::setUnbufferedMode()
 {
 }
+
+
+void PhysicsState::PostSolve(b2Contact* contact, const b2ContactImpulse *impulse)
+{
+	parker_->PostSolve(contact, impulse);
+}
+
 
 //=============================================================================
 //							BeginContact

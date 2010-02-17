@@ -86,6 +86,7 @@ public:
 	void setBufferedMode();
 	void setUnbufferedMode();
 
+	void PhysicsState::PostSolve(b2Contact* contact, const b2ContactImpulse *impulse);
 	/// Called when two fixtures begin to touch.
 	void BeginContact(b2Contact* contact);
 
