@@ -210,6 +210,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\source\EntityMaterialInstance.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\source\KeyHandler.cpp"
 				>
 			</File>
@@ -222,6 +226,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\source\MaterialInstance.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\source\MousePicking.cpp"
 				>
 			</File>
@@ -231,6 +239,10 @@
 			</File>
 			<File
 				RelativePath=".\source\OgreGpuCommandBufferFlush.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\source\SubEntityMaterialInstance.cpp"
 				>
 			</File>
 			<Filter
@@ -436,11 +448,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\EntityMaterialInstance.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\KeyHandler.h"
 				>
 			</File>
 			<File
 				RelativePath=".\include\LevelLoader.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\MaterialInstance.h"
 				>
 			</File>
 			<File
@@ -453,6 +473,10 @@
 			</File>
 			<File
 				RelativePath=".\include\OgreGpuCommandBufferFlush.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\SubEntityMaterialInstance.h"
 				>
 			</File>
 			<File

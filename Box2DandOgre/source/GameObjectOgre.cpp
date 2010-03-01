@@ -16,6 +16,7 @@ GameObject(name)
 {
 	sceneManager_ = GAMEFRAMEWORK->sceneManager;
 	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
+	transparency_ = 0;
 }
 
 
@@ -54,6 +55,7 @@ bool GameObjectOgre::Initialize(Ogre::String meshName)
 	sceneNode_->attachObject(entity_);
 	initialized_ = true;
 
+	/*transparency_ = new EntityMaterialInstance(entity_);*/
 	return initialized_;
 }
 
