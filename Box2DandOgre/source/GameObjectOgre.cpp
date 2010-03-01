@@ -77,3 +77,22 @@ bool GameObjectOgre::UpdateGraphics(double timeSinceLastFrame)
 {
 	return true;
 }
+
+
+void GameObjectOgre::SetTransparency(Ogre::Real alpha)
+	{
+		if(transparency_ == 0)
+		{
+			transparency_ = new EntityMaterialInstance(entity_);
+		}
+		transparency_->setTransparency(alpha);
+	}
+
+void GameObjectOgre::SetBlendType(Ogre::SceneBlendType type)
+{
+	if(transparency_ == 0)
+	{
+		transparency_ = new EntityMaterialInstance(entity_);
+	}
+	transparency_->setSceneBlending(type);
+}
