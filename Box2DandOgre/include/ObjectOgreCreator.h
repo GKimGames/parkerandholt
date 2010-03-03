@@ -122,6 +122,10 @@ public:
 		{
 			CreatePlatform(element,gameObjectOgre);
 		}
+		else if(type.compare("particleSystem") == 0)
+		{
+			CreateParticle(element,gameObjectOgre);
+		}
 		else
 		{
 			
@@ -147,6 +151,18 @@ public:
 		gameObjectOgre->sceneNode_->attachObject(light);
 	}
 
+	void CreateParticle(TiXmlElement* element, GameObjectOgre* gameObjectOgre)
+	{
+		Ogre::SceneNode* node = gameObjectOgre->sceneNode_->createChildSceneNode();
+		Ogre::String name = TinyXMLHelper::GetAttribute(element, "name");
+		Ogre::String particleSystem = TinyXMLHelper::GetAttribute(element, "particleSystem");
+		Ogre::ParticleSystem* ps = gameObjectOgre->sceneManager_->createParticleSystem(name, particleSystem);
+		node->attachObject(ps);
+		node->setPosition(TinyXMLHelper::GetAttributeVector3(element, "position"));
+
+		ps->getEmitter(0)->setDirection(TinyXMLHelper::GetAttributeVector3(element, "direction"));
+	}
+
 	void CreatePlatform(TiXmlElement* element, GameObjectOgre* gameObjectOgre)
 	{
 		Ogre::String material = TinyXMLHelper::GetAttribute(element, "material","Matt/Road");
@@ -166,7 +182,6 @@ public:
 			point2 = point1;
 			point1 = holder;
 		}
-
 
 		Ogre::String planeName("PlatformPlane");
 		Ogre::String planeMeshName("PlatformPlaneMesh");

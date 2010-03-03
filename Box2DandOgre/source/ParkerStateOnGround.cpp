@@ -17,13 +17,14 @@
 #include "Parker.h"
 #include "Message.h"
 
+
 //=============================================================================
 //								Constructor
 //
 ParkerStateOnGround::ParkerStateOnGround(	
 	CharacterParker* parker,
-	FSMStateMachine<CharacterParker>* stateMachine):
-	FSMState<CharacterParker>(parker,stateMachine)
+	ParkerStateMachine* stateMachine):
+	ParkerState(parker,stateMachine)
 {
 	isJumping_ = false;
 	moveLeftDown_ = false;

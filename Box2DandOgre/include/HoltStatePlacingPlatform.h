@@ -2,6 +2,8 @@
 #define HOLT_STATE_PLACING_PLATFORM_H
 
 #include "FSMState.h"
+#include "ParkerState.h"
+
 #include "Parker.h"
 #include "MousePicking.h"
 #include "GravityVector.h"
@@ -9,7 +11,7 @@
 #include "Platform.h"
 
 class CharacterParker;
-class HoltStatePlacingPlatform : public FSMState<CharacterParker>
+class HoltStatePlacingPlatform : public ParkerState
 {
 
 public:

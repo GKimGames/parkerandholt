@@ -130,6 +130,11 @@ public:
 		  currentState_->EndContact(contact,contactFixture, collidedFixture);
 	  }
 
+	  void PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse)
+	  {
+		  currentState_->PostSolve(contact, contactFixture, collidedFixture, impulse);
+	  }
+
 
 
 /*=============================================================================
@@ -144,7 +149,7 @@ public:
 	  FSMState<T>*  GetGlobalState()   const { return globalState_;}
 	  FSMState<T>*  GetPreviousState() const { return previousState_;}
 
-private:
+protected:
 
 	/// A pointer to the object that drives the state machine.
 	T*				driver_;

@@ -15,11 +15,47 @@
 #include "MessageDispatcher.h"
 
 
+enum SensorType
+{
+	SENSORTYPE_DEFAULT,
+	SENSORTYPE_LEDGE,
+	SENSORTYPE_COUNT
+};
+
+/// An array allowing easy conversion of KGBMessageType to a c string.
+const static char* SensorTypeString[SENSORTYPE_COUNT] = 
+{
+	"sensortype default",
+	"sensortype ledge",
+};
+
+//=============================================================================
+//						StringToSensorType
+//
+/// This returns an Ogre::String as a SensorType
+static SensorType StringToSensorType(Ogre::String str)
+{
+	Ogre::StringUtil::toLowerCase(str);
+
+	for(int i = 0; i < SENSORTYPE_COUNT; i++) 
+	{
+		if(str.compare(SensorTypeString[i]) == 0)
+		{
+			return (SensorType) i;
+		}
+	}
+
+	return SENSORTYPE_COUNT;
+}
+
 class GameObjectSensor : public GameObjectOgreBox2D
 {
 public:
 
 	friend class GameObjectSensorCreator;
+
+	
+
 	/// Constructor takes a message to send to all GameObjects registered
 	/// to this sensor. Shapes for the sensor can be added using the 
 	/// AddShape function, this must be done or optionally a body already
@@ -36,6 +72,8 @@ public:
 	{
 		defaultMessageOn_  = messageOn;
 		defaultMessageOff_ = messageOff;
+		sensorType_ = SENSORTYPE_DEFAULT;
+		gameObjectType_ = GOType_Sensor;
 	}
 
 	virtual ~GameObjectSensor(){}
@@ -183,6 +221,9 @@ public:
 	void IgnoreSensorsOff(){ignoreSensors_ = false;}
 	bool IsIgnoringSensors(){return ignoreSensors_;}
 
+	SensorType GetSensorType(){return sensorType_;}
+	
+
 protected:
 
 	struct SensorMessage
@@ -193,8 +234,11 @@ protected:
 		SensorMessage(KGBMessageType pOn, KGBMessageType pOff):on(pOn), off(pOff){}
 	};
 
+	
+
 	typedef std::map<GameObjectId, SensorMessage> SensorMap;
 	
+	SensorType sensorType_;
 
 	KGBMessageType defaultMessageOn_;
 	KGBMessageType defaultMessageOff_;

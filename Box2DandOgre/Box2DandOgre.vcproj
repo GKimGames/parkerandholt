@@ -97,8 +97,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="Copying exe to samples bin directory ..."
-				CommandLine="copyDebug.bat"
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -433,6 +432,12 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Resource Files"
+				Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
+				UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+				>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -453,6 +458,10 @@
 			</File>
 			<File
 				RelativePath=".\include\KeyHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\KGBTimer.h"
 				>
 			</File>
 			<File
@@ -555,6 +564,10 @@
 					</File>
 					<File
 						RelativePath=".\include\Parker.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\ParkerState.h"
 						>
 					</File>
 					<File
@@ -662,6 +675,10 @@
 					RelativePath=".\include\Switch.h"
 					>
 				</File>
+				<File
+					RelativePath=".\include\Teleporter.h"
+					>
+				</File>
 				<Filter
 					Name="Object Creators"
 					>
@@ -675,6 +692,10 @@
 					</File>
 					<File
 						RelativePath=".\source\GameObjectSensorCreator.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\LedgeSensorCreator.h"
 						>
 					</File>
 					<File
@@ -722,6 +743,18 @@
 					RelativePath=".\include\DynamicRenderable.h"
 					>
 				</File>
+				<Filter
+					Name="TextThing"
+					>
+					<File
+						RelativePath=".\include\TextRenderer.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\include\TextRenderer.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="XML Loaders"
@@ -738,13 +771,11 @@
 					RelativePath=".\include\TinyXMLHelper.h"
 					>
 				</File>
+				<File
+					RelativePath=".\include\XMLQuickVars.h"
+					>
+				</File>
 			</Filter>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
 		</Filter>
 		<Filter
 			Name="TinyXML"
@@ -791,6 +822,10 @@
 			</File>
 			<File
 				RelativePath="..\..\OgreSDK\bin\MapEditorSettings.xml"
+				>
+			</File>
+			<File
+				RelativePath="..\..\OgreSDK\bin\Myvars.xml"
 				>
 			</File>
 			<File

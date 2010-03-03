@@ -25,6 +25,14 @@ GameObject(name)
 //
 GameObjectOgre::~GameObjectOgre()
 {
+	// go through all attached entities
+	/*
+	Ogre::SceneNode::ObjectIterator Iter = sceneNode_->getAttachedObjectIterator();
+	while(Iter.hasMoreElements())
+	{
+		Ogre::MovableObject* mobj = Iter.getNext();
+	}
+	*/
 	sceneManager_->destroySceneNode(sceneNode_);
 }
 

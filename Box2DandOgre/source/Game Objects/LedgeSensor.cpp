@@ -19,7 +19,7 @@ LedgeSensor::LedgeSensor() : GameObjectSensor(NO_MESSAGE)
 	
 	// This is the sensor
 	b2CircleShape circleDef;
-	circleDef.m_radius = 0.38608f;
+	circleDef.m_radius = 0.2f;
 
 	b2FixtureDef fd;
 	fd.shape = &circleDef;
@@ -29,7 +29,7 @@ LedgeSensor::LedgeSensor() : GameObjectSensor(NO_MESSAGE)
 
 	body_->SetUserData(this);
 
-	gameObjectType_ = GOType_LedgeSensor;
+	gameObjectType_ = GOType_Sensor;
 
 }
 
