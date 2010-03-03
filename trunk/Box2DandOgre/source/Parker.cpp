@@ -613,6 +613,9 @@ void CharacterParker::ReturnToCheckPoint(b2Vec2 checkPoint)
 	traumaMeter_->ResetTrauma();
 	body_->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
 	SetBodyPosition(playerInfo_->GetCheckPoint());
+	
+	placingPlatform_->GetGravityVector()->RemovePlayer();
+	
 }
 
 void CharacterParker::PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse)

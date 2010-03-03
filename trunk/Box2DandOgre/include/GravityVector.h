@@ -4,7 +4,7 @@
 #include "GameObjectOgreBox2D.h"
 
  
-class GravityVector : public GameObjectOgreBox2D
+class GravityVector : public GameObjectOgreBox2D, public b2RayCastCallback
 {
 public:
 	GravityVector(Ogre::SceneManager* sceneManager, b2Vec2 center, b2Vec2 direction);
@@ -14,6 +14,10 @@ public:
 	bool Update(double timeSinceLastFrame);
 	bool Stop();
 	bool Start(b2Vec2 newPosition, b2Vec2 newDirection);
+	void SetPosition(b2Vec2 position);
+	bool RemovePlayer();
+	virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction);
+
 
 protected:
 	b2Vec2					position_;
@@ -22,6 +26,8 @@ protected:
 	b2Vec2					forceApplied_;
 	float					maxForce_;
 	bool					active_;
+	int						listNumber_;
+	b2Vec2					forcePoint_;
 
 };
 

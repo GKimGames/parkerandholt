@@ -40,7 +40,8 @@ bool PlayerInfo::HandleMessage(const KGBMessage message)
 		}
 	case ADD_ITEM:
 		{
-			inventory_ += boost::any_cast<int>(message.messageData);
+			AddToInventory(boost::any_cast<int>(message.messageData));
+			//inventory_ += boost::any_cast<int>(message.messageData);
 			return true;
 		}
 	}

@@ -162,7 +162,9 @@ bool GravityVector::Update(double timeSinceLastFrame)
 		
 		for(int i = 0; i < bodyList_.size(); i++)
 		{
-			bodyList_[i]->ApplyForce(forceApplied_, position_);
+			listNumber_ = i;
+			world_->RayCast(this, position_, bodyList_[0]->GetPosition());
+			bodyList_[i]->ApplyForce(forceApplied_, forcePoint_);
 		}
 		
 		UpdateGraphics(timeSinceLastFrame);
@@ -216,4 +218,50 @@ bool GravityVector::Start(b2Vec2 newPosition, b2Vec2 newDirection)
 	sceneNode_->setVisible(true);
 
 	return true;
+}
+
+
+//=============================================================================
+//								SetPosition
+//
+void GravityVector::SetPosition(b2Vec2 position)
+{
+	position_ = position;
+	SetBodyPosition(position_);
+	sceneNode_->setPosition(position_.x, position_.y, 0);
+}
+
+
+//=============================================================================
+//								RemovePlayer
+//
+bool GravityVector::RemovePlayer()
+{
+	for(int i = 0; i < bodyList_.size(); i++)
+	{
+		if(bodyList_[i]->GetUserData() != NULL)
+		{
+			GameObject* object = (GameObject*) bodyList_[i]->GetUserData();
+			if(object->GetId() == object->GetParkerId())
+			{
+				bodyList_.erase(bodyList_.begin()+i);
+				return true;
+			}
+		}
+
+	}
+	return false;
+}
+
+
+float32 GravityVector::ReportFixture(b2Fixture *fixture, const b2Vec2 &point, const b2Vec2 &normal, float32 fraction)
+{
+	if(fixture->GetBody() == bodyList_[listNumber_])
+	{
+		forcePoint_ = point;
+		return 0;
+	}
+	forcePoint_ = position_;
+	return 1;
+
 }
