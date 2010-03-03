@@ -18,11 +18,13 @@ struct IgnoreBody
 		body = b;
 		detected = false;
 		inContact = false;
+		contactCount = 0;
 	}
 
 	b2Body* body;
 	bool	detected;
 	bool	inContact;
+	int		contactCount;
 };
 
 
@@ -44,7 +46,7 @@ public:
 
 	bool Update(double timeSinceLastFrame)
 	{
-
+		/*
 		SetAllNotInContact();
 
 		b2ContactEdge* contacts = body_->GetContactList();
@@ -68,6 +70,7 @@ public:
 		}
 
 		RemoveNotInContact();
+		*/
 
 		return true;
 	}
@@ -82,32 +85,71 @@ public:
 	{
 		b2Body* body = collidedFixture->GetBody();
 
-		if(body->GetType() == b2_dynamicBody && !DoIgnoreBody(body))
+		bool ignoreBody = DoIgnoreBody(body);
+		if(body->GetType() == b2_dynamicBody && !ignoreBody)
 		{
 			if(body->GetUserData())
 			{
 				GameObjectOgreBox2D* goob = (GameObjectOgreBox2D*) body->GetUserData();
 
 				goob->SetBodyPosition(partner_->GetBodyPosition());
+				partner_->IgnoreThisBody(body);
 			}
 		}
-		
+		else if(ignoreBody)
+		{
+			std::vector<IgnoreBody*>::iterator iter = ignoreBodies_.begin();
+			while(iter != ignoreBodies_.end())
+			{
+				if((*iter)->body == body)
+				{
+					(*iter)->contactCount += 1;
+				}
+
+				iter++;
+			}
+		}
 	}
 
-
-	/// Called when two fixtures cease to touch.
+	/// Called when two fixtures begin to touch.
 	/// Contact fixture is the fixture in this Object's body.
 	/// Collided fixture is the fixture that hit this Object's body.
 	/// By default this does nothing.
 	virtual void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 	{
-		
-	}
+		b2Body* body = collidedFixture->GetBody();
 
+		bool ignoreBody = DoIgnoreBody(body);
+		if(ignoreBody)
+		{
+			std::vector<IgnoreBody*>::iterator iter = ignoreBodies_.begin();
+			while(iter != ignoreBodies_.end())
+			{
+				if((*iter)->body == body)
+				{
+					IgnoreBody* b = (*iter);
+					b->contactCount -= 1;
+					if(b->contactCount == 0)
+					{
+						iter = ignoreBodies_.erase(iter);
+						delete b;
+					}
+					else
+					{
+						iter++;
+					}
+				}
+				else
+				{
+					iter++;
+				}
+			}
+		}
+	}
 
 	void IgnoreThisBody(b2Body* b)
 	{
-		ignoreBodies_.push_back( new IgnoreBody(b));
+		ignoreBodies_.push_back( new IgnoreBody(b) );
 	}
 
 protected:
@@ -122,6 +164,7 @@ protected:
 			if((*iter)->body == b)
 			{
 				(*iter)->detected = true;
+				(*iter)->inContact = true;
 				return true;
 			}
 
@@ -153,13 +196,16 @@ protected:
 		while(iter != ignoreBodies_.end())
 		{
 
-			if((*iter)->inContact = false)
+			if((*iter)->inContact == false)
 			{
-				delete (*iter);
-				ignoreBodies_.erase(iter);
+				IgnoreBody* b = (*iter);
+				iter = ignoreBodies_.erase(iter);
+				delete b;
 			}
-
-			iter++;
+			else
+			{
+				iter++;
+			}
 		}
 	}
 

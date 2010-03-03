@@ -40,7 +40,7 @@ public:
 	bool KeyReleased(const OIS::KeyEvent &keyEventRef);
 
 	bool AddKey(const OIS::KeyCode key, const KGBMessageType message);
-	bool AddKey(const OIS::KeyCode key, std::pair<KGBMessageType, KGBMessageType> messageType);
+	bool AddKey(const OIS::KeyCode key, KGBMessageType messageType1, KGBMessageType messageType2);
 	void CheckKeys();
 
 	virtual bool Initialize()

@@ -214,6 +214,7 @@ bool Platform::InitializePlaceable()
 	bd.type = b2_dynamicBody;
 	bd.fixedRotation = false;
 	body_= world_->CreateBody(&bd);
+	body_->SetUserData(this);
 
 	float tempLength = sqrt((point2.x - point1.x) * (point2.x - point1.x) + (point2.y - point1.y) * (point2.y - point1.y));
 	float platformHeight = 0.1f;
@@ -238,6 +239,50 @@ bool Platform::InitializePlaceable()
 	sceneNode_->attachObject(entity_);
 	sceneNode_->scale(tempLength,platformHeight / 1.0, 1.0);
 
+	previousAngle_ = body_->GetAngle();
 	initialized_ = true;
+	return true;
+}
+bool Platform::SetGraphics(b2Vec2 position, float length, float angle, bool final)
+{
+		
+		body_->SetTransform(body_->GetPosition(), -previousAngle_);
+		body_->SetTransform(position, angle);
+		body_->GetPosition().x -3;
+
+		sceneNode_->setScale(length, 0.1f, 1.0);
+
+		previousAngle_ = angle;
+ 
+
+
+		//b2PolygonShape bodyShapeDef;
+		//bodyShapeDef.SetAsBox(2.0f, 2.0f); //body_->GetPosition(), previousAngle_);
+		//b2FixtureDef fd;
+		//fd.shape = &bodyShapeDef;
+
+		//fd.density = 25;
+		//fd.friction = DEFAULT_FRICTION;
+		//body_->GetPosition().x -3;
+		////fd.filter.groupIndex = STATIC_MAP_GROUP;
+
+		//body_->CreateFixture(&fd);
+
+
+	if(final)
+	{
+		b2PolygonShape bodyShapeDef;
+		bodyShapeDef.SetAsBox(length/2, 0.05f); //body_->GetPosition(), previousAngle_);
+		b2FixtureDef fd;
+		fd.shape = &bodyShapeDef;
+
+		fd.density = 25;
+		fd.friction = DEFAULT_FRICTION;
+		body_->GetPosition().x -3;
+		//fd.filter.groupIndex = STATIC_MAP_GROUP;
+
+		body_->CreateFixture(&fd);
+	}
+
 	return true;
 }

@@ -33,6 +33,7 @@ public:
 	virtual bool Initialize();
 	virtual bool Initialize(Ogre::String str);
 	bool InitializePlaceable();
+	bool SetGraphics(b2Vec2 position, float length, float angle, bool final);
 
 protected:
 
@@ -40,6 +41,8 @@ protected:
 
 	b2Vec2 point1;
 	b2Vec2 point2;
+	float32 previousAngle_;
+	float length_;
 	
 };
 

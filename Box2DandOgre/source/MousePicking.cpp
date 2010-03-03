@@ -40,6 +40,7 @@ MousePicking::MousePicking(Ogre::SceneManager* sceneManager, Ogre::Camera* camer
 	box_[1] = 0;
 	box_[2] = 0;
 	incrementer_ = 0;
+	entity_->setVisible(false);
 }
 
 

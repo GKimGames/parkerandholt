@@ -28,6 +28,7 @@ HoltStatePlacingPlatform::HoltStatePlacingPlatform(
 	box_[2] = 0;
 	incrimenter_ = 0;
 	gravityVector_ = new GravityVector(driver_->sceneManager_, b2Vec2(0,0), b2Vec2(1,1));
+	leftMouseDown_ = false;
 }
 
 //=============================================================================
@@ -45,6 +46,7 @@ void HoltStatePlacingPlatform::Enter()
 	}
 
 	driver_->mousePicking_->boxSize_ = 0.2f;
+	driver_->mousePicking_->UpdateMouseFromCamera();
 	driver_->mousePicking_->SetVisibility(true);
 }
 
@@ -110,6 +112,25 @@ bool HoltStatePlacingPlatform::Update()
 		}
 	}
 
+	if(leftMouseDown_)
+	{
+		endPosition_.x = driver_->mousePicking_->GetPosition().x;
+		endPosition_.y = driver_->mousePicking_->GetPosition().y;
+		float tempLength = sqrt((startPosition_.x - endPosition_.x) * (startPosition_.x - endPosition_.x)
+							 + (startPosition_.y - endPosition_.y) * (startPosition_.y - endPosition_.y));
+		if(tempLength > 0.5)
+		{
+			if(platform_ == 0)
+			{
+				SpawnPlatform();
+			}
+			b2Vec2 tempPosition(startPosition_.x - (startPosition_.x - endPosition_.x)/2,
+								startPosition_.y - (startPosition_.y - endPosition_.y)/2);
+			float angle = atan2((endPosition_.y - startPosition_.y)/2,(endPosition_.x - startPosition_.x)/2);
+			platform_->SetGraphics(tempPosition, tempLength, angle, false);
+		}
+	}
+
 
 	return true;
 }
@@ -132,13 +153,41 @@ bool HoltStatePlacingPlatform::HandleMessage(const KGBMessage message)
 		{	
 			startPosition_.x = driver_->mousePicking_->GetPosition().x;
 			startPosition_.y = driver_->mousePicking_->GetPosition().y;
+			endPosition_.x = driver_->mousePicking_->GetPosition().x;
+			endPosition_.y = driver_->mousePicking_->GetPosition().y;
+			leftMouseDown_ = true;
 			return true;
 		}
 		case LEFT_MOUSE_MINUS:
 		{
 			endPosition_.x = driver_->mousePicking_->GetPosition().x;
 			endPosition_.y = driver_->mousePicking_->GetPosition().y;
-			SpawnPlatform();
+			//SpawnPlatform();
+			float tempLength = sqrt((startPosition_.x - endPosition_.x) * (startPosition_.x - endPosition_.x)
+								 + (startPosition_.y - endPosition_.y) * (startPosition_.y - endPosition_.y));
+			if(platform_ == 0)
+			{
+				leftMouseDown_ = false;
+			}
+			else if(tempLength < .5)
+			{
+				leftMouseDown_ = false;
+				//delete platform_;
+			}
+			else
+			{
+				platform_->GetBody()->SetActive(true);
+				leftMouseDown_ = false;
+				trans_->setTransparency(0.0);
+
+				platform_->SetGraphics(platform_->GetBody()->GetPosition(), tempLength, platform_->GetBody()->GetAngle(), true);
+				platform_ = 0;
+			}
+			/*startPosition_.x = 0; startPosition_.y = 0;
+			endPosition_.x = 0; endPosition_.y = 0;*/
+			
+			
+
 			return true;
 		}
 		case MIDDLE_MOUSE_MINUS:
@@ -187,6 +236,11 @@ bool HoltStatePlacingPlatform::HandleMessage(const KGBMessage message)
 			startPosition_.x = driver_->mousePicking_->GetPosition().x;
 			startPosition_.y = driver_->mousePicking_->GetPosition().y;
 			gravityVector_->Stop();
+			
+			gravityVector_->SetPosition(startPosition_);
+
+			gravityVector_->GetEntity()->setVisible(true);
+			driver_->sceneManager_->getParticleSystem("Fireworks")->setVisible(false);
 			return true;
 		}
 
@@ -348,7 +402,6 @@ void HoltStatePlacingPlatform::UpdateAnimation()
 bool HoltStatePlacingPlatform::SpawnBox()
 {
 	XMLQuickVars var("..\\Myvars.xml");
-
 	box_[incrimenter_%3] = new HoltBox(driver_->sceneManager_, 
 		b2Vec2((float32)driver_->mousePicking_->GetPosition().x, (float32)driver_->mousePicking_->GetPosition().y),
 		driver_->mousePicking_->boxSize_/2, var.Double("HoltBox/boxDensity"));
@@ -358,23 +411,15 @@ bool HoltStatePlacingPlatform::SpawnBox()
 
 bool HoltStatePlacingPlatform::SpawnPlatform()
 {
-	float tempLength = sqrt((startPosition_.x - endPosition_.x) * (startPosition_.x - endPosition_.x) + (startPosition_.y - endPosition_.y) * (startPosition_.y - endPosition_.y));
-	if(tempLength < .5)
-	{
-		return false;
-	}
-	else if(tempLength <= 5)
-	{
-		platform_ = new Platform(driver_->sceneManager_, b2Vec2(startPosition_.x, startPosition_.y), b2Vec2(endPosition_.x, endPosition_.y), 1);
-		return true;
-	}
-	else if(tempLength > 5)
-	{
-		platform_ = new Platform(driver_->sceneManager_, b2Vec2(startPosition_.x, startPosition_.y), b2Vec2(endPosition_.x, endPosition_.y), 1);
-		return true;
-	}
+	float tempLength = sqrt((startPosition_.x - endPosition_.x) * (startPosition_.x - endPosition_.x)
+						+ (startPosition_.y - endPosition_.y) * (startPosition_.y - endPosition_.y));
 
-	return false;
+	platform_ = new Platform(driver_->sceneManager_, b2Vec2(startPosition_.x, startPosition_.y), b2Vec2(endPosition_.x, endPosition_.y), 1);
+	platform_->GetBody()->SetActive(false);
+	trans_ = new EntityMaterialInstance(platform_->GetEntity());
+	trans_->setSceneBlending(Ogre::SceneBlendType::SBT_ADD);
+	trans_->setTransparency(0.5);
+	return true;
 }
 
 //=============================================================================
@@ -393,4 +438,8 @@ bool HoltStatePlacingPlatform::SpawnGravityVector()
 	}
 
 	return false;
+}
+GravityVector* HoltStatePlacingPlatform::GetGravityVector()
+{
+	return gravityVector_;
 }

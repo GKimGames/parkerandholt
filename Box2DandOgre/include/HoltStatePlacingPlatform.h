@@ -38,9 +38,12 @@ public:
 	/// This will execute when the state is exited.
 	virtual void Exit();
 
+	GravityVector* GetGravityVector();
+
 	bool SpawnBox();
 	bool SpawnPlatform();
 	bool SpawnGravityVector();
+	bool leftMouseDown_;
 	
 	
 
@@ -62,6 +65,7 @@ protected:
 	Platform*		platform_;
 	int				incrimenter_;
 	GravityVector*	gravityVector_;
+	EntityMaterialInstance*	trans_;
 };
 
 #endif

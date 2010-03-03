@@ -60,10 +60,10 @@ bool KeyHandler::AddKey(const OIS::KeyCode key, KGBMessageType messageType)
 	return true;
 }
 
-bool KeyHandler::AddKey(const OIS::KeyCode key, std::pair<KGBMessageType,KGBMessageType> messageType)
+bool KeyHandler::AddKey(const OIS::KeyCode key, KGBMessageType messageType1, KGBMessageType messageType2)
 {
-	keyListDown_[key] = messageType.first;
-	keyListUp_[key] = messageType.second;
+	keyListDown_[key] = messageType1;
+	keyListUp_[key] = messageType2;
 	return true;
 }
 
