@@ -11,7 +11,7 @@
 #include "ParkerStateOnGround.h"
 #include "ParkerStateInAir.h"
 #include "HoltStatePlacingGravityVector.h"
-
+#include "XMLQuickVars.h"
 
 //=============================================================================
 //								Constructor
@@ -19,7 +19,7 @@
 HoltStatePlacingPlatform::HoltStatePlacingPlatform(	
 	CharacterParker* parker,
 	FSMStateMachine<CharacterParker>* stateMachine):
-	FSMState<CharacterParker>(parker,stateMachine)
+	ParkerState(parker,stateMachine)
 {
 	feetContactCount_ = 0;
 	platform_ = 0;
@@ -347,9 +347,11 @@ void HoltStatePlacingPlatform::UpdateAnimation()
 
 bool HoltStatePlacingPlatform::SpawnBox()
 {
+	XMLQuickVars var("..\\Myvars.xml");
+
 	box_[incrimenter_%3] = new HoltBox(driver_->sceneManager_, 
 		b2Vec2((float32)driver_->mousePicking_->GetPosition().x, (float32)driver_->mousePicking_->GetPosition().y),
-		driver_->mousePicking_->boxSize_/2);
+		driver_->mousePicking_->boxSize_/2, var.Double("HoltBox/boxDensity"));
 	incrimenter_++;
 	return true;
 }

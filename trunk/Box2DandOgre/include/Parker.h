@@ -17,6 +17,9 @@
 #include "TraumaMeter.h"
 #include "PlayerInfo.h"
 
+#include "LedgeSensor.h"
+#include "ParkerState.h"
+
 class MousePicking;
 
 /// Parkers class
@@ -47,7 +50,7 @@ public:
 	/// Called when two fixtures cease to touch.
 	void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 	
-	void PostSolve(b2Contact* contact, const b2ContactImpulse *impulse);
+	void PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse);
 	void ReturnToCheckPoint(b2Vec2);
 	bool Initialize();
 
@@ -70,6 +73,7 @@ private:
 
 	ParkerStateOnGround*			onGroundState_;
 	ParkerStateInAir*				inAirState_;
+	ParkerStateLedgeGrab*			ledgeGrabState_;
 	HoltStatePlacingPlatform*		placingPlatform_;
 	HoltStatePlacingGravityVector*	placingGravityVector_;
 
@@ -112,6 +116,9 @@ private:
 	
 	TraumaMeter*		traumaMeter_;
 	PlayerInfo*			playerInfo_;
+
+	GameObjectSensor*	ledge_;
+	b2Fixture*			sensorLedge_;
 };
 
 

@@ -12,6 +12,7 @@
 
 #include "ParkerStateOnGround.h"
 #include "ParkerStateInAir.h"
+#include "ParkerStateLedgeGrab.h"
 #include "HoltStatePlacingPlatform.h"
 #include "HoltStatePlacingGravityVector.h"
 
@@ -28,8 +29,9 @@ CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager, MousePicking*
 
 	stateMachine_ = new FSMStateMachine<CharacterParker>(this);
 
-	onGroundState_ = new ParkerStateOnGround(this,stateMachine_);
-	inAirState_ = new ParkerStateInAir(this,stateMachine_);
+	onGroundState_ = new ParkerStateOnGround(this, stateMachine_);
+	inAirState_ = new ParkerStateInAir(this, stateMachine_);
+	ledgeGrabState_ = new ParkerStateLedgeGrab(this, stateMachine_);
 	placingPlatform_ = new HoltStatePlacingPlatform(this, stateMachine_);
 	placingGravityVector_ = new HoltStatePlacingGravityVector(this, stateMachine_);
 
@@ -431,6 +433,8 @@ bool CharacterParker::Update(double timeSinceLastFrame)
 	shinLeftHit_ = false;
 	torsoLeftHit_ = false;
 	torsoRightHit_ = false;
+	ledge_ = 0;
+	sensorLedge_ = 0;
 
 	b2ContactEdge* contacts = body_->GetContactList();
 	while(contacts)
@@ -440,6 +444,54 @@ bool CharacterParker::Update(double timeSinceLastFrame)
 			b2Fixture* A = contacts->contact->GetFixtureA();
 			b2Fixture* B = contacts->contact->GetFixtureB();
 
+
+			GameObject* goA = (GameObject*) contacts->contact->GetFixtureA()->GetBody()->GetUserData();
+			GameObject* goB = (GameObject*) contacts->contact->GetFixtureB()->GetBody()->GetUserData();
+
+			if(goA && goA->GetGameObjectType() == GOType_Sensor)
+			{
+				if(ledge_ == 0)
+				{
+					GameObjectSensor* sensor;
+					sensor = dynamic_cast<GameObjectSensor*> (goA);
+					if(sensor)
+					{
+						if(B == torsoSensorRight_)
+						{
+							sensorLedge_ = torsoSensorRight_;
+							ledge_ = (GameObjectSensor*) goA;
+						}
+						else if(B == torsoSensorLeft_)
+						{
+							sensorLedge_ = torsoSensorLeft_;
+							ledge_ = (GameObjectSensor*) goA;
+						}
+					}
+				}
+			}
+			else if(goB && goB->GetGameObjectType() == GOType_Sensor && ledge_ == 0)
+			{
+				if(ledge_ == 0)
+				{
+					GameObjectSensor* sensor;
+					sensor = dynamic_cast<GameObjectSensor*> (goB);
+					if(sensor)
+					{
+						if(A == torsoSensorRight_)
+						{
+							sensorLedge_ = torsoSensorRight_;
+							ledge_ = (GameObjectSensor*) goB;
+						}
+						else if(A == torsoSensorLeft_)
+						{
+							sensorLedge_ = torsoSensorLeft_;
+							ledge_ = (GameObjectSensor*) goB;
+						}
+					}
+				}
+			}
+
+			// Check which sensor is in contact
 			if(A == feetSensor_ && !B->IsSensor())
 			{
 				feetSensorHit_ = true;
@@ -563,7 +615,7 @@ void CharacterParker::ReturnToCheckPoint(b2Vec2 checkPoint)
 	SetBodyPosition(playerInfo_->GetCheckPoint());
 }
 
-void CharacterParker::PostSolve(b2Contact *contact, const b2ContactImpulse *impulse)
+void CharacterParker::PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse)
 {
 	if(contact->GetFixtureA()->GetBody()->GetUserData() != NULL)
 	{
@@ -599,4 +651,7 @@ void CharacterParker::PostSolve(b2Contact *contact, const b2ContactImpulse *impu
 			}
 		}
 	}
+
+	stateMachine_->PostSolve(contact,contactFixture, collidedFixture, impulse);
+
 }

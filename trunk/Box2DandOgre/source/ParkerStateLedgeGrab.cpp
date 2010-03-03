@@ -16,6 +16,7 @@
 #include "ParkerStateOnGround.h"
 #include "ParkerStateInAir.h"
 
+// 470 to stop him from moving
 
 //=============================================================================
 //								Constructor
@@ -23,18 +24,30 @@
 ParkerStateLedgeGrab::ParkerStateLedgeGrab(
 	CharacterParker* parker,
 	FSMStateMachine<CharacterParker>* stateMachine):
-	FSMState<CharacterParker>(parker,stateMachine)
+	ParkerState(parker,stateMachine)
 {
 }
+
 
 //=============================================================================
 //								Enter
 //
 void ParkerStateLedgeGrab::Enter()
 {
-	//b2RevoluteJointDef jdef;
-	//jdef.bodyA = driver_->body_;
-	//driver_->world_->CreateJoint();
+	b2Vec2 vp = driver_->GetBodyPosition();
+	originalPosition_ = vp;
+	ledgePosition_ = driver_->ledge_->GetBodyPosition();
+	driver_->SetBodyPosition(b2Vec2(vp.x, ledgePosition_.y - 1.5));
+	vp = driver_->GetBodyPosition();
+	vp.y += 1.884 / 2.0;
+
+	b2DistanceJointDef ddef;
+	ddef.Initialize(driver_->ledge_->GetBody(),driver_->body_, ledgePosition_, vp);
+	grabJoint_ = (b2DistanceJoint*)  driver_->world_->CreateJoint(&ddef);
+
+	driver_->animationBlender_->Blend("climb", AnimationBlender::BlendThenAnimate, 0.3, false, 0.0);
+
+	climbing_ = false;
 
 }
 
@@ -43,52 +56,42 @@ void ParkerStateLedgeGrab::Enter()
 //
 bool ParkerStateLedgeGrab::Update()
 {
-	if(driver_->moveLeft_)
-	{
-		MoveLeft();
-	}
-	if(driver_->moveRight_)
-	{
-		MoveRight();
-	}
-	if(driver_->jump_)
-	{
-		//Jump();
-		;
-	}
+
 	static Ogre::Vector3 direction;
 	
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
-	if(driver_->feetSensorHitCount_ > 0)
+	// Set the position of the scene node to that of the Box2D body
+	b2Vec2 v = driver_->body_->GetPosition();
+
+	// Make the scene face the direction the body is moving
+	if(ledgePosition_.x > v.x)
 	{
-		stateMachine_->ChangeState(driver_->onGroundState_);
+		direction = Ogre::Vector3(0,0,1);
 	}
 	else
 	{
-		// Set the position of the scene node to that of the Box2D body
-		b2Vec2 v = driver_->body_->GetPosition();
-		driver_->sceneNode_->setPosition(v.x, v.y,0);
+		direction = Ogre::Vector3(0,0,-1);
+	}
 
-		// Make the scene face the direction the body is moving
-		if(driver_->body_->GetLinearVelocity().x > 0.1)
-		{
-			direction = Ogre::Vector3(0,0,1);
-		}
-		else if(driver_->body_->GetLinearVelocity().x < -0.1)
-		{
-			direction = Ogre::Vector3(0,0,-1);
-		}
+	driver_->sceneNode_->setDirection(direction,Ogre::Node::TS_WORLD);
 
-		driver_->sceneNode_->setDirection(direction,Ogre::Node::TS_WORLD);
+	UpdateAnimation();
 
-		UpdateAnimation();
+	Ogre::Bone* rightWrist = driver_->entity_->getSkeleton()->getBone("Right_Wrist");
+	Ogre::Vector3 v2(ledgePosition_.x,ledgePosition_.y,0);
 
-		if(driver_->debugDrawOn_)
-		{
-			driver_->UpdateDebugDraw();
-		}
+	rightWrist->setPosition(rightWrist->getParent()->_getDerivedOrientation().Inverse() * (v2 - rightWrist->getParent()->_getDerivedPosition()));
+	driver_->sceneNode_->setPosition(v.x, v.y,0);
 
+	if(driver_->debugDrawOn_)
+	{
+		driver_->UpdateDebugDraw();
+	}
+
+	if(climbing_)
+	{
+		Climb();
 	}
 
 	// We've successfully updated.
@@ -106,38 +109,62 @@ bool ParkerStateLedgeGrab::HandleMessage(const KGBMessage message)
 		case CHARACTER_MOVE_LEFT_PLUS:
 		{
 			driver_->moveLeft_ = true;
-			//MoveLeft();
 			return true;
 		}
+
 		case CHARACTER_MOVE_RIGHT_PLUS:
 		{
 			driver_->moveRight_ = true;
-			//MoveRight();
 			return true;
 		}
+
 		case CHARACTER_JUMP_PLUS:
 		{
 			driver_->jump_ = true;
-			//Jump();
+
+			if(!climbing_ && !driver_->moveLeft_ && !driver_->moveRight_)
+			{
+				climbing_ = true;
+				originalPosition_ = driver_->GetBodyPosition();
+				driver_->world_->DestroyJoint(grabJoint_);
+				grabJoint_ = 0;
+				driver_->animationBlender_->targetTime_ = 1000;
+			}
+			else if(!climbing_)
+			{
+				if(grabJoint_)
+				{
+					driver_->world_->DestroyJoint(grabJoint_);
+					grabJoint_ = 0;
+				}
+				stateMachine_->ChangeState(driver_->inAirState_);
+			}
+
 			return true;
 		}
 
 		case CHARACTER_MOVE_LEFT_MINUS:
 		{
 			driver_->moveLeft_ = false;
-			//MoveLeft();
+
 			return true;
 		}
+
 		case CHARACTER_MOVE_RIGHT_MINUS:
 		{
 			driver_->moveRight_ = false;
-			//MoveRight();
 			return true;
 		}
+
 		case CHARACTER_JUMP_MINUS:
 		{
 			driver_->jump_ = false;
-			//Jump();
+			return true;
+		}
+
+		case CHARACTER_MOVE_DOWN_PLUS:
+		{
+			stateMachine_->ChangeState(driver_->inAirState_);
 			return true;
 		}
 	}
@@ -150,7 +177,11 @@ bool ParkerStateLedgeGrab::HandleMessage(const KGBMessage message)
 //
 void ParkerStateLedgeGrab::Exit()
 {
-
+	if(grabJoint_)
+	{
+		driver_->world_->DestroyJoint(grabJoint_);
+		grabJoint_ = 0;
+	}
 }
 
 //=============================================================================
@@ -163,8 +194,6 @@ void ParkerStateLedgeGrab::BeginContact(ContactPoint* contact, b2Fixture* contac
 	{
 		if(contactFixture == driver_->feetSensor_)
 		{
-			stateMachine_->ChangeState(driver_->onGroundState_);
-			driver_->BeginContact(contact,contactFixture,collidedFixture);
 		}
 	}
 
@@ -179,36 +208,6 @@ void ParkerStateLedgeGrab::EndContact(ContactPoint* contact, b2Fixture* contactF
 
 }
 
-//=============================================================================
-//								MoveLeft
-//
-///
-void ParkerStateLedgeGrab::MoveLeft()
-{
-
-	double timeSinceLastFrame = GameFramework::getSingletonPtr()->GetTimeSinceLastFrame();
-
-	if(driver_->body_->GetLinearVelocity().x > -driver_->maximumAirVelocity_)
-	{
-		driver_->body_->ApplyForce(b2Vec2(-driver_->airForce_ * timeSinceLastFrame,0), driver_->body_->GetPosition());
-	}
-
-}
-
-//=============================================================================
-//								MoveRight
-//
-/// 
-void ParkerStateLedgeGrab::MoveRight()
-{
-	double timeSinceLastFrame = GameFramework::getSingletonPtr()->GetTimeSinceLastFrame();
-
-	if(driver_->body_->GetLinearVelocity().x < driver_->maximumAirVelocity_)
-	{
-		driver_->body_->ApplyForce(b2Vec2(driver_->airForce_ * timeSinceLastFrame,0), driver_->body_->GetPosition());
-	}
-
-}
 
 
 //=============================================================================
@@ -219,25 +218,64 @@ void ParkerStateLedgeGrab::MoveRight()
 void ParkerStateLedgeGrab::Climb()
 {
 
-	double timeLeft = (driver_->animationState_->getLength() - driver_->animationState_->getTimePosition()) / driver_->animationState_->getLength();
-	driver_->body_->ApplyForce(b2Vec2(0,driver_->jumpingAfterForce_ * timeLeft), driver_->body_->GetPosition());
+	double timeLeft = driver_->animationBlender_->GetSource()->getTimePosition() / driver_->animationBlender_->GetSource()->getLength();
 
-	// Code to wall jump
-	/*
-	if(torsoSensorHitCount_ > 0 && justWallJumped_ == false)
+	b2Vec2 dest = ledgePosition_ - originalPosition_;
+	driver_->SetBodyPosition(originalPosition_);
+	if(timeLeft < 0.8 && timeLeft > 0.1)
 	{
-		body_->SetLinearVelocity(b2Vec2(0,body_->GetLinearVelocity().y)); 
-		body_->ApplyImpulse(b2Vec2(-jumpingForce_/2,jumpingForce_), body_->GetPosition());
-		justWallJumped_ = true;
-
-		animationState_->setEnabled(false);
-		animationState_ = entity_->getAnimationState("JumpNoHeight");
-		animationState_->setTimePosition(Ogre::Real(0));
-		animationState_->setLoop(false);
-		animationState_->setEnabled(true);
+		Ogre::Vector3 v(originalPosition_.x, originalPosition_.y + ((dest.y + 1.05) * timeLeft / 0.75),0);
+		driver_->SetBodyPosition(b2Vec2(v.x,v.y));
+		driver_->GetBody()->SetLinearVelocity(b2Vec2(0,0));
 	}
-	*/
+	else if(timeLeft > 0.1 && timeLeft < 0.9)
+	{
+		Ogre::Vector3 v(originalPosition_.x + dest.x * (timeLeft + 0.1 - 0.9) * 5, originalPosition_.y + dest.y + 1.05,0);
+		driver_->SetBodyPosition(b2Vec2(v.x,v.y));
+		driver_->GetBody()->SetLinearVelocity(b2Vec2(0,0));
+		Ogre::Skeleton* s = driver_->GetEntity()->getSkeleton();
+	}
+	else if(timeLeft > 0.9)
+	{
+		driver_->SetBodyPosition(b2Vec2(originalPosition_.x + dest.x, originalPosition_.y + dest.y + 1.05));
+		driver_->GetBody()->SetLinearVelocity(b2Vec2(0,0));
+		Ogre::Skeleton* s = driver_->GetEntity()->getSkeleton();
+		climbing_ = false;
 
+		driver_->animationBlender_->Blend("idle",AnimationBlender::BlendWhileAnimating, 0.1);
+		stateMachine_->ChangeState(driver_->onGroundState_);
+	}
+
+
+}
+
+#include "XMLQuickVars.h"
+//=============================================================================
+//								PostSolve
+void ParkerStateLedgeGrab::PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse)
+{
+	XMLQuickVars var("..\\Myvars.xml");
+	float totalImpulse = abs(impulse->normalImpulses[0]);
+
+	if(climbing_)
+	{
+		b2Body* b = collidedFixture->GetBody();
+
+		if(b->GetType() != b2_staticBody)
+		{
+			if((totalImpulse > var.Double("ledge/maxForce") && totalImpulse < 500000) || (b->GetMass() * 9.8) > 470 )
+			{
+				if(grabJoint_)
+				{
+					driver_->world_->DestroyJoint(grabJoint_);
+					grabJoint_ = 0;
+				}
+
+				stateMachine_->ChangeState(driver_->inAirState_);
+			}
+		}
+	}
+	
 }
 
 //=============================================================================
@@ -246,5 +284,5 @@ void ParkerStateLedgeGrab::UpdateAnimation()
 {
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
-	driver_->animationState_->addTime(timeSinceLastFrame);
+	driver_->animationBlender_->AddTime(timeSinceLastFrame);
 }

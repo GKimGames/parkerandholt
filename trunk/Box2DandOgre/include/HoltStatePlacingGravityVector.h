@@ -2,18 +2,20 @@
 #define HOLT_STATE_PLACING_GRAVITY_VECTOR_H
 
 #include "FSMState.h"
+#include "ParkerState.h"
+
 #include "Parker.h"
 #include "MousePicking.h"
 #include "Platform.h"
 #include "GravityVector.h"
 
 class CharacterParker;
-class HoltStatePlacingGravityVector : public FSMState<CharacterParker>
+class HoltStatePlacingGravityVector : public ParkerState
 {
 
 public:
 
-	HoltStatePlacingGravityVector(CharacterParker* parker, FSMStateMachine<CharacterParker>* stateMachine);
+	HoltStatePlacingGravityVector(CharacterParker* parker, ParkerStateMachine* stateMachine);
 
 	~HoltStatePlacingGravityVector(){}
 

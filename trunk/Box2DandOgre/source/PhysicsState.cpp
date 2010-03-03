@@ -11,9 +11,10 @@
 #include "TinyXMLHelper.h"
 #include "CameraStateWatch.h"
 #include "CameraStateGoToPoint.h"
-
+#include "Teleporter.h"
 #include "Parker.h"
 
+#include "KGBTimer.h"
 using namespace Ogre;
 
 class LedgeSensor;
@@ -34,6 +35,7 @@ PhysicsState::PhysicsState()
 void PhysicsState::enter()
 {
 
+	//GAMEFRAMEWORK->time = 0;
 	testing_ = .5;
 
 	gameObject_ = new GameObject("PhysicsState");
@@ -44,7 +46,7 @@ void PhysicsState::enter()
 	TiXmlHandle* root = TinyXMLHelper::GetRootFromFile("../Settings.xml", settingsDoc);
 	
 	TiXmlHandle cameraHandle = root->FirstChildElement("Camera");
-	Ogre::Vector3 camPosition = TinyXMLHelper::GetAttributeVector3(cameraHandle.ToElement(), "position");
+	camPosition = TinyXMLHelper::GetAttributeVector3(cameraHandle.ToElement(), "position");
 	Ogre::Vector3 camLook = TinyXMLHelper::GetAttributeVector3(cameraHandle.ToElement(), "lookAt");
 
 	TiXmlHandle box2DHandle = root->FirstChildElement("Box2D");
@@ -200,7 +202,7 @@ void PhysicsState::createPhysics()
 	parker_->Initialize();
 	parker_->InitializeDebugDraw();
 
-	new MovingPlatform(sceneManager_, b2Vec2(10.0f, 1.0f), b2Vec2(0.0f, 1.0f), b2Vec2(5.0f, 1.0f), b2Vec2(0.0f, 5.0f), 2);
+	//new MovingPlatform(sceneManager_, b2Vec2(10.0f, 1.0f), b2Vec2(0.0f, 1.0f), b2Vec2(5.0f, 1.0f), b2Vec2(0.0f, 5.0f), 2);
 	PressureSwitch* ps = new PressureSwitch(sceneManager_);
 
 	ps->AddToMessageList(parker_->GetId(), CREATE_BOX);
@@ -210,11 +212,14 @@ void PhysicsState::createPhysics()
 	myKeyHandler_->AddKey(OIS::KC_RIGHT, std::make_pair(CHARACTER_MOVE_RIGHT_PLUS, CHARACTER_MOVE_RIGHT_MINUS));
 	myKeyHandler_->AddKey(OIS::KC_LEFT, std::make_pair(CHARACTER_MOVE_LEFT_PLUS, CHARACTER_MOVE_LEFT_MINUS));
 	myKeyHandler_->AddKey(OIS::KC_UP, std::make_pair(CHARACTER_JUMP_PLUS, CHARACTER_JUMP_MINUS));
+	myKeyHandler_->AddKey(OIS::KC_DOWN, std::make_pair(CHARACTER_MOVE_DOWN_PLUS, CHARACTER_MOVE_DOWN_MINUS));
 	myKeyHandler_->AddKey(OIS::KC_D, std::make_pair(CHARACTER_MOVE_RIGHT_PLUS, CHARACTER_MOVE_RIGHT_MINUS));
 	myKeyHandler_->AddKey(OIS::KC_A, std::make_pair(CHARACTER_MOVE_LEFT_PLUS, CHARACTER_MOVE_LEFT_MINUS));
 	myKeyHandler_->AddKey(OIS::KC_W, std::make_pair(CHARACTER_JUMP_PLUS, CHARACTER_JUMP_MINUS));
+	myKeyHandler_->AddKey(OIS::KC_S, std::make_pair(CHARACTER_MOVE_DOWN_PLUS, CHARACTER_MOVE_DOWN_MINUS));
 	myKeyHandler_->AddKey(OIS::KC_1, CHARACTER_ENTER_PLATFORMSTATE);
 	myKeyHandler_->AddKey(OIS::KC_Q, CHARACTER_EXIT_PLACINGSTATE);
+	myKeyHandler_->AddKey(OIS::KC_F, CHARACTER_GRAB_LEDGE);
 	
 	new CheckPoint(sceneManager_, b2Vec2(-8.0f, 2.0f),2,4);
 	new CheckPoint(sceneManager_, b2Vec2(-16.0f, 2.0f),2,4);
@@ -224,6 +229,35 @@ void PhysicsState::createPhysics()
 	new PickUp(sceneManager_, b2Vec2(-3.0f, 3.0f));
 	new PickUp(sceneManager_, b2Vec2(-6.0f, 3.0f));
 	new PickUp(sceneManager_, b2Vec2(-9.0f, 3.0f));
+
+	Teleporter* t1 = new Teleporter("Steeeeeeve");
+	Teleporter* t2 = new Teleporter("Steeeeve");
+
+	t1->SetPartner(t2);
+	t2->SetPartner(t1);
+
+	b2BodyDef bdef;
+	bdef.position.Set(10, 3);
+	b2CircleShape circleShape;
+	circleShape.m_radius = 0.5;
+
+	b2FixtureDef fd;
+	fd.shape = &circleShape;
+	fd.isSensor = true;
+
+	b2Body* b = world->CreateBody(&bdef);
+	b->SetUserData(t1);
+	b->CreateFixture(&fd);
+	t1->SetBody(b);
+
+	bdef.position.Set(14, 3);
+	b = world->CreateBody(&bdef);
+	b->SetUserData(t2);
+	b->CreateFixture(&fd);
+	t2->SetBody(b);
+
+	LedgeSensor* ls = new LedgeSensor();
+	ls->SetBodyPosition(b2Vec2(0,5));
 	
 #if DEBUG_DRAW_ON
 	debugDraw_ = new OgreB2DebugDraw(sceneManager_, "debugDraw", 0);
@@ -449,6 +483,7 @@ void PhysicsState::createScene()
 //
 bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 {
+	static bool myFlip = true;
 	myKeyHandler_->KeyPressed(keyEventRef);
 	if(keyEventRef.key == OIS::KC_P)
 	{
@@ -471,8 +506,35 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 		CompositorManager::getSingleton().setCompositorEnabled(GAMEFRAMEWORK->viewport_, "B&W",true);
 	}
 	
-	GameFramework::getSingletonPtr()->KeyPressed(keyEventRef);
 
+	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_R))
+	{
+		CameraStateGoToPointDef def;
+		def.target = Ogre::Vector3(50,0,100);
+		def.toleranceDistance = 0.1;
+		def.factor = 2.5;
+		def.initialPosition = camera_->getPosition();
+		gameCamera_->InitializeDef(&def);
+
+	}
+
+	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_T))
+	{
+		CameraStateWatchDef def;
+		def.initialPosition = camPosition;
+		def.targetObject = parker_;
+		gameCamera_->InitializeDef(&def);
+	}
+
+	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_E))
+	{
+		CameraStateWatchDef def;
+		def.initialPosition = Ogre::Vector3(0,8,50);
+		def.targetObject = parker_;
+		gameCamera_->InitializeDef(&def);
+	}
+
+	GameFramework::getSingletonPtr()->KeyPressed(keyEventRef);
 
 	return true;
 }
@@ -740,6 +802,8 @@ bool PhysicsState::update(double timeSinceLastFrame)
 		// Process b2Contacts that happened in this world step.
 		ProcessContacts();
 
+		ProcessPostSolveData();
+
 		// Update all the game objects.
 		GameObject::UpdateObjectList(timeStep);
 		
@@ -760,9 +824,17 @@ void PhysicsState::setUnbufferedMode()
 }
 
 
-void PhysicsState::PostSolve(b2Contact* contact, const b2ContactImpulse *impulse)
+void PhysicsState::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse)
 {
-	parker_->PostSolve(contact, impulse);
+	PostSolveData* d = new PostSolveData();
+
+	d->contact = contact;
+	d->impulse = new b2ContactImpulse((*impulse));
+
+	postSolveList_.push_back(d);
+
+	//PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture. b2ContactImpulse* impulse);
+	//parker_->PostSolve(contact, impulse);
 }
 
 
@@ -775,8 +847,6 @@ void PhysicsState::PostSolve(b2Contact* contact, const b2ContactImpulse *impulse
 /// which fixture was of the GameObjectOgreBox2D and which one it collided with.
 void PhysicsState::BeginContact(b2Contact* contact)
 {
-
-
 	ContactPoint* c = new ContactPoint();
 	c->fixtureA = contact->GetFixtureA();
 	c->fixtureB = contact->GetFixtureB();
@@ -806,6 +876,59 @@ void PhysicsState::EndContact(b2Contact* contact)
 }
 
 //=============================================================================
+//						ProcessPostSolveData
+//
+void PhysicsState::ProcessPostSolveData()
+{
+	PostSolveData* psData;
+	PostSolveList::iterator iter;
+
+	// Process the PostSolve data
+	for(iter = postSolveList_.begin(); iter != postSolveList_.end(); iter++)
+	{
+		psData = (*iter);
+		b2Contact* contact = psData->contact;
+
+		// Check if fixtureA's body has some user data
+		// If it does check if the Object responds to contacts
+		if(contact->GetFixtureA()->GetBody()->GetUserData() != NULL)
+		{
+			GameObject* object = (GameObject*) contact->GetFixtureA()->GetBody()->GetUserData();
+			GameObjectOgreBox2D* contactableA;
+
+			contactableA = dynamic_cast<GameObjectOgreBox2D*> (object);
+
+			if(contactableA)
+			{
+				contactableA->PostSolve(contact,contact->GetFixtureA(),contact->GetFixtureB(),psData->impulse);
+			}
+		}
+
+		// Check if fixtureB's body has some user data
+		// If it does check if the Object responds to contacts
+		if(contact->GetFixtureB()->GetBody()->GetUserData() != NULL)
+		{
+			GameObject* object = (GameObject*) contact->GetFixtureB()->GetBody()->GetUserData();
+			GameObjectOgreBox2D* contactableB;
+
+			contactableB = dynamic_cast<GameObjectOgreBox2D*> (object);
+
+			if(contactableB)
+			{
+				contactableB->PostSolve(contact,contact->GetFixtureB(),contact->GetFixtureA(),psData->impulse);
+			}
+		}
+	}
+
+	for(iter = postSolveList_.begin(); iter != postSolveList_.end(); iter++)
+	{
+		delete (*iter);
+	}
+
+	postSolveList_.clear();
+}
+
+//=============================================================================
 //							ProcessContacts
 //
 void PhysicsState::ProcessContacts()
@@ -814,7 +937,7 @@ void PhysicsState::ProcessContacts()
 	ContactPoint* contact; 
 	ContactList::iterator iter;
 
-	// Process the EndContact list of b2Contacts
+	// Process the BeginContact list of b2Contacts
 	for(iter = beginContactList_.begin(); iter != beginContactList_.end(); iter++)
 	{
 		contact = (*iter);
@@ -884,6 +1007,16 @@ void PhysicsState::ProcessContacts()
 				contactableB->EndContact(contact,contact->fixtureB,contact->fixtureA);
 			}
 		}
+	}
+
+	for(iter = endContactList_.begin(); iter != endContactList_.end(); iter++)
+	{
+		delete (*iter);
+	}
+
+	for(iter = beginContactList_.begin(); iter != beginContactList_.end(); iter++)
+	{
+		delete (*iter);
 	}
 
 	endContactList_.clear();

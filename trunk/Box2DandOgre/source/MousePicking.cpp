@@ -160,6 +160,7 @@ bool MousePicking::HandleMessage(const KGBMessage message)
 
 bool MousePicking::SpawnBox()
 {
+
 	if(box_[incrementer_ % 3] != 0)
 	{
 		delete box_[incrementer_ % 3];

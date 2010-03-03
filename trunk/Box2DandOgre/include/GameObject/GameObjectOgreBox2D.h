@@ -27,6 +27,18 @@ struct ContactPoint
 	b2PointState state;
 };
 
+/// Structure to represent a contact point.
+struct PostSolveData
+{
+	b2Contact* contact;
+	const b2ContactImpulse* impulse;
+
+	~PostSolveData()
+	{
+		delete impulse;
+	}
+};
+
 /// The default value of friction for all Box2D objects in the game.
 const static double DEFAULT_FRICTION = 0.4;
 const static signed short STATIC_MAP_GROUP = -10;
@@ -67,12 +79,14 @@ public:
 	/// By default this does nothing.
 	virtual void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture){}
 
+	virtual void PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse){}
+
+
 	/// Sets the scene node to be positioned the same as as the Box2D body
 	/// this object has.
 	virtual bool UpdateGraphics(double timeSinceLastFrame);
 
 	virtual void RedrawDebug();
-
 
 	virtual void CreatePhysics(){}
 
@@ -92,6 +106,9 @@ public:
 		debugSceneNode_->setVisible(false);
 		debugDrawOn_ = false; 
 	}
+
+	/// Sets the b2Body for this GameObjectOgreBox2D.
+	virtual void SetBody(b2Body* b){ body_ = b;}
 
 	/// Returns the b2Body for this GameObjectOgreBox2D.
 	virtual b2Body* GetBody(){ return body_; }

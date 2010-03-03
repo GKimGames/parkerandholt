@@ -13,6 +13,8 @@
 
 #include "Parker.h"
 #include "Message.h"
+#include "TinyXMLHelper.h"
+#include "XMLQuickVars.h"
 
 //=============================================================================
 //								Constructor
@@ -20,8 +22,15 @@
 ParkerStateInAir::ParkerStateInAir(	
 	CharacterParker* parker,
 	FSMStateMachine<CharacterParker>* stateMachine):
-	FSMState<CharacterParker>(parker,stateMachine)
+	ParkerState(parker,stateMachine)
 {
+	XMLQuickVars vars("..\\Myvars.xml");
+
+	float f = vars.Float("steve2");
+	Ogre::String s = vars.String("ben");
+	b2Vec2 v = vars.B2Vec2("vecty");
+	f = f + 5;
+
 }
 
 
@@ -33,7 +42,11 @@ void ParkerStateInAir::Enter()
 {
 	driver_->feetSensorHitCount_ = 0;
 	jumpTimer_ = 0.0;
-	if(driver_->onGroundState_->isJumping_)
+	if(driver_->stateMachine_->GetPreviousState() == (ParkerState*) driver_->ledgeGrabState_)
+	{
+		driver_->animationBlender_->Blend("jump_idle", AnimationBlender::BlendThenAnimate, 0.3, true);
+	}
+	else if(driver_->onGroundState_->isJumping_)
 	{
 		driver_->animationBlender_->Blend("jump_idle", AnimationBlender::BlendThenAnimate, 1.0, true);
 	}
@@ -41,9 +54,11 @@ void ParkerStateInAir::Enter()
 	{
 		driver_->animationBlender_->Blend("jump_idle", AnimationBlender::BlendWhileAnimating, 0.3, true);
 	}
+
 	wallJumpedLeft_ = false;
 	justWallJumped_ = false;
 	wallJumpTimer_ = -1.0;
+	wallJumpBetweenTimer_ = -1.0;
 }
 
 
@@ -97,24 +112,23 @@ bool ParkerStateInAir::Update()
 		}
 
 		driver_->sceneNode_->setDirection(direction,Ogre::Node::TS_WORLD);
-
+		static bool mySwitch = true;
 		if(justWallJumped_)
 		{
 			wallJumpTimer_ += GAMEFRAMEWORK->GetTimeSinceLastFrame();
-			if(wallJumpedLeft_)
+			
+			if(wallJumpedLeft_ && mySwitch)
 			{
 				driver_->sceneNode_->setDirection(Ogre::Vector3(0,0,-1),Ogre::Node::TS_WORLD);
 			}
-			else
+			else if (mySwitch)
 			{	
 				driver_->sceneNode_->setDirection(Ogre::Vector3(0,0,1),Ogre::Node::TS_WORLD);
 			}
 
-			if(wallJumpTimer_ > 0.2)
+			if(wallJumpTimer_ > 0.2 && mySwitch)
 			{
-				wallJumpTimer_ = -1;
-				justWallJumped_ = false;
-
+				mySwitch = false;
 				driver_->body_->SetLinearVelocity(b2Vec2(0,driver_->body_->GetLinearVelocity().y)); 
 
 				if(wallJumpedLeft_)
@@ -123,8 +137,15 @@ bool ParkerStateInAir::Update()
 				}
 				else
 				{
-					driver_->body_->ApplyImpulse(-driver_->wallJumpForce_, driver_->body_->GetPosition());
+					driver_->body_->ApplyImpulse(b2Vec2(-driver_->wallJumpForce_.x,driver_->wallJumpForce_.y ), driver_->body_->GetPosition());
 				}
+			}
+
+			if(wallJumpTimer_ > 0.5)
+			{
+				wallJumpTimer_ = -1.0;
+				mySwitch = true;
+				justWallJumped_ = false;
 			}
 		}
 
@@ -180,6 +201,13 @@ bool ParkerStateInAir::HandleMessage(const KGBMessage message)
 		{
 			driver_->jump_ = false;
 			return true;
+		}
+		case CHARACTER_GRAB_LEDGE:
+		{
+			if(driver_->ledge_)
+			{
+				stateMachine_->ChangeState((FSMState<CharacterParker>*) driver_->ledgeGrabState_);
+			}
 		}
 	}
 

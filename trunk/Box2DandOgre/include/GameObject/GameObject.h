@@ -32,6 +32,7 @@ enum GameObjectType
 	GOType_Character_Holt,					//< \brief Character Holt Object
 	CharacterFoot,
 	GOType_HoltBox,
+	GOType_Sensor,
 	GOType_LedgeSensor,
 	GOType_Platform,
 	GOType_ElevatorBeginTypes,

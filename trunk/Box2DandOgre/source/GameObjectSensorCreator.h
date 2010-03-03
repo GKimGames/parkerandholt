@@ -54,9 +54,14 @@ public:
 
 					if(objects != 0)
 					{
+						
 						Ogre::String objectID = TinyXMLHelper::GetAttribute(objects, "objectID", "");
 						KGBMessageType onMessage = TinyXMLHelper::GetMessage(objects, "on", MESSAGE_NULL);
 						KGBMessageType offMessage = TinyXMLHelper::GetMessage(objects, "off", MESSAGE_NULL);
+						Ogre::String sensorTypeString = TinyXMLHelper::GetAttribute(objects, "sensorType", "");
+						gameObjectSensor->sensorType_ = StringToSensorType(sensorTypeString);
+						gameObjectSensor->gameObjectType_ = GOType_Sensor;
+
 						GameObject* go = GameObject::GetObjectById(objectID);
 						
 						if(go)

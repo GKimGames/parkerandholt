@@ -11,6 +11,81 @@
 
 using namespace Ogre;
 
+void TinyXMLHelper::WalkDoc(TiXmlNode * pParent, std::map<Ogre::String, Ogre::String>* map, Ogre::String pName )
+{
+    if ( !pParent ) return;
+    int t = pParent->Type();
+    switch (t)
+    {
+    case TiXmlNode::ELEMENT:
+		{
+		
+			TiXmlAttribute* attribute = ((TiXmlElement*)pParent)->FirstAttribute();
+
+			while(attribute)
+			{
+				Ogre::String key = pName + attribute->NameTStr();
+				Ogre::StringUtil::toLowerCase(key);
+				Ogre::String val = attribute->ValueStr();
+				map->insert(std::make_pair(key,val));
+
+				attribute = attribute->Next();
+			}
+
+        break;
+		}
+    default:
+        break;
+    }
+
+    TiXmlNode * pChild;
+
+    for ( pChild = pParent->FirstChild(); pChild != 0; pChild = pChild->NextSibling()) 
+    {
+		if(pName.compare("") != 0)
+		{
+			WalkDoc(pChild,map,pName + pChild->ValueTStr() + "/");
+		}
+		else
+		{
+			WalkDoc(pChild,map,pChild->ValueTStr() + "/");
+		}
+    }
+}
+
+//=============================================================================
+//								GetMapFromFile
+//
+/// Returns a handle to the root node of a file or 0 if it can't find it.
+bool TinyXMLHelper::GetMapFromFile(Ogre::String fileName, std::map<Ogre::String, Ogre::String>* map)
+{
+	TiXmlDocument* configXML = new TiXmlDocument(fileName.c_str());
+	configXML->LoadFile();
+
+	// If there was an error loading the file return 0.
+	if(configXML->Error())
+	{
+		return false;
+	}
+
+	TiXmlHandle hDoc(configXML);
+
+	TiXmlElement* rootElement = hDoc.FirstChildElement().Element();
+
+	// If we couldn't get an element we return 0.
+	if (rootElement == 0) 
+	{
+		return false;
+	}
+
+	WalkDoc(rootElement,map,"");
+
+	delete configXML;
+
+	return true;
+}
+
+
 
 //=============================================================================
 //								GetRootFromFile
@@ -36,7 +111,6 @@ TiXmlHandle* TinyXMLHelper::GetRootFromFile(Ogre::String fileName, TiXmlDocument
 	{
 		return 0;
 	}
-
 
 	return new TiXmlHandle(rootElement);
 }

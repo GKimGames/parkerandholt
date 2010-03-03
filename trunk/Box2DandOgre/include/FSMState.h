@@ -59,6 +59,9 @@ public:
 	/// Called when two fixtures cease to touch.
 	virtual void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture){}
 
+	/// Called
+	virtual void PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse){};
+
 	
 
 	

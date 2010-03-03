@@ -34,6 +34,8 @@ GameObject::GameObject(Ogre::String str)
 	objectName_ = str;
 	objectList.insert(std::make_pair(objectId_,this));
 
+	// This has to be removed - just for testing
+	gameObjectType_ = GOType_Platform;
 	initialized_ = false;
 }
 

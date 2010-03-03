@@ -1,8 +1,8 @@
 /*=============================================================================
 
-		GravityVector.cpp
+GravityVector.cpp
 
-		Author: Greg King
+Author: Greg King
 
 =============================================================================*/
 #include "GravityVector.h"
@@ -25,7 +25,7 @@ GravityVector::GravityVector(Ogre::SceneManager *sceneManager, b2Vec2 center, b2
 
 	b2CircleShape bodyShapeDef;
 	bodyShapeDef.m_radius = 1.5f;
-	
+
 	b2FixtureDef fd;
 	fd.shape = &bodyShapeDef;
 
@@ -42,7 +42,7 @@ GravityVector::GravityVector(Ogre::SceneManager *sceneManager, b2Vec2 center, b2
 	forceApplied_.x = maxForce_ * tempMagnitude.x;
 	forceApplied_.y = maxForce_ * tempMagnitude.y;
 
-	
+
 	//sceneNode_ = sceneManager_->getRootSceneNode()->createChild();
 
 	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
@@ -53,7 +53,7 @@ GravityVector::GravityVector(Ogre::SceneManager *sceneManager, b2Vec2 center, b2
 
 
 	entity_ = sceneManager_->createEntity("GravMesh", "sphere.mesh");
-	
+
 	entity_->setMaterial(Ogre::MaterialManager::getSingletonPtr()->getByName("TransparentBox/Transparent125"));
 	Ogre::SceneNode* meshNode = sceneNode_->createChildSceneNode();
 	meshNode->attachObject(entity_);
@@ -66,7 +66,7 @@ GravityVector::GravityVector(Ogre::SceneManager *sceneManager, b2Vec2 center, b2
 	sceneNode_->scale(0.3,0.3,0.3);
 	Initialize();
 	Stop();
-	
+
 }
 
 //=============================================================================
@@ -96,20 +96,20 @@ void GravityVector::BeginContact(ContactPoint* contact, b2Fixture* contactFixtur
 //
 void GravityVector::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
-  if(active_)
-  {
-	if(contactFixture == gravitySensor_)
+	if(active_)
 	{
-		for(int i = 0; i < bodyList_.size(); i++)
+		if(contactFixture == gravitySensor_)
 		{
-			if(bodyList_[i] == collidedFixture->GetBody())
+			for(int i = 0; i < bodyList_.size(); i++)
 			{
-				bodyList_.erase(bodyList_.begin()+i);
-				break;
+				if(bodyList_[i] == collidedFixture->GetBody())
+				{
+					bodyList_.erase(bodyList_.begin()+i);
+					break;
+				}
 			}
 		}
 	}
-  }
 }
 
 
@@ -118,20 +118,61 @@ void GravityVector::EndContact(ContactPoint* contact, b2Fixture* contactFixture,
 //
 bool GravityVector::Update(double timeSinceLastFrame)
 {
-  if(active_)
-  {
-	for(int i = 0; i < bodyList_.size(); i++)
+	if(active_)
 	{
-		bodyList_[i]->ApplyForce(forceApplied_, position_);
-	}
-	UpdateGraphics(timeSinceLastFrame);
-  }
-  else
-  {
-	  bodyList_.clear();
-  }
+		/*b2ContactEdge* contacts = body_->GetContactList();
+		while(contacts)
+		{
+			if(contacts->contact->IsTouching())
+			{
+				b2Vec2 pos;
+				b2Body* body;
 
-	
+				if(contacts->contact->GetFixtureA()->GetBody() != body_)
+				{
+					body = contacts->contact->GetFixtureA()->GetBody();
+				}
+				else
+				{
+					body = contacts->contact->GetFixtureB()->GetBody();
+				}
+
+				pos = body->GetPosition() - position_;
+				
+				if(pos.LengthSquared() < 2.25)
+				{
+					pos = body->GetPosition();
+				}
+				else
+				{
+					pos = position_;
+					b2Vec2 pos2 = body->GetPosition();
+					pos2.Normalize();
+					pos2 *= 1.5;
+					pos += pos2;
+				}
+				body->ApplyForce(forceApplied_, pos);
+				static b2Color color(1,1,0);
+				GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(position_, pos, color);
+			}
+
+			contacts = contacts->next;
+		}
+		*/
+		
+		for(int i = 0; i < bodyList_.size(); i++)
+		{
+			bodyList_[i]->ApplyForce(forceApplied_, position_);
+		}
+		
+		UpdateGraphics(timeSinceLastFrame);
+	}
+	else
+	{
+		bodyList_.clear();
+	}
+
+
 	return true;
 }
 
@@ -169,7 +210,7 @@ bool GravityVector::Start(b2Vec2 newPosition, b2Vec2 newDirection)
 	tempPS = (Ogre::ParticleSystem*)sceneNode_->getAttachedObject("Fireworks");
 	tempMagnitude.Normalize();
 	tempPS->getEmitter(0)->setDirection(Ogre::Vector3(tempMagnitude.x,tempMagnitude.y, 0));
-	
+
 
 	active_ = true;
 	sceneNode_->setVisible(true);

@@ -11,16 +11,17 @@
 #define PARKER_STATE_ON_GROUND_H
 
 #include "FSMState.h"
+#include "ParkerState.h"
 
 class CharacterParker;
-class ParkerStateOnGround : public FSMState<CharacterParker>
+class ParkerStateOnGround : public ParkerState
 {
 
 public:
 
 	friend class ParkerStateInAir;
 
-	ParkerStateOnGround(CharacterParker* parker, FSMStateMachine<CharacterParker>* stateMachine);
+	ParkerStateOnGround(CharacterParker* parker, ParkerStateMachine* stateMachine);
 
 	~ParkerStateOnGround(){}
 

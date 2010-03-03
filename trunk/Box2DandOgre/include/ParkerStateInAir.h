@@ -11,10 +11,11 @@
 #define PARKER_STATE_IN_AIR_H
 
 #include "FSMState.h"
+#include "ParkerState.h"
 
 
 class CharacterParker;
-class ParkerStateInAir : public FSMState<CharacterParker>
+class ParkerStateInAir : public ParkerState
 {
 
 public:
@@ -52,6 +53,8 @@ protected:
 	bool	wallJumpedLeft_;
 	bool	justWallJumped_;
 	double	wallJumpTimer_;
+
+	double  wallJumpBetweenTimer_;
 
 };
 

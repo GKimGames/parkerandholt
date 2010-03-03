@@ -56,6 +56,7 @@ class PhysicsState : public AppState, public b2ContactListener, public b2Destruc
 {
 
 typedef std::vector<ContactPoint*> ContactList;
+typedef std::vector<PostSolveData*> PostSolveList;
 
 public:
 
@@ -86,7 +87,9 @@ public:
 	void setBufferedMode();
 	void setUnbufferedMode();
 
-	void PhysicsState::PostSolve(b2Contact* contact, const b2ContactImpulse *impulse);
+	void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse);
+	void ProcessPostSolveData();
+
 	/// Called when two fixtures begin to touch.
 	void BeginContact(b2Contact* contact);
 
@@ -158,11 +161,13 @@ private:
 
 	ContactList beginContactList_;
 	ContactList endContactList_;
+	PostSolveList postSolveList_;
 
 	//ContactPoint m_points[k_maxContactPoints];
 	int32 m_pointCount;
 
-	GameCamera* gameCamera_;
+	GameCamera*		gameCamera_;
+	Ogre::Vector3	camPosition;
 
 };
 
