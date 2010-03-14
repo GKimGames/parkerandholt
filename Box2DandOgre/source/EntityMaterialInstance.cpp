@@ -1,5 +1,7 @@
 #include "EntityMaterialInstance.h"
 
+using namespace Ogre;
+
 EntityMaterialInstance::EntityMaterialInstance (Entity *e) {
   for (unsigned int i = 0; i < e->getNumSubEntities (); i++) {
     mSEMIs.push_back (new SubEntityMaterialInstance (e->getSubEntity (i)));

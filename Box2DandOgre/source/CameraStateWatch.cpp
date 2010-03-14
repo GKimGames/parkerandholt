@@ -8,6 +8,7 @@
 
 #include "CameraStateWatch.h"
 #include "GameCamera.h"
+#include "GameFramework.h"
 
 //=============================================================================
 //					CameraStateWatch::Constructor

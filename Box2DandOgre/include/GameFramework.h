@@ -30,6 +30,8 @@
 #include <Box2D/Box2D.h>
 #include "OgreB2DebugDraw.h"
 
+#include "GameCamera.h"
+
 
 
 #define GAMEFRAMEWORK GameFramework::getSingletonPtr()
@@ -93,6 +95,8 @@ public:
 	OIS::Mouse*					mouse_;
 
 	b2World*					world_;
+
+	Ogre::Camera*				camera_;
 
 	OgreB2DebugDraw* debugDraw_;
 

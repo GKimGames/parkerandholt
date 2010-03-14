@@ -1,4 +1,6 @@
 #include "PickUp.h"
+#include <boost/any.hpp>
+#include "MessageDispatcher.h"
 
 PickUp::PickUp(Ogre::SceneManager *sceneManager, b2Vec2 center)
 {
@@ -58,6 +60,7 @@ bool PickUp::Update(double timeSinceLastFrame)
 	if(pickedUp_)
 	{
 		sceneNode_->setVisible(false);
+		return false;
 	}
 
 	return true;

@@ -91,6 +91,10 @@ bool GameCamera::Update(double timeSinceLastFrame)
 //
 void GameCamera::InitializeDef(CameraStateDef* cameraStateDef)
 {
+	// This would be better done with a map of Camera Types
+	// and the camera states objects. Theres only a few
+	// camera types though, so it is easier this way.
+
 	if(cameraStateDef->type == CAMERASTATE_WATCH)
 	{
 		cameraStateWatch_->InitializeDef(cameraStateDef);

@@ -117,6 +117,24 @@ public:
 			Ogre::Vector3 sceneNodeScale = TinyXMLHelper::GetAttributeVector3(element, "scale", Ogre::Vector3::UNIT_SCALE);
 			meshSceneNode->scale(sceneNodeScale);
 
+			if(TinyXMLHelper::GetAttributeBool(element, "fitToPoints"))
+			{
+				Ogre::Vector3 point1 = TinyXMLHelper::GetAttributeVector3(element, "point1");
+				Ogre::Vector3 point2 = TinyXMLHelper::GetAttributeVector3(element, "point2");
+				Ogre::Vector3 offSet = TinyXMLHelper::GetAttributeVector3(element, "offset");
+				
+				Ogre::Vector3 center = point1.midPoint(point2) + offSet;
+				
+				Ogre::Real length = point1.distance(point2);
+				meshSceneNode->setPosition(center);
+
+				Ogre::AxisAlignedBox box = meshEntity->getBoundingBox();
+				Ogre::Vector3 v3 = box.getSize();
+
+				meshSceneNode->setScale(length / v3.x, sceneNodeScale.y, sceneNodeScale.z);
+				//meshSceneNode->roll(point1.angleBetween(point2));
+			}
+
 		}
 		else if(type.compare("platform") == 0)
 		{
@@ -213,6 +231,11 @@ public:
 		planeEnt->setMaterial(Ogre::MaterialManager::getSingleton().getByName(material));
 
 		Ogre::SceneNode* planeNode = gameObjectOgre->sceneNode_->createChildSceneNode();
+		Ogre::Vector3 rotation = TinyXMLHelper::GetAttributeVector3(element, "rotation");
+		planeNode->pitch(Ogre::Radian(Ogre::Degree(rotation.x)));
+		planeNode->yaw(Ogre::Radian(Ogre::Degree(rotation.y)));
+		planeNode->roll(Ogre::Radian(Ogre::Degree(rotation.z)));
+
 		planeNode->attachObject(planeEnt);
 		
 		// Rotate the node to fit the points

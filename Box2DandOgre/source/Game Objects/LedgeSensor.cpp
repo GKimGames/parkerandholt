@@ -7,6 +7,7 @@
 =============================================================================*/
 
 #include "LedgeSensor.h"
+#include "GameFramework.h"
 
 LedgeSensor::LedgeSensor() : GameObjectSensor(NO_MESSAGE)
 {

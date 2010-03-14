@@ -15,8 +15,8 @@
 
 #include "CameraState.h"
 
-class GameObjectOgre;
 class GameObject;
+class GameObjectOgre;
 
 class GameCamera : public GameObject
 {

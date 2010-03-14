@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Boxes>
+
+  <BoxInfo>
+    <Box boxMax="1.0" boxMin="0.25" incriment=".1" initialSize="0.25" boxDensity="7" />
+  </BoxInfo>
+
+  <BodyInfo>
+    <body boxDensity="2" boxFriction="5.5" />
+  </BodyInfo>
+
+</Boxes>

@@ -7,6 +7,7 @@
 =============================================================================*/
 
 #include "GameObject.h"
+#include "Message.h"
 
 GameObjectId GameObject::staticObjectId_ = 1;
 GameObjectId GameObject::parkerId_ = -1;
@@ -35,8 +36,10 @@ GameObject::GameObject(Ogre::String str)
 	objectList.insert(std::make_pair(objectId_,this));
 
 	// This has to be removed - just for testing
-	gameObjectType_ = GOType_Platform;
+	gameObjectType_ = GOTYPE_GameObject;
+
 	initialized_ = false;
+	destroyMe_ = false;
 }
 
 //=============================================================================
@@ -45,7 +48,7 @@ GameObject::GameObject(Ogre::String str)
 /// The destructor removes it from the objectList and objectNameList
 GameObject::~GameObject()
 {
-	objectList.erase(objectList.find(objectId_));
+	//objectList.erase(objectList.find(objectId_));
 }
 
 //=============================================================================
@@ -54,6 +57,11 @@ GameObject::~GameObject()
 /// All Objects must be able to  update.
 bool GameObject::Update(double timeSinceLastFrame)
 {
+	if(destroyMe_)
+	{
+		return false;
+	}
+
 	return true;
 }
 
@@ -64,25 +72,30 @@ bool GameObject::Update(double timeSinceLastFrame)
 /// within the object after some variables are setup.
 bool GameObject::Initialize()
 {
-	std::pair<std::map<Ogre::String, GameObject*>::iterator,bool> ret;
-
-	ret = objectNameList.insert(std::make_pair(objectName_,this));
-	
-	if(ret.second == false || objectName_.empty())
+	if(!initialized_)
 	{
-		Ogre::String s = "ERROR: GameObject creation name conflict: ";
-		s += objectName_;
-		s += ". Now is: ";
+		std::pair<std::map<Ogre::String, GameObject*>::iterator,bool> ret;
 
-		objectName_ += "_";
-		objectName_ += Ogre::StringConverter::toString(objectId_);
+		ret = objectNameList.insert(std::make_pair(objectName_,this));
+		
+		if(ret.second == false || objectName_.empty())
+		{
+			Ogre::String s = "ERROR: GameObject creation name conflict: ";
+			s += objectName_;
+			s += ". Now is: ";
 
-		s += objectName_;
+			objectName_ += "_";
+			objectName_ += Ogre::StringConverter::toString(objectId_);
 
-		DEBUG_LOG(s);
+			s += objectName_;
+
+			DEBUG_LOG(s);
+		}
+		
+		objectNameList.insert(std::make_pair(objectName_,this));
+
+		initialized_ = true;
 	}
-
-	initialized_ = true;
 
 	return initialized_;
 }
@@ -96,5 +109,10 @@ bool GameObject::Initialize()
 /// true if the object was able to handle the message.
 bool GameObject::HandleMessage(const KGBMessage message)
 { 
+	if(message.messageType == GO_DESTROY)
+	{
+		destroyMe_ = true;
+	}
+
 	return false;
 }

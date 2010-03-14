@@ -743,6 +743,10 @@
 					RelativePath=".\include\DynamicRenderable.h"
 					>
 				</File>
+				<File
+					RelativePath=".\include\OgreHelper.h"
+					>
+				</File>
 				<Filter
 					Name="TextThing"
 					>
@@ -818,6 +822,10 @@
 			</File>
 			<File
 				RelativePath="..\..\OgreSDK\bin\LevelOne.xml"
+				>
+			</File>
+			<File
+				RelativePath="..\..\OgreSDK\bin\MainMenu.xml"
 				>
 			</File>
 			<File

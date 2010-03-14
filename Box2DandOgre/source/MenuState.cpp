@@ -6,7 +6,7 @@
 
 =============================================================================*/
 #include "MenuState.hpp"
-
+#include "GameObjectFactory.h"
 
 using namespace Ogre;
 
@@ -15,11 +15,13 @@ void MenuState::enter()
 {
 	GameFramework::getSingletonPtr()->log_->logMessage("Entering MenuState...");
 	
-	m_pSceneMgr = GameFramework::getSingletonPtr()->root_->createSceneManager(ST_GENERIC, "MenuSceneMgr");
-	m_pSceneMgr->setAmbientLight(Ogre::ColourValue(1.0, 0.7, 0.7)); 
+	sceneManager_ = GAMEFRAMEWORK->root_->createSceneManager(ST_GENERIC, "MenuSceneManager");
+	GAMEFRAMEWORK->sceneManager = sceneManager_;
 
-	m_pCamera = m_pSceneMgr->createCamera("MenuCam");
-	m_pCamera->setPosition(Vector3(0, 25, -50));
+	sceneManager_->setAmbientLight(Ogre::ColourValue(0.7, 0.7, 0.7)); 
+
+	m_pCamera = sceneManager_->createCamera("MenuCam");
+	m_pCamera->setPosition(Vector3(0, 0, 18));
 	m_pCamera->lookAt(Vector3(0, 0, 0));
 	m_pCamera->setNearClipDistance(1);
 
@@ -60,6 +62,14 @@ void MenuState::resume()
 void MenuState::createScene()
 {
 
+	GameFramework::getSingletonPtr()->viewport_->setBackgroundColour(Ogre::ColourValue(0,0,0));
+
+	GameObjectFactory gof;
+	gof.AddObjectCreators();
+	gof.sceneManager = sceneManager_;
+	gof.LoadFile("..\\MainMenu.xml");
+
+	/*
 	Ogre::StringVector sv = Ogre::ResourceGroupManager::getSingletonPtr()->getResourceGroups();
 	
 
@@ -82,6 +92,7 @@ void MenuState::createScene()
 			Ogre::FileInfo fi = (*it);
 		}
 	}
+	*/
 	
 
 }
@@ -90,11 +101,11 @@ void MenuState::createScene()
 
 void MenuState::exit()
 {
-	GameFramework::getSingletonPtr()->log_->logMessage("Leaving MenuState...");
+	GAMEFRAMEWORK->log_->logMessage("Leaving MenuState...");
 
-	m_pSceneMgr->destroyCamera(m_pCamera);
-	if(m_pSceneMgr)
-		GameFramework::getSingletonPtr()->root_->destroySceneManager(m_pSceneMgr);
+	sceneManager_->destroyCamera(m_pCamera);
+	if(sceneManager_)
+		GAMEFRAMEWORK->root_->destroySceneManager(sceneManager_);
 }
 
 

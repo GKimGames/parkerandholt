@@ -3,12 +3,10 @@
 
 #include "SubEntityMaterialInstance.h"
 
-using namespace Ogre;
-
 /** Iterator to traverse the SubEntityMaterialInstance's.
  * @author Kencho.
  */
-typedef VectorIterator<std::vector<SubEntityMaterialInstance *> > SubEntityMaterialInstancesIterator;
+typedef Ogre::VectorIterator<std::vector<SubEntityMaterialInstance *> > SubEntityMaterialInstancesIterator;
 
 /** An instance of a full Entity material.
  * This is like a hub for all the underlying SubEntities material instances.
@@ -26,7 +24,7 @@ class EntityMaterialInstance {
     /** Keeps the current transparency value.
      * @see SubEntityMaterialInstance::mCurrentTransparency.
      */
-    Real mCurrentTransparency;
+	Ogre::Real mCurrentTransparency;
 // Methods ====================================================================================
   public:
     /** Constructor. 
@@ -34,7 +32,7 @@ class EntityMaterialInstance {
      * @param e The entity this material instance will affect to.
      * @note This will create material instances for all the underlying SubEntities.
      */
-    EntityMaterialInstance (Entity *e);
+	  EntityMaterialInstance (Ogre::Entity *e);
     /** Destructor.
      * Destroys all the underlying SubEntityMaterialInstances.
      */
@@ -44,17 +42,17 @@ class EntityMaterialInstance {
      * @param name Name of the new material for this entity (all of its SubEntities).
      * @see SubEntityMaterialInstance::setMaterialName().
      */
-    void setMaterialName (String name);
+	void setMaterialName (Ogre::String name);
     /** Sets the scene blending method for all the SubEntities.
      * @param sbt The desired SceneBlendType.
      * @see SubEntityMaterialInstance::setSceneBlending().
      */
-    void setSceneBlending (SceneBlendType sbt);
+    void setSceneBlending (Ogre::SceneBlendType sbt);
     /** Changes the whole Entity transparency, through all the underlying SubEntityMaterialInstances.
      * @param transparency New transparency.
      * @see SubEntityMaterialInstance::setTransparency().
      */
-    void setTransparency (Real transparency);
+    void setTransparency (Ogre::Real transparency);
     /** Returns an iterator to traverse all the underlying MaterialInstances.
      * @return The SubEntityMaterialInstances iterator.
      */

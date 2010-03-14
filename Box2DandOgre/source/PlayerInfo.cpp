@@ -1,5 +1,5 @@
 #include "PlayerInfo.h"
-
+#include "Message.h"
 
 PlayerInfo::PlayerInfo()
 {

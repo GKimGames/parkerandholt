@@ -3,7 +3,6 @@
 
 #include "Ogre.h"
 
-using namespace Ogre;
 
 /** An instance of a single material.
  * This class represents a single instance of a material. It's mainly 
@@ -27,16 +26,16 @@ class MaterialInstance {
   protected:
     /** Reference to the original material.
      */
-    MaterialPtr mOriginalMat;
+    Ogre::MaterialPtr mOriginalMat;
     /** Reference to the copy material.
      */
-    MaterialPtr mCopyMat;
+    Ogre::MaterialPtr mCopyMat;
     /** Keeps the current transparency value.
      */
-    Real mCurrentTransparency;
+    Ogre::Real mCurrentTransparency;
     /** Current blending method.
      */
-    SceneBlendType mSBT;
+    Ogre::SceneBlendType mSBT;
 // Methods ====================================================================================
   public:
     /** Constructor. 
@@ -50,7 +49,7 @@ class MaterialInstance {
     /** Sets the blending method to use to adjust transparency.
      * @param sbt The SceneBlendType desired.
      */
-    void setSceneBlending (SceneBlendType sbt);
+    void setSceneBlending (Ogre::SceneBlendType sbt);
     /** Changes this instance transparency. 
      * @param transparency The new transparency. Values will be clamped to [0..1].
      * @note This changes transparency. A value of 0 means full opacity, while 1 means full 
@@ -58,11 +57,11 @@ class MaterialInstance {
      * @note If transparency equals 0, it will use the original material instead of the copy 
      *       (the copy is mandatory transparent, and thus might be slower than the original).
      */
-    void setTransparency (Real transparency);
+    void setTransparency (Ogre::Real transparency);
     /** Retrieves a shared pointer to its cloned material.
      * @return A MaterialPtr of the cloned material.
      */
-    MaterialPtr getCopyMaterial ();
+    Ogre::MaterialPtr getCopyMaterial ();
   protected:
     /** Initialises the reference to the original material.
      */

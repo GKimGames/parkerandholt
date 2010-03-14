@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Settings>
+  <Camera>
+    <InitialPosition x="0" y="0" z="20"/>
+  </Camera>
+  <Platform gameObject="Platform" name="Platformy" px1="0" py1="-5" px2="5" py2="-5"/>
+  
+  <Object type="ObjectOgre">
+    <GameObject name="ObjectOgre_TEST"/>
+    <OgreObject mesh="ninja.mesh" position="0 0 -20" scale="0.010 0.010 0.010" />
+  </Object>
+ 
+  <Object type="GameObject">
+    <GameObject name="MapEditorState"/>
+  </Object>
+  <Object3 type="OgreBox2D">
+    <GameObject name="OgreBox2D_Demo"/>
+    <OgreObject mesh="cube.1m.mesh" position="0 0 10" />
+    <Box2DObject>
+      <Body>
+        <BodyDef bodyType="dynamicBody" position="0 10"/>
+        <Fixture shape="box" boxWidth="3" boxHeight="3" density="15"/>
+      </Body>
+    </Box2DObject>
+  </Object3>
+  
+  
+</Settings>

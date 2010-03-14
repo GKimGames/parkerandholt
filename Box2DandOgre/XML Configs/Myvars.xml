@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Vars>
+  <HoltBox boxDensity="15"/>
+  <ledge maxforce="50"/>
+</Vars>

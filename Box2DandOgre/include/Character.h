@@ -15,9 +15,6 @@
 #include <OgreMaterialManager.h>
 #include <Ogre.h>
 #include <tinyxml.h>
-
-#include "AnimationBlender.h"
-
 #include "GameObjectOgreBox2D.h"
 
 #include "FSMStateMachine.h"
@@ -114,7 +111,6 @@ protected:
   
 	Ogre::String			meshName_;
 	Ogre::AnimationState*	animationState_; // The current animation state of the object
-	AnimationBlender*		animationBlender_;
 
 	Ogre::SceneNode*	bodyNode_;
 

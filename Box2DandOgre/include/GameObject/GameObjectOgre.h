@@ -10,8 +10,8 @@
 #define GAME_OBJECT_OGRE_H
 
 #include "GameObject.h"
-#include "GameFramework.h"
 #include "EntityMaterialInstance.h"
+#include "AnimationBlender.h"
 
 /// GameObjectOgre extends GameObject
 class GameObjectOgre : public GameObject
@@ -36,7 +36,11 @@ public:
 
 	virtual bool UpdateGraphics(double timeSinceLastFrame);
 
-	virtual bool HandleMessage(const KGBMessage message){return false;}
+	virtual bool HandleMessage(const KGBMessage message);
+	
+	virtual void SetTransparency(Ogre::Real alpha);
+
+	virtual void SetBlendType(Ogre::SceneBlendType type);
 
 //===========================================================================//
 //																			 //
@@ -62,18 +66,44 @@ public:
 		return entity_;
 	}
 
-	virtual void SetTransparency(Ogre::Real alpha);
+	void DisableParticleSystem()
+	{
+		
+		if(particleSystem_)
+		{
+			particleSystem_->setNonVisibleUpdateTimeout(0.1);
+			particleSystem_->setVisible(false);
+		}
+	}
 
-	virtual void SetBlendType(Ogre::SceneBlendType type);
+	void EnableParticleSystem()
+	{
+		if(particleSystem_)
+		{
+			particleSystem_->setNonVisibleUpdateTimeout(0.0);
+			particleSystem_->setVisible(true);
+		}
+	}
 
 protected:
 
-	Ogre::SceneManager*     sceneManager_;   //< \brief Node's parent.
-	Ogre::SceneNode*        sceneNode_;      //< \brief Scene Node.
-	Ogre::Entity*           entity_;         //< \brief Attached Entity or NULL.
+	AnimationBlender*		animationBlender_;
+	Ogre::SceneManager*     sceneManager_;		//< \brief Node's parent.
+	Ogre::SceneNode*        sceneNode_;			//< \brief Scene Node.
+	Ogre::Entity*           entity_;			//< \brief Attached Entity or NULL.
+	Ogre::ParticleSystem*	particleSystem_; 
 	EntityMaterialInstance* transparency_;
 
 };
 
+// Messages needed
+/*
+	SetTransparency	double
+	Blend			BlendData
+	StartAnimation
+	StopAnimation
+	DisableParticleSystem
+	EnableParticleSystem
 
+*/
 #endif

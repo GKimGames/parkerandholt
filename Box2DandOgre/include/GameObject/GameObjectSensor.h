@@ -70,13 +70,18 @@ public:
 					 b2Body* body = 0, Ogre::Entity* entity = 0):
 	GameObjectOgreBox2D(name, body, entity)
 	{
-		defaultMessageOn_  = messageOn;
-		defaultMessageOff_ = messageOff;
+		defaultMessageOn_.messageType  = messageOn;
+		defaultMessageOff_.messageType = messageOff;
 		sensorType_ = SENSORTYPE_DEFAULT;
 		gameObjectType_ = GOType_Sensor;
+		messageObjectOnContact_ = false;
+		isEnabled_ = true;
 	}
 
-	virtual ~GameObjectSensor(){}
+	virtual ~GameObjectSensor()
+	{
+
+	}
 
 	bool Update(double timeSinceLastFrame)
 	{ 
@@ -87,7 +92,9 @@ public:
 
 	bool HandleMessage(const KGBMessage message)
 	{
-		if(message.messageType == defaultMessageOff_)
+		GameObject::HandleMessage(message);
+
+		if(message.messageType == defaultMessageOff_.messageType)
 		{
 			if(message.sender == objectId_)
 			{
@@ -119,23 +126,50 @@ public:
 	/// Called when two fixtures begin to touch.
 	virtual void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 	{
-		if(ignoreSensors_ && collidedFixture->IsSensor())
+		if(isEnabled_)
 		{
-			return;
-		}
+			if(ignoreSensors_ && collidedFixture->IsSensor())
+			{
+				return;
+			}
 
-		SendOnMessageToList();
+			if(messageObjectOnContact_)
+			{
+				GameObject* go = (GameObject*) collidedFixture->GetBody()->GetUserData();
+
+				if(go)
+				{
+					boost::any pUserData = 0;
+					Dispatch->DispatchMessage(SEND_IMMEDIATELY,objectId_, go->GetId(), defaultMessageOn_.messageType, defaultMessageOn_.messageData);
+				}
+			}
+
+			SendOnMessageToList();
+		}
 	}
 
 	/// Called when two fixtures cease to touch.
 	virtual void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 	{
-		if(ignoreSensors_ && collidedFixture->IsSensor())
+		if(isEnabled_)
 		{
-			return; 
-		}
+			if(ignoreSensors_ && collidedFixture->IsSensor())
+			{
+				return; 
+			}
 
-		SendOffMessageToList();
+			if(messageObjectOnContact_)
+			{
+				GameObject* go = (GameObject*) collidedFixture->GetBody()->GetUserData();
+				if(go)
+				{
+					boost::any pUserData = 0;
+					Dispatch->DispatchMessage(SEND_IMMEDIATELY,objectId_, go->GetId(), defaultMessageOff_.messageType, defaultMessageOff_.messageData);
+				}
+			}
+
+			SendOffMessageToList();
+		}
 	}
 
 	/// Send out a message to all the Objects in messageList_.
@@ -145,9 +179,9 @@ public:
 
 		for(it = messageList_.begin(); it != messageList_.end(); it++)
 		{
-			if((*it).second.on != NO_MESSAGE)
+			if((*it).second.on.messageType != NO_MESSAGE)
 			{
-				Dispatch->DispatchMessage(SEND_IMMEDIATELY, objectId_, (*it).first, (*it).second.on, pUserData);
+				Dispatch->DispatchMessage((*it).second.on.messageType, objectId_, (*it).first, (*it).second.on.messageType, (*it).second.on.messageData);
 			}
 		}
 	}
@@ -159,9 +193,9 @@ public:
 
 		for(it = messageList_.begin(); it != messageList_.end(); it++)
 		{
-			if((*it).second.on != NO_MESSAGE)
+			if((*it).second.off.messageType != NO_MESSAGE)
 			{
-				Dispatch->DispatchMessage(SEND_IMMEDIATELY, objectId_, (*it).first, (*it).second.off, pUserData);
+				Dispatch->DispatchMessage(SEND_IMMEDIATELY, objectId_, (*it).first, (*it).second.off.messageType, (*it).second.off.messageData);
 			}
 		}
 	}
@@ -184,23 +218,49 @@ public:
 	void AddToMessageList(GameObjectId Id, KGBMessageType messageOn = MESSAGE_NULL, KGBMessageType messageOff = MESSAGE_NULL) 
 	{ 
 		SensorMessage sm;
+
+		sm.off.dispatchTime = SEND_IMMEDIATELY;
+		sm.on.dispatchTime = SEND_IMMEDIATELY;
 		// If the message is MESSAGE_NULL the default message is used.
 		if(messageOn != MESSAGE_NULL)
 		{
-			sm.on = messageOn;
+			sm.on.messageType = messageOn;
 		}
 		else
 		{
-			sm.on = defaultMessageOn_;
+			sm.on.messageType = defaultMessageOn_.messageType;
 		}
 
 		if(messageOff != MESSAGE_NULL)
 		{
-			sm.off = messageOff;
+			sm.off.messageType = messageOff;
 		}
 		else
 		{
-			sm.off = defaultMessageOff_;
+			sm.off.messageType = defaultMessageOff_.messageType;
+		}
+
+		messageList_.insert(std::make_pair<GameObjectId, SensorMessage>(Id, sm));
+
+	}
+
+	/// Add an Object to the message list
+	void AddToMessageList(GameObjectId Id, KGBMessage messageOn, KGBMessage messageOff) 
+	{ 
+		SensorMessage sm;
+
+		sm.off = KGBMessage(messageOff);
+		sm.on = KGBMessage(messageOn);
+
+		// If the message is MESSAGE_NULL the default message is used.
+		if(messageOn.messageType == MESSAGE_NULL)
+		{
+			sm.on.messageType = defaultMessageOn_.messageType;
+		}
+
+		if(messageOff.messageType == MESSAGE_NULL)
+		{
+			sm.off.messageType = defaultMessageOff_.messageType;
 		}
 
 		messageList_.insert(std::make_pair<GameObjectId, SensorMessage>(Id, sm));
@@ -214,13 +274,15 @@ public:
 	}
 
 
-	void SetDefaultOnMessage(KGBMessageType onMessage){ defaultMessageOn_ = onMessage; }
-	void SetDefaultOffMessage(KGBMessageType offMessage){ defaultMessageOff_ = offMessage; }
+	void SetDefaultOnMessage(KGBMessageType onMessage){ defaultMessageOn_.messageType = onMessage; }
+	void SetDefaultOffMessage(KGBMessageType offMessage){ defaultMessageOff_.messageType = offMessage; }
 
 	void IgnoreSensors(){ignoreSensors_ = true;} 
 	void IgnoreSensorsOff(){ignoreSensors_ = false;}
 	bool IsIgnoringSensors(){return ignoreSensors_;}
 
+	void SetEnabled(bool e){ isEnabled_ = e; }
+	bool IsEnabled(){ return isEnabled_;}
 	SensorType GetSensorType(){return sensorType_;}
 	
 
@@ -228,10 +290,14 @@ protected:
 
 	struct SensorMessage
 	{
-		KGBMessageType on;
-		KGBMessageType off;
+		KGBMessage on;
+		KGBMessage off;
 		SensorMessage(){}
-		SensorMessage(KGBMessageType pOn, KGBMessageType pOff):on(pOn), off(pOff){}
+		SensorMessage(KGBMessageType pOn, KGBMessageType pOff)
+		{
+			on.messageType = pOn;
+			off.messageType = pOff;
+		}
 	};
 
 	
@@ -240,12 +306,16 @@ protected:
 	
 	SensorType sensorType_;
 
-	KGBMessageType defaultMessageOn_;
-	KGBMessageType defaultMessageOff_;
+	KGBMessage defaultMessageOn_;
+	KGBMessage defaultMessageOff_;
 
 	/// Map of GameObjectId's and a message to send to that object
 	/// when the sensor is activated.
 	SensorMap messageList_;
+
+	bool isEnabled_;
+
+	bool messageObjectOnContact_;
 
 	bool ignoreSensors_;
 

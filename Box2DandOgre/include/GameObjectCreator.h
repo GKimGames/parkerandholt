@@ -75,12 +75,10 @@ public:
 			{
 				Ogre::String str = "GameObject_" + Ogre::StringConverter::toString(gameObject->objectId_);
 
-	
 				gameObject->objectName_ = TinyXMLHelper::GetAttribute(gameObjectElement, "name", str);
 				gameObject->Initialize();
 
-
-				result =  CREATOR_OK;
+				result = CREATOR_OK;
 			}
 			else
 			{
@@ -118,7 +116,9 @@ public:
 	}
 
 protected:
+
 	GameObjectFactory* gameObjectFactory_;
+
 };
 
 #endif 

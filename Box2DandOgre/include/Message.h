@@ -5,7 +5,7 @@
 		Author: Matt King
 
 		This is a message that allows objects to send commands to each other.
-		All objects have the method HandleMessage
+		All objects have the method HandleMessage.
 
 =============================================================================*/
 #ifndef KGBMESSAGE_H
@@ -24,6 +24,16 @@ enum KGBMessageType
 	MESSAGE_ZERO,
 	MESSAGE_NULL,
 	NO_MESSAGE,
+	GO_DESTROY,
+	GOO_SET_TRANSPARENCY,
+	GOO_ANIMATION_BLEND,
+	GOO_START_ANIMATION,
+	GOO_STOP_ANIMATION,
+	GOO_DISABLE_PARTICLESYSTEM,
+	GOO_ENABLE_PARTICLESYSTEM,
+	CAMERA_PAN_TO,
+	CAMERA_PAN_TO_AND_FOLLOW,
+	CAMERA_FOLLOW,
 	CHARACTER_MOVE_LEFT_PLUS,
 	CHARACTER_MOVE_LEFT_MINUS,
 	CHARACTER_MOVE_RIGHT_PLUS,
@@ -59,6 +69,16 @@ const static char* KGBMessageTypeString[MESSAGE_TYPE_COUNT] =
 	"message zero",
 	"message null",
 	"no message",
+	"destroy",
+	"set transparency",
+	"animation blend",
+	"start animation",
+	"stop animation",
+	"disable particlesystem",
+	"enable particlesystem",
+	"pan to",
+	"pan to and follow",
+	"follow",
 	"character move left plus",
 	"character move left minus",
 	"character move right plus",
