@@ -10,11 +10,9 @@
 #define GAME_OBJECT_OGRE_BOX2D_H
 
 #include <Box2D/Box2D.h>
-#include "GameFramework.h"
 #include "GameObjectOgre.h"
 #include "OgreB2DebugDraw.h"
 #include "ManualObjectHelper.h"
-
 
 /// Structure to represent a contact point.
 struct ContactPoint
@@ -43,6 +41,7 @@ struct PostSolveData
 const static double DEFAULT_FRICTION = 0.4;
 const static signed short STATIC_MAP_GROUP = -10;
 
+class GameObjectOgre;
 /// This extends GameObjectOgre and adds a Box2D component.
 class GameObjectOgreBox2D  : public GameObjectOgre
 {
@@ -59,8 +58,7 @@ public:
 
 	virtual bool Update(double timeSinceLastFrame);
 
-	virtual bool HandleMessage(const KGBMessage message){return false;}
-
+	virtual bool HandleMessage(const KGBMessage message);
 	virtual bool Initialize();
 	virtual bool InitializeDebugDraw(Ogre::ColourValue color = Ogre::ColourValue(1,1,1,1), Ogre::String materialName = "debugDraw");
 

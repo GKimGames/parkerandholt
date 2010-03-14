@@ -8,6 +8,7 @@
 
 #include "CameraStateGoToPoint.h"
 #include "GameCamera.h"
+#include "GameFramework.h"
 
 //=============================================================================
 //					CameraStateGoToPoint::Constructor

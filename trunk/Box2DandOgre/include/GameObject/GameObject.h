@@ -14,18 +14,18 @@
 #include <vector>
 
 #include "HelperFunctions.h"
-#include "Message.h"
 
 class GameObject;
 typedef unsigned int GameObjectId;
 typedef std::map<GameObjectId, GameObject*> GameObjectMap;
 typedef std::map<Ogre::String, GameObject*> GameObjectNameMap;
-
+struct KGBMessage;
 /// This will identify what type of GameObject an Object is.
 /// This is useful due to Box2D having all contact callbacks go through a single
 /// world wide callback.
 enum GameObjectType
 {
+	GOTYPE_GameObject,
 	GOType_Character,						//< \brief Character Object
 	GOType_Character_Parker,				//< \brief Character Parker Object
 	GOType_Character_Parker_FEET_SENSOR,	//< \brief Character Parker Object
@@ -45,6 +45,7 @@ enum GameObjectType
 class GameObjectDef
 {
 
+
 public:
 	GameObjectType			gameObjectType_;	//< \brief GameObjectType of the object.
 	Ogre::String			objectName_;		//< \brief A name for the object.
@@ -58,9 +59,9 @@ public:
 class GameObject 
 {
 	friend class GameObjectCreator;
-
+	
 public:
-
+	
 /*=============================================================================
 				Object methods
 =============================================================================*/
@@ -135,9 +136,19 @@ public:
 	{
 		GameObjectMap::iterator it;
 
-		for (it = objectList.begin(); it != objectList.end(); it++)
+		for(it = objectList.begin(); it != objectList.end();)
 		{
-			(*it).second->Update(timeSinceLastFrame);		
+			if(!(*it).second->Update(timeSinceLastFrame))
+			{
+
+				objectNameList.erase(objectNameList.find((*it).second->objectName_));
+				delete (*it).second;
+				objectList.erase(it++);
+			}
+			else
+			{
+				++it;
+			}
 		}
 	}
 
@@ -193,6 +204,8 @@ protected:
 	GameObjectId			objectId_;			//< \brief Unique Id for the object.
 	Ogre::String			objectName_;		//< \brief A name for the object.
 	bool					initialized_;
+
+	bool					destroyMe_;	//< \brief Set this to false to have the object deleted
 
 /*=============================================================================
 				PROTECTED static members.

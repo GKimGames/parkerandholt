@@ -1,5 +1,7 @@
 
 #include "CheckPoint.h"
+#include <boost/any.hpp>
+#include "MessageDispatcher.h"
 
 CheckPoint::CheckPoint(Ogre::SceneManager *sceneManager, b2Vec2 center, float width, float height)
 {

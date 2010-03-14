@@ -7,6 +7,7 @@
 =============================================================================*/
 
 #include "GameObjectOgre.h"
+#include "GameFramework.h"
 
 //=============================================================================
 //							GameObjectOgre::Constructor
@@ -17,6 +18,7 @@ GameObject(name)
 	sceneManager_ = GAMEFRAMEWORK->sceneManager;
 	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
 	transparency_ = 0;
+	particleSystem_ = 0;
 }
 
 
@@ -55,13 +57,16 @@ bool GameObjectOgre::Initialize(Ogre::String meshName)
 	objectName_ = meshName;
 	initialized_ = GameObject::Initialize();
 
-	Ogre::String entityName = objectName_;
-	entityName += "_Entity_";
-	entityName += Ogre::StringConverter::toString(objectId_);
+	if(initialized_)
+	{
+		Ogre::String entityName = objectName_;
+		entityName += "_Entity_";
+		entityName += Ogre::StringConverter::toString(objectId_);
 
-	entity_ = sceneManager_->createEntity(entityName, meshName);
-	sceneNode_->attachObject(entity_);
-	initialized_ = true;
+		entity_ = sceneManager_->createEntity(entityName, meshName);
+		sceneNode_->attachObject(entity_);
+		initialized_ = true;
+	}
 
 	/*transparency_ = new EntityMaterialInstance(entity_);*/
 	return initialized_;
@@ -73,8 +78,16 @@ bool GameObjectOgre::Initialize(Ogre::String meshName)
 /// Update calls UpdataGraphics
 bool GameObjectOgre::Update(double timeSinceLastFrame)
 {
-	UpdateGraphics(timeSinceLastFrame);
-	return true;
+	if(GameObject::Update(timeSinceLastFrame))
+	{
+		UpdateGraphics(timeSinceLastFrame);
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 //=============================================================================
@@ -102,5 +115,25 @@ void GameObjectOgre::SetBlendType(Ogre::SceneBlendType type)
 	{
 		transparency_ = new EntityMaterialInstance(entity_);
 	}
+
 	transparency_->setSceneBlending(type);
+}
+
+
+bool GameObjectOgre::HandleMessage(const KGBMessage message)
+{
+	if(GameObject::HandleMessage(message))
+	{
+		return true;
+	}
+	else
+	{
+		if(message.messageType == GOO_SET_TRANSPARENCY)
+		{
+			SetTransparency(boost::any_cast<Ogre::Real>(message.messageData));
+		}
+
+	}
+
+	return false;
 }

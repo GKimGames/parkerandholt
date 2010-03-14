@@ -2,9 +2,6 @@
 #define PICKUP_H
 
 #include "GameObjectOgreBox2D.h"
-#include <boost/any.hpp>
-#include "MessageDispatcher.h"
-
 
 class PickUp : public GameObjectOgreBox2D
 {

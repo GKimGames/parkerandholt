@@ -43,7 +43,6 @@
 #include "MyGUI.h"
 
 #include "MousePicking.h"
-#include "GameCamera.h"
 #include "CheckPoint.h"
 #include "TraumaMeter.h"
 #include "PlayerInfo.h"
@@ -166,7 +165,6 @@ private:
 	//ContactPoint m_points[k_maxContactPoints];
 	int32 m_pointCount;
 
-	GameCamera*		gameCamera_;
 	Ogre::Vector3	camPosition;
 
 };

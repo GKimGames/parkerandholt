@@ -6,8 +6,11 @@
 		
 		Taken from the OGRE wiki.
 
-		+Added being able to play the animation to a certain time and have it
-		loop or stop there.
+		+	Added being able to play the animation to a certain time and have
+			it loop or stop there.
+
+		+	Added BlendData to be able to pass structs to the class to setup
+			a blending transition
 =============================================================================*/
 
 
@@ -16,11 +19,13 @@
 
 #include "Ogre.h"
 
+
 class AnimationBlender
 {
 
 public:
 
+	
 	enum BlendingTransition
 	{
 		BlendSwitch,				// stop source and start dest
@@ -28,15 +33,35 @@ public:
 		BlendThenAnimate			// blend source to first frame of dest, when done, start dest anim
 	};
 
+	struct BlendData
+	{
+		Ogre::String animation;
+		AnimationBlender::BlendingTransition transition;
+		Ogre::Real duration;
+		bool loop;
+		Ogre::Real targetTime;
+
+		BlendData(): animation("")
+		{
+			transition = AnimationBlender::BlendThenAnimate;
+			duration = 1.0;
+			loop = true;
+			targetTime = 9999;
+		}
+		
+	};
+
 	AnimationBlender( Ogre::Entity *);
 
 	void Blend( 
-		const Ogre::String &animation,
+		const Ogre::String& animation,
 		BlendingTransition transition,
 		Ogre::Real duration,
 		bool loop = true,
 		Ogre::Real targetTime = 9999
 		);
+
+	void Blend(BlendData data);
 
 	void Initialize( const Ogre::String &animation, bool loop = true );
 	void AddTime( Ogre::Real time );
@@ -64,9 +89,6 @@ public:
 	bool loop_;
 	bool complete_;
 
-
-
 };
-
 
 #endif

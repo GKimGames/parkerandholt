@@ -1,0 +1,267 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SampleLevel>
+  <LevelInfo>
+    <!-- Level Info Should Go In Here -->
+  </LevelInfo>
+  <Box2D>
+    <!--<Body>
+      <BodyDef position="0.5 2.5"/>
+      <Fixture shape="box" boxWidth="1" boxHeight="5" density="40"/>
+    </Body>-->
+    <Body id="myLedge2">
+      <BodyDef position="-11.2 10.15"/>
+      <Fixture shape="circle" radius="0.3" sensor="1"/>
+    </Body>
+    <Body id="myLedge3">
+      <BodyDef position="-10.0 10.15"/>
+      <Fixture shape="circle" radius="0.3" sensor="1"/>
+    </Body>
+    <Body id="myLedge4">
+      <BodyDef position="20 0"/>
+      <Fixture shape="circle" radius="0.3" sensor="1"/>
+    </Body>
+    <Body id="myLedge5">
+      <BodyDef position="-20 10.15"/>
+      <Fixture shape="circle" radius="0.3" sensor="1"/>
+    </Body>
+    <Body id="farOffLedge">
+      <BodyDef position="75 -1"/>
+      <Fixture shape="circle" radius="0.3" sensor="1"/>
+    </Body>
+    <Body>
+      <BodyDef/>
+      <Fixture shape="edge" point1="-20 0" point2="20 0"/>
+    </Body>
+    <Body id="MySensor">
+      <BodyDef bodyType="dynamicBody" position="15 20"/>
+      <Fixture shape="box" boxWidth="1" boxHeight="1" density="40"/>
+    </Body>
+    <Body id="ground">
+      <BodyDef position="0 -50"/>
+      <Fixture shape="box" boxWidth="1" boxHeight="1" density="40"/>
+    </Body>
+    <Body>
+      <BodyDef position="-10.6 2.5"/>
+      <Fixture shape="box" boxWidth="1.2" boxHeight="5.3" density="40"/>
+    </Body>
+    <Body>
+      <BodyDef position="-20.6 2.5"/>
+      <Fixture shape="box" boxWidth="1.2" boxHeight="5.3" density="40"/>
+    </Body>
+    <Body>
+      <BodyDef position="-10.6 7.5"/>
+      <Fixture shape="box" boxWidth="1.2" boxHeight="5.3" density="40"/>
+    </Body>
+    <Body>
+      <BodyDef position="-20.6 7.5"/>
+      <Fixture shape="box" boxWidth="1.2" boxHeight="5.3" density="40"/>
+    </Body>
+    <Body id="LevarArm1">
+      <BodyDef bodyType="dynamicBody" position="35 2"/>
+      <Fixture shape="box" boxWidth="14.16" boxHeight="1.2" density="40"/>
+    </Body>
+    <Body id="LevarArm2">
+      <BodyDef bodyType="dynamicBody" position="50 -4"/>
+      <Fixture shape="box" boxWidth="14.16" boxHeight="1.2" density="40"/>
+    </Body>
+    <Joint id="Revjoint" type="revolute">
+      <JointDef bodyA="ground" bodyB="LevarArm1"/>
+    </Joint>
+    <Joint id="Revjoint" type="revolute">
+      <JointDef bodyA="ground" bodyB="LevarArm2"/>
+    </Joint>
+    <Body>
+      <BodyDef/>
+      <Fixture shape="edge" point1="75 -1" point2="90 -1"/>
+    </Body>
+    <Body>
+      <BodyDef/>
+      <Fixture shape="edge" point1="90 -1" point2="120 -10"/>
+    </Body>
+    <Body>
+      <BodyDef/>
+      <Fixture shape="edge" point1="120 -10" point2="135 -10"/>
+    </Body>
+    <Body id="steve">
+      <BodyDef bodyType="dynamicBody" position="137 -10"/>
+      <Fixture shape="box" boxWidth="3" boxHeight="0.5" density="15"/>
+    </Body>
+    <Joint id="MrJoint" type="prismatic">
+      <JointDef bodyA="ground" bodyB="steve" localAxis1="0 1" enableLimit="1" lowerTranslation="-20" upperTranslation="1" worldAnchor="137 -10" enableMotor="1" motorSpeed="200" maxMotorForce="1500"/>
+      <!--<JointDef bodyA="bill" bodyB="steve" localAnchorA="0 10" localAnchorB="3 2" groundAnchorA="0 11" groundAnchorB="3 11" ratio="2" lengthB="5"/>-->
+    </Joint>
+    <Body>
+      <BodyDef/>
+      <Fixture shape="edge" point1="100 -31" point2="135 -31" />
+    </Body>
+  </Box2D>
+  <GameObjects>
+    <GameObject type="ObjectOgre">
+      <Object/>
+      <OgreObject position="0 0 0" scale="1 1 1">
+        <Mesh mesh="SideWall.mesh" position="10 0 -7.5" scale="0.2 0.2 0.2"/>
+      </OgreObject>
+    </GameObject>
+    <GameObject type="ObjectOgre">
+      <Object/>
+      <OgreObject position="0 6 20" scale="1 1 1">
+        <Light name="MyLighty" position="0 6 20" direction="0 -1 -1"/>
+      </OgreObject>
+    </GameObject>
+    <GameObject type="ObjectOgre">
+      <Object/>
+      <OgreObject position="0 0 0" scale="1 1 1">
+        <Light name="MyLighty2" position="-20 6 0" direction="0 -1 0"/>
+      </OgreObject>
+    </GameObject>
+    <GameObject type="OgreBox2D">
+      <Object name="A lever Arm"/>
+      <OgreObject position="0 0 0" >
+        <Mesh mesh="LeverArm.mesh" scale="0.4 0.2 0.2"/>
+      </OgreObject>
+      <Box2DObject bodyID="LevarArm1"/>
+    </GameObject>
+    <GameObject type="OgreBox2D">
+      <Object name="A lever Arm2"/>
+      <OgreObject position="0 0 0" >
+        <Mesh mesh="LeverArm.mesh" scale="0.4 0.2 0.2"/>
+      </OgreObject>
+      <Box2DObject bodyID="LevarArm2"/>
+    </GameObject>
+    <!--<GameObject type="ObjectOgre">
+      <Object/>
+      <OgreObject position="-12.5 0 0" >
+        <Mesh mesh="Island.mesh" position="-12.5 0 0" scale="1.5 1 1"/>
+      </OgreObject>
+    </GameObject>
+    <GameObject type="ObjectOgre">
+      <Object/>
+      <OgreObject position="0 0 0" scale="0.1 0.1 0.1">
+        <Mesh name="MyPlatty" type="platform" point1="-20 0" point2="20 0" xTile="4" yTile="1" material="Examples/GrassFloor" zLength="10"/>
+      </OgreObject>
+    </GameObject>-->
+    <GameObject type="ObjectOgre">
+      <Object/>
+      <OgreObject position="0 0 0" scale="0.1 0.1 0.1">
+        <Mesh name="pefx" type="particleSystem"  position="0 10 0" particleSystem="Examples/MattAureola"/>
+      </OgreObject>
+    </GameObject>
+    <GameObject type="ObjectOgre">
+      <Object/>
+      <OgreObject position="0 0 0" scale="0.1 0.1 0.1">
+        <Mesh name="Batman" type="platform" point1="75 -1" point2="90 -1" material="Examples/GrassFloor" zLength="10"/>
+      </OgreObject>
+    </GameObject>
+    <GameObject type="ObjectOgre">
+      <Object/>
+      <OgreObject>
+        <!--<Mesh mesh="Island.mesh" position="0 -0.8 0" scale="1.5 1 1"/>-->
+        <Mesh mesh="BigIsland.mesh" position="81 -1.1 0" scale="1.5 2 2" rotation="0 180 0"/>
+        <Mesh mesh="BigIsland.mesh" position="50 15 -20" scale="1.5 2 2" rotation="0 180 0"/>
+        <Mesh fitToPoints="0" point1="-20 0 0" point2="20 0 0" mesh="BigIsland.mesh" position="-9.0 -0.1 0" scale="5 2 2" rotation="0 180 0"/>
+        <Mesh mesh="BigIsland.mesh" position="5 -5 -25" scale="1 1 1" rotation="180 0 0"/>
+        <Mesh mesh="BigIsland.mesh" position="4 -5 -25" scale="1 1 1" rotation="0 180 0"/>
+        <Mesh mesh="BigIsland.mesh" position="2 -3 -25" scale="1 1 1" rotation="0 180 0"/>
+      </OgreObject>
+    </GameObject>
+    <GameObject type="ObjectOgre">
+      <Object/>
+      <OgreObject position="-12.5 0 0" >
+        <Mesh mesh="Island.mesh" position="82.5 -1.2 0" scale="1.5 1 1"/>
+      </OgreObject>
+    </GameObject>
+    <GameObject type="ObjectOgre">
+      <Object/>
+      <OgreObject position="0 0 0" scale="0.1 0.1 0.1">
+        <Mesh name="Batman2" type="platform" point1="90 -1" point2="120 -10" xTile="4" yTile="1" material="Examples/GrassFloor" zLength="10"/>
+      </OgreObject>
+    </GameObject>
+    <GameObject type="ObjectOgre">
+      <Object/>
+      <OgreObject position="0 0 0" scale="0.1 0.1 0.1">
+        <Mesh name="Batman3" type="platform" point1="100 -31" point2="135 -31" xTile="4" yTile="2" material="Examples/GrassFloor" zLength="10"/>
+      </OgreObject>
+    </GameObject>
+    <GameObject type="ObjectOgre">
+      <Object/>
+      <OgreObject position="0 0 0" scale="0.1 0.1 0.1">
+        <Mesh name="Batman4" type="platform" point1="120 -10" point2="135 -10"  material="Examples/GrassFloor" zLength="10"/>
+      </OgreObject>
+    </GameObject>
+    <GameObject type="ObjectOgre">
+      <Object/>
+      <OgreObject position="0 0 0">
+        <Mesh mesh="SideWall.mesh" position="-10 0 0" scale="0.3 0.2 0.2" rotation="0 90 0"/>
+        <Mesh mesh="SideWall.mesh" position="-10 5 0" scale="0.3 0.2 0.2" rotation="0 90 0"/>
+      </OgreObject>
+    </GameObject>
+    <GameObject type="ObjectOgre">
+      <Object/>
+      <OgreObject>
+        <Mesh mesh="SideWall.mesh" position="-20 0 0" scale="0.3 0.2 0.2" rotation="0 90 0"/>
+        <Mesh mesh="SideWall.mesh" position="-20 5 0" scale="0.3 0.2 0.2" rotation="0 90 0"/>
+      </OgreObject>
+    </GameObject>
+    <GameObject type="ObjectSensor">
+      <Object name="sleeves"/>
+      <OgreObject position="0 0 0" >
+        <Mesh mesh="cube.1m.mesh"/>
+      </OgreObject>
+      <Box2DObject bodyID="MySensor"/>
+      <ObjectSensor messageOnContact="1">
+        <Object objectID="MyObjectSensor" on=""/>
+        <Messages>
+          <Message id="Jumper" type="" delay="0">
+            <data>
+              <kittycat butts="butts"/>
+            </data>
+          </Message>
+        </Messages>
+      </ObjectSensor>
+    </GameObject>
+    <GameObject type="ObjectSensor">
+      <Object name="MyLedgeSensor"/>
+      <Box2DObject bodyID="myLedge4"/>
+      <ObjectSensor>
+        <Object objectID="MyObjectSensor" sensorType="sensortype ledge"/>
+      </ObjectSensor>
+    </GameObject>
+    <GameObject type="ObjectSensor">
+      <Object name="MyLedgeSensor"/>
+      <Box2DObject bodyID="myLedge2"/>
+      <ObjectSensor>
+        <Object objectID="MyObjectSensor" sensorType="sensortype ledge"/>
+      </ObjectSensor>
+    </GameObject>
+    <GameObject type="ObjectSensor">
+      <Object name="MyLedgeSensor"/>
+      <Box2DObject bodyID="myLedge3"/>
+      <ObjectSensor>
+        <Object objectID="MyObjectSensor" sensorType="sensortype ledge"/>
+      </ObjectSensor>
+    </GameObject>
+    <GameObject type="ObjectSensor">
+      <Object name="MyLedgeSensor"/>
+      <Box2DObject bodyID="myLedge5"/>
+      <ObjectSensor>
+        <Object objectID="MyObjectSensor" sensorType="sensortype ledge"/>
+      </ObjectSensor>
+    </GameObject>
+    <GameObject type="ObjectSensor">
+      <Object name="MyLedgeSensor"/>
+      <Box2DObject bodyID="farOffLedge"/>
+      <ObjectSensor>
+        <Object objectID="MyObjectSensor" sensorType="sensortype ledge"/>
+      </ObjectSensor>
+    </GameObject>
+    <GameObject type="OgreBox2D">
+      <Object name="OgreBox2D Platty"/>
+      <OgreObject position="0 0 0" >
+        <Mesh mesh="cube.1m.mesh" scale="3 0.5 3"/>
+      </OgreObject>
+      <Box2DObject bodyID="steve"/>
+    </GameObject>
+    <MovingPlatform type="MovingPlatform" name="Batman" point1="10 1" point2="0 1" start="5 1" end="0 5" speed="2"/>
+  </GameObjects>
+
+</SampleLevel>

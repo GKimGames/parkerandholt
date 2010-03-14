@@ -236,8 +236,12 @@ bool Platform::InitializePlaceable()
 	// Add the entity number to the HoltBox name to make it unique.
 	entityName += Ogre::StringConverter::toString(objectId_);
 	entity_ = sceneManager_->createEntity(entityName, "cube.1m.mesh");
+	Ogre::AxisAlignedBox box = entity_->getBoundingBox();
+	Ogre::Vector3 v3 = box.getSize();
+
 	sceneNode_->attachObject(entity_);
-	sceneNode_->scale(tempLength,platformHeight / 1.0, 1.0);
+
+	sceneNode_->scale(tempLength/v3.x,platformHeight / v3.y, 1.0);
 
 	previousAngle_ = body_->GetAngle();
 	initialized_ = true;
@@ -248,7 +252,6 @@ bool Platform::SetGraphics(b2Vec2 position, float length, float angle, bool fina
 		
 		body_->SetTransform(body_->GetPosition(), -previousAngle_);
 		body_->SetTransform(position, angle);
-		body_->GetPosition().x -3;
 
 		sceneNode_->setScale(length, 0.1f, 1.0);
 
@@ -278,7 +281,6 @@ bool Platform::SetGraphics(b2Vec2 position, float length, float angle, bool fina
 
 		fd.density = 25;
 		fd.friction = DEFAULT_FRICTION;
-		body_->GetPosition().x -3;
 		//fd.filter.groupIndex = STATIC_MAP_GROUP;
 
 		body_->CreateFixture(&fd);

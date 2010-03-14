@@ -42,7 +42,7 @@ void PhysicsState::enter()
 
 	GameFramework::getSingletonPtr()->log_->logMessage("Entering PhysicsState...");
 	
-	TiXmlDocument* settingsDoc = 0;// = new TiXmlDocument("../Settings.xml");
+	TiXmlDocument* settingsDoc = 0;
 	TiXmlHandle* root = TinyXMLHelper::GetRootFromFile("../Settings.xml", settingsDoc);
 	
 	TiXmlHandle cameraHandle = root->FirstChildElement("Camera");
@@ -51,7 +51,7 @@ void PhysicsState::enter()
 
 	TiXmlHandle box2DHandle = root->FirstChildElement("Box2D");
 	gravity_ = TinyXMLHelper::GetAttributeb2Vec2(box2DHandle.FirstChildElement("Gravity").ToElement(), "direction");
-	timeStep = TinyXMLHelper::GetAttributeFloat(box2DHandle.FirstChildElement("Timestep").ToElement(), "timestep");
+	timeStep = TinyXMLHelper::GetAttributeFloat(box2DHandle.FirstChildElement("Timestep").ToElement(),  "timestep");
 	
 	delete root;
 	delete settingsDoc;
@@ -229,13 +229,23 @@ void PhysicsState::createPhysics()
 	new PickUp(sceneManager_, b2Vec2(-3.0f, 3.0f));
 	new PickUp(sceneManager_, b2Vec2(-6.0f, 3.0f));
 	new PickUp(sceneManager_, b2Vec2(-9.0f, 3.0f));
+	new PickUp(sceneManager_, b2Vec2(-14.0f, 3.0f));
+	new PickUp(sceneManager_, b2Vec2(120.0f, 3.0f));
+	new PickUp(sceneManager_, b2Vec2(120.0f, -15.0f));
+	new PickUp(sceneManager_, b2Vec2(122.0f, -15.0f));
+	new PickUp(sceneManager_, b2Vec2(124.0f, -18.0f));
+	new PickUp(sceneManager_, b2Vec2(126.0f, -18.0f));
+	new PickUp(sceneManager_, b2Vec2(116.0f, -18.0f));
+	new PickUp(sceneManager_, b2Vec2(116.0f, -20.0f));
 
+	/*
 	Teleporter* t1 = new Teleporter("Steeeeeeve");
 	Teleporter* t2 = new Teleporter("Steeeeve");
 
 	t1->SetPartner(t2);
 	t2->SetPartner(t1);
 
+	
 	b2BodyDef bdef;
 	bdef.position.Set(10, 3);
 	b2CircleShape circleShape;
@@ -255,9 +265,12 @@ void PhysicsState::createPhysics()
 	b->SetUserData(t2);
 	b->CreateFixture(&fd);
 	t2->SetBody(b);
+	*/
 
+	/*
 	LedgeSensor* ls = new LedgeSensor();
 	ls->SetBodyPosition(b2Vec2(0,5));
+	*/
 	
 #if DEBUG_DRAW_ON
 	debugDraw_ = new OgreB2DebugDraw(sceneManager_, "debugDraw", 0);
@@ -810,6 +823,7 @@ bool PhysicsState::update(double timeSinceLastFrame)
 		moveCamera();
 		
 	}
+
 
 	return true;
 

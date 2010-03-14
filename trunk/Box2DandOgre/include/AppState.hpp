@@ -18,6 +18,7 @@
 
 #include "GameFramework.h"
 #include "Message.h"
+#include "GameCamera.h"
 
 class AppState;
 class GameObject;
@@ -63,6 +64,7 @@ protected:
 	void		shutdown(void){m_pParent->shutdown();}
 	
 	AppStateListener*		m_pParent;
+	GameCamera*				gameCamera_;
 	
 	Ogre::Camera*			m_pCamera;
 	Ogre::SceneManager*		m_pSceneMgr;

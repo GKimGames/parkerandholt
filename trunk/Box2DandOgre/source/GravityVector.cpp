@@ -1,8 +1,8 @@
 /*=============================================================================
 
-GravityVector.cpp
+		GravityVector.cpp
 
-Author: Greg King
+		Author: Greg King
 
 =============================================================================*/
 #include "GravityVector.h"

@@ -7,7 +7,8 @@
 =============================================================================*/
 
 #include "GameObjectOgreBox2D.h"
-
+#include "GameObjectOgre.h"
+#include "GameFramework.h"
 
 /// Constructor grabs the reference from the OgreFramework of the b2World.
 /// The object is not initialized until Initialize is called and will only
@@ -81,14 +82,20 @@ bool GameObjectOgreBox2D::InitializeDebugDraw(Ogre::ColourValue color, Ogre::Str
 
 bool GameObjectOgreBox2D::Update(double timeSinceLastFrame)
 {
-	UpdateGraphics(timeSinceLastFrame);
-	
-	if(debugDrawOn_)
+	if(GameObjectOgre::Update(timeSinceLastFrame))
 	{
-		UpdateDebugDraw();
-	}
+	
+		if(debugDrawOn_)
+		{
+			UpdateDebugDraw();
+		}
 
-	return true;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void GameObjectOgreBox2D::UpdateDebugDraw()
@@ -153,6 +160,22 @@ bool GameObjectOgreBox2D::UpdateGraphics(double timeSinceLastFrame)
 
 	return true;
 }
+
+
+bool GameObjectOgreBox2D::HandleMessage(const KGBMessage message)
+{	
+	if(GameObjectOgre::HandleMessage(message))
+	{
+		return true;
+	}
+	else
+	{
+
+	}
+
+	return false;
+}
+
 
 void GameObjectOgreBox2D::RedrawDebug()
 {

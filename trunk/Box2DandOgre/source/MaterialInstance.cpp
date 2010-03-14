@@ -1,5 +1,6 @@
 #include "MaterialInstance.h"
 
+using namespace Ogre;
 MaterialInstance::MaterialInstance () {
   mCurrentTransparency = 0.0f;
 

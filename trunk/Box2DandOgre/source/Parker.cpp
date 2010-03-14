@@ -208,6 +208,15 @@ void CharacterParker::CreateGraphics()
 	animationState_->setLoop(true);
 	animationState_->setEnabled(true);
 
+	Ogre::MeshPtr mesh = Ogre::MeshManager::getSingletonPtr()->getByName("cube.1m.mesh");
+
+	Ogre::Vector3* vertices;
+	size_t vertex_count,index_count;
+	unsigned long* indices;
+
+	
+	GetMeshInformation((Ogre::Mesh*) mesh.getPointer(),vertex_count,vertices,index_count,indices);
+
 	// Create a scene node for Parker
 	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode( "ParkerNode" );
 
@@ -392,9 +401,16 @@ void CharacterParker::UpdateAnimation(double timeSinceLastFrame)
 bool CharacterParker::HandleMessage(const KGBMessage message)
 { 
 
-	if(message.messageType == CREATE_BOX)
+	if(GameObject::HandleMessage(message))
 	{
-		new HoltBox(sceneManager_, b2Vec2(-7, 10), 1, 20);
+		return true;
+	}
+	else
+	{
+		if(message.messageType == CREATE_BOX)
+		{
+			new HoltBox(sceneManager_, b2Vec2(-7, 10), 1, 20);
+		}
 	}
 
 	return stateMachine_->HandleMessage(message); 
@@ -427,7 +443,16 @@ bool CharacterParker::Update(double timeSinceLastFrame)
 		GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec1, feetVec1, color);
 		GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec2, feetVec2, color);
 	}*/
+
+	if(GameObjectOgreBox2D::Update(timeSinceLastFrame))
+	{
 	
+	}
+	else
+	{
+		return false;
+	}
+
 	feetSensorHit_ = false;
 	shinRightHit_ = false;
 	shinLeftHit_ = false;

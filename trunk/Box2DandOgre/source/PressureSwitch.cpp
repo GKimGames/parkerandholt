@@ -76,7 +76,10 @@ PressureSwitch::PressureSwitch(Ogre::SceneManager* sceneManager,
 
 	world_->CreateJoint(&pjd);
 
-
+	objectName_ = "PressureSwitch";
+	GameObject::Initialize();
+	entity_ = sceneManager_->createEntity(objectName_, "FloorSwitch.mesh");
+	sceneNode_->attachObject(entity_);
 
 	/*
 	messageList_.insert(
@@ -142,6 +145,8 @@ void PressureSwitch::EndContact(ContactPoint* contact, b2Fixture* contactFixture
 //
 bool PressureSwitch::Update(double timeSinceLastFrame)
 { 
+	GameObjectSensor::Update(timeSinceLastFrame);
+
 	if(hitBegun_)
 	{
 		timeAccum_ += timeSinceLastFrame;

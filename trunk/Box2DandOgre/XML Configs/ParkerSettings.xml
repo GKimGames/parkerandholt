@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Character>
+  <MeshInfo>
+    <Mesh name="parkor.mesh" translate="0 -.91 0" rotateY="-90"/>
+  </MeshInfo>
+  <ShapeInfo>
+    <Size width="0.3" height="1.884" scaleX="0.11" scaleY="0.11" scaleZ="0.11"/>
+    <ShapeDef   mass="50.0"
+                friction="50"
+                restitution="0.1"
+                linearDamping="0.00"
+                />
+  </ShapeInfo>
+  <!-- MoveInfo stores all the information on forces that move the character-->
+  <MovementInfo>
+    <RunningInfo 	runningForce="80000"    	maximumVelocity="9" />
+    <JumpingInfo 	jumpingForce="1000"      		jumpingAfterForce="490" />
+    <WallJumpInfo	jumpingForce="300 360"/>
+    <AirInfo     		airForce="2500"         		maximumVelocity="6"  />
+  </MovementInfo>
+  <Platform gameObject="Platform" name="Platformy" p1="0 -5" p2="5 -5"/>
+</Character>

@@ -1,5 +1,7 @@
 #include "SubEntityMaterialInstance.h"
 
+using namespace Ogre;
+
 SubEntityMaterialInstance::SubEntityMaterialInstance (SubEntity *se) : MaterialInstance () {
   mSubEntity = se;
       

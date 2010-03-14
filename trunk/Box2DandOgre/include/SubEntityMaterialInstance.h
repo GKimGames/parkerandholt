@@ -3,8 +3,6 @@
 
 #include "MaterialInstance.h"
 
-using namespace Ogre;
-
 /** Specialisation of the MaterialInstance class for SubEntities.
  * @author Kencho.
  * @see MaterialInstance.
@@ -15,14 +13,14 @@ class SubEntityMaterialInstance : public MaterialInstance {
   protected:
     /** Reference to the affected SubEntity.
      */
-    SubEntity *mSubEntity;
+    Ogre::SubEntity *mSubEntity;
 // Methods ====================================================================================
   public:
     /** Constructor. 
      * Initialises references and parameters.
      * @param se The SubEntity this SubEntityMaterialInstance works on.
      */
-    SubEntityMaterialInstance (SubEntity *se);
+    SubEntityMaterialInstance (Ogre::SubEntity *se);
     /** Destructor.
      * @note Destroys the copy material if needed.
      */
@@ -34,7 +32,7 @@ class SubEntityMaterialInstance : public MaterialInstance {
      *       SubEntity::setMaterialName() if this method is called. Indeed it's recommended to 
      *       change it through this instance rather than changing it manually.
      */
-    void setMaterialName (String name);
+    void setMaterialName (Ogre::String name);
     /** Changes this instance transparency. 
      * @param transparency The new transparency. Values will be clamped to [0..1].
      * @note This changes transparency. A value of 0 means full opacity, while 1 means full 
@@ -43,7 +41,7 @@ class SubEntityMaterialInstance : public MaterialInstance {
      *       (the copy is mandatory transparent, and thus might be slower than the original).
      * @see MaterialInstance::setTransparency().
      */
-    void setTransparency (Real transparency);
+    void setTransparency (Ogre::Real transparency);
   protected:
     /** Initialises the reference to the original material from the SubEntity's.
      * @see MaterialInstance::initOriginalMaterial().

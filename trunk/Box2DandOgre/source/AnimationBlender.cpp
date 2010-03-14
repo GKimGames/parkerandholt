@@ -54,8 +54,21 @@ void AnimationBlender::Initialize(const String &animation, bool loop)
 //
 /// Blend to a new animation or switch to it depending on the BlendingTransition
 /// passed to the function.
+void AnimationBlender::Blend(BlendData data)
+{
+	if(data.animation.compare("") != 0)
+	{
+		Blend(data.animation.c_str(), data.transition, data.duration, data.loop, data.targetTime);
+	}
+}
+
+//=============================================================================
+//						Blend
+//
+/// Blend to a new animation or switch to it depending on the BlendingTransition
+/// passed to the function.
 void AnimationBlender::Blend(
-		const String &animation,
+	    const Ogre::String &animation,
 		BlendingTransition transition,
 		Real duration,
 		bool loop,
