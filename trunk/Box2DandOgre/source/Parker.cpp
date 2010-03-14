@@ -210,13 +210,6 @@ void CharacterParker::CreateGraphics()
 
 	Ogre::MeshPtr mesh = Ogre::MeshManager::getSingletonPtr()->getByName("cube.1m.mesh");
 
-	Ogre::Vector3* vertices;
-	size_t vertex_count,index_count;
-	unsigned long* indices;
-
-	
-	GetMeshInformation((Ogre::Mesh*) mesh.getPointer(),vertex_count,vertices,index_count,indices);
-
 	// Create a scene node for Parker
 	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode( "ParkerNode" );
 
