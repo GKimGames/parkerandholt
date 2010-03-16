@@ -24,6 +24,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="echo Start Time: %TIME%"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -97,7 +98,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine=""
+				CommandLine="echo End Time: %TIME%"
 			/>
 		</Configuration>
 		<Configuration
@@ -616,6 +617,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Door.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\GameConstants.h"
 					>
 				</File>
@@ -683,6 +688,10 @@
 					Name="Object Creators"
 					>
 					<File
+						RelativePath=".\include\DoorCreator.h"
+						>
+					</File>
+					<File
 						RelativePath=".\include\GameObjectCreator.h"
 						>
 					</File>
@@ -708,6 +717,10 @@
 					</File>
 					<File
 						RelativePath=".\include\PlatformCreator.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\StaticOgreObjectCreator.h"
 						>
 					</File>
 				</Filter>
@@ -822,6 +835,10 @@
 			</File>
 			<File
 				RelativePath="..\..\OgreSDK\bin\LevelOne.xml"
+				>
+			</File>
+			<File
+				RelativePath="..\..\OgreSDK\bin\LevelTwo.xml"
 				>
 			</File>
 			<File

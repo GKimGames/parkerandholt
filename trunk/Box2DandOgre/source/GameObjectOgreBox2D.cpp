@@ -170,7 +170,15 @@ bool GameObjectOgreBox2D::HandleMessage(const KGBMessage message)
 	}
 	else
 	{
-
+		if(message.messageType == SET_POSITION)
+		{
+			if(message.messageData.empty() == false)
+			{	
+				Ogre::String typeName(message.messageData.type().name());
+				Ogre::Vector3 pos((boost::any_cast<Ogre::Vector3>(message.messageData)));
+				SetBodyPosition(b2Vec2(pos.x,pos.y));
+			}
+		}
 	}
 
 	return false;

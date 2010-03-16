@@ -18,6 +18,8 @@
 
 #include "TinyXMLHelper.h"
 
+#include "Door.h"
+
 //=============================================================================
 //								Constructor
 //
@@ -195,7 +197,8 @@ void CharacterParker::CreatePhysics()
 
 }
 
-
+#include "OgreHelper.h"
+#include "DynamicLines.h"
 //=============================================================================
 //								CreateGraphics
 //
@@ -223,6 +226,53 @@ void CharacterParker::CreateGraphics()
 	bodyNode_->scale(scaleX_,scaleY_,scaleZ_);
 	bodyNode_->translate(translate_);
 	bodyNode_->rotate(Ogre::Vector3::UNIT_Y,Ogre::Degree(rotateY));
+
+	entity_->getMesh()->buildEdgeList();
+
+	size_t vertex_count,index_count;
+	Ogre::Vector3* vertices;
+	unsigned long* indices;
+
+	GetMeshInformation(entity_->getMesh().getPointer(),vertex_count,vertices,index_count,indices);
+	Ogre::Vector3 *vertexArray = new Ogre::Vector3[vertex_count];
+	vertexArray = vertices;
+	
+	Ogre::EdgeData* edgeData = entity_->getMesh()->getEdgeList(0);
+	Ogre::EdgeData::EdgeGroupList::iterator i, iend;
+	Ogre::EdgeData::EdgeList::iterator ei, eiend;
+
+	std::vector<Ogre::Vector3> myVecs;
+
+	Ogre::Vector3 normal(0,0,1);
+	Ogre::Plane plane(normal, 0);
+	Ogre::Ray ray;
+	DynamicLines* dynamicLines = new DynamicLines();
+	sceneNode_->attachObject(dynamicLines);
+	iend = edgeData->edgeGroups.end();
+	for (i = edgeData->edgeGroups.begin(); i != iend; ++i)
+	{
+		int num = 0;
+		eiend = i->edges.end();
+		for (ei = i->edges.begin(); ei != eiend; ++ei, ++num)
+		{
+
+			Ogre::EdgeData::Edge& e = *ei;
+
+			Ogre::Vector3 start = Ogre::Vector3(vertexArray[e.vertIndex[0]]);
+			Ogre::Vector3 end = Ogre::Vector3(vertexArray[e.vertIndex[1]]);
+			
+			if((start.z < 0 && end.z > 0) || (start.z > 0 && end.z < 0))
+			{
+				ray.setOrigin(start);
+				ray.setDirection(end - start);
+				myVecs.push_back(ray.getPoint(ray.intersects(plane).second));
+				dynamicLines->addPoint(ray.getPoint(ray.intersects(plane).second));
+			}
+		}
+	}
+
+	dynamicLines->update();
+
 
 }
 
@@ -394,7 +444,7 @@ void CharacterParker::UpdateAnimation(double timeSinceLastFrame)
 bool CharacterParker::HandleMessage(const KGBMessage message)
 { 
 
-	if(GameObject::HandleMessage(message))
+	if(GameObjectOgreBox2D::HandleMessage(message))
 	{
 		return true;
 	}
@@ -462,95 +512,76 @@ bool CharacterParker::Update(double timeSinceLastFrame)
 			b2Fixture* A = contacts->contact->GetFixtureA();
 			b2Fixture* B = contacts->contact->GetFixtureB();
 
+			GameObject* goA = (GameObject*) A->GetBody()->GetUserData();
+			GameObject* goB = (GameObject*) B->GetBody()->GetUserData();
 
-			GameObject* goA = (GameObject*) contacts->contact->GetFixtureA()->GetBody()->GetUserData();
-			GameObject* goB = (GameObject*) contacts->contact->GetFixtureB()->GetBody()->GetUserData();
+			GameObject* collidedObject;
+			b2Fixture*	collidedFixture;
+			b2Fixture*	myFixture;
 
-			if(goA && goA->GetGameObjectType() == GOType_Sensor)
+			if(goA == this)
 			{
-				if(ledge_ == 0)
+				collidedObject =	goB;
+				collidedFixture =	B;
+				myFixture =			A;
+			}
+			else
+			{
+				collidedObject =	goA;
+				collidedFixture =	A;
+				myFixture =			B;
+			}
+
+			if(collidedObject)
+			{
+				if(ledge_ == 0 && collidedObject->GetGameObjectType() == GOType_Sensor)
 				{
-					GameObjectSensor* sensor;
-					sensor = dynamic_cast<GameObjectSensor*> (goA);
-					if(sensor)
+					GameObjectSensor* sensor = (GameObjectSensor*) collidedObject;
+					if(sensor->GetSensorType() == SENSORTYPE_LEDGE)
 					{
-						if(B == torsoSensorRight_)
+						if(myFixture == torsoSensorRight_)
 						{
 							sensorLedge_ = torsoSensorRight_;
-							ledge_ = (GameObjectSensor*) goA;
+							ledge_ = sensor;
 						}
-						else if(B == torsoSensorLeft_)
+						else if(myFixture == torsoSensorLeft_)
 						{
 							sensorLedge_ = torsoSensorLeft_;
-							ledge_ = (GameObjectSensor*) goA;
+							ledge_ = sensor;
 						}
 					}
 				}
-			}
-			else if(goB && goB->GetGameObjectType() == GOType_Sensor && ledge_ == 0)
-			{
-				if(ledge_ == 0)
+				else if(collidedObject->GetGameObjectType() == GOType_Door)
 				{
-					GameObjectSensor* sensor;
-					sensor = dynamic_cast<GameObjectSensor*> (goB);
-					if(sensor)
-					{
-						if(A == torsoSensorRight_)
-						{
-							sensorLedge_ = torsoSensorRight_;
-							ledge_ = (GameObjectSensor*) goB;
-						}
-						else if(A == torsoSensorLeft_)
-						{
-							sensorLedge_ = torsoSensorLeft_;
-							ledge_ = (GameObjectSensor*) goB;
-						}
-					}
+					door_ = (Door*) collidedObject;
 				}
 			}
 
 			// Check which sensor is in contact
-			if(A == feetSensor_ && !B->IsSensor())
+			if(myFixture == feetSensor_ && !collidedFixture->IsSensor())
 			{
 				feetSensorHit_ = true;
 			}
-			else if(B == feetSensor_ && !A->IsSensor())
+			else if(myFixture == feetSensor_ && !collidedFixture->IsSensor())
 			{
 				feetSensorHit_ = true;
 			}
-			else if(A == shinSensorRight_ && !B->IsSensor())
+			else if(myFixture == shinSensorRight_ && !collidedFixture->IsSensor())
 			{
 				shinRightHit_ = true;
 			}
-			else if(A == shinSensorLeft_ && !B->IsSensor())
+			else if(myFixture == shinSensorLeft_ && !collidedFixture->IsSensor())
 			{
 				shinLeftHit_ = true;
 			}
-			else if(A == torsoSensorRight_ && !B->IsSensor())
+			else if(myFixture == torsoSensorRight_ && !collidedFixture->IsSensor())
 			{
 				torsoRightHit_ = true;
 			}
-			else if(A == torsoSensorLeft_ && !B->IsSensor())
+			else if(myFixture == torsoSensorLeft_ && !collidedFixture->IsSensor())
 			{
 				torsoLeftHit_ = true;
 			}
-			else if(B == shinSensorRight_ && !A->IsSensor())
-			{
-				shinRightHit_ = true;
-			}
-			else if(B == shinSensorLeft_ && !A->IsSensor())
-			{
-				shinLeftHit_ = true;
-			}
-			else if(B == torsoSensorRight_ && !A->IsSensor())
-			{
-				torsoRightHit_ = true;
-			}
-			else if(B == torsoSensorLeft_ && !A->IsSensor())
-			{
-				torsoLeftHit_ = true;
-			}
-
 		}
 
 		contacts = contacts->next;

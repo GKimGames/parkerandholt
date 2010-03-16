@@ -38,6 +38,8 @@
 
 class GameObjectFactory;
 
+class AppStateManager;
+
 /// GameFramework srarts up Ogre and loads resource to be used as well as
 /// storing the current states b2World reference
 class GameFramework : public Ogre::Singleton<GameFramework>, OIS::KeyListener, OIS::MouseListener
@@ -93,6 +95,8 @@ public:
 	OIS::InputManager*			inputManager_;
 	OIS::Keyboard*				keyboard_;
 	OIS::Mouse*					mouse_;
+
+	AppStateManager*			appStateManager;
 
 	b2World*					world_;
 

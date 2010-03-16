@@ -13,6 +13,7 @@
 #include "ParkerStateInAir.h"
 #include "HoltStatePlacingGravityVector.h"
 #include "HoltStatePlacingPlatform.h"
+#include "Door.h"
 
 #include "Parker.h"
 #include "Message.h"
@@ -180,6 +181,12 @@ bool ParkerStateOnGround::HandleMessage(const KGBMessage message)
 		case CHARACTER_ENTER_GRAVITYSTATE:
 		{
 			driver_->stateMachine_->ChangeState(driver_->placingGravityVector_);
+			return true;
+		}
+		case CHARACTER_OPEN_DOOR:
+		{
+			driver_->door_->OpenDoor();
+
 			return true;
 		}
 	}

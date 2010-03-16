@@ -27,7 +27,7 @@ GameObjectNameMap GameObject::objectNameList;
 /// number, this name must be unique.
 GameObject::GameObject(Ogre::String str)
 {
-	
+
 	// Increase the staticObjectId value so each Object has its own
 	// unique identifying number.
 	staticObjectId_++;

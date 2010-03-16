@@ -25,6 +25,7 @@
 AppStateManager::AppStateManager()
 {
 	m_bShutdown = false;
+	popState_ = false;
 }
 
 
@@ -158,6 +159,12 @@ void AppStateManager::start(AppState* state)
 
 			}
 			
+			if(popState_)
+			{
+				popState_ = false;
+				popAppState();
+			}
+
 			/*
 			GAMEFRAMEWORK->SetTimeSinceLastFrame(timeSinceLastFrame);
 			GAMEFRAMEWORK->keyboard_->capture();
@@ -220,7 +227,13 @@ bool AppStateManager::pushAppState(AppState* state)
 	return true;
 }
 
-
+//=============================================================================
+//						popStateAfterNextUpdate
+//
+void AppStateManager::popStateAfterNextUpdate()
+{
+	popState_ = true;
+}
 
 //=============================================================================
 //							popAppState

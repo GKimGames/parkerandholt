@@ -48,6 +48,10 @@ void KGBOgreApplication::Start()
 		PhysicsState::create(appStateManager_, "PhysicsState");
 		MapEditorState::create(appStateManager_, "MapEditorState");
 
+		GAMEFRAMEWORK->appStateManager = appStateManager_;
+
 		appStateManager_->start(appStateManager_->findByName("MenuState"));
+
+		
 	}
 }

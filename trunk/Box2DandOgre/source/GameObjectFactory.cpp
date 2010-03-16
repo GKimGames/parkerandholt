@@ -15,6 +15,9 @@
 #include "ObjectOgreCreator.h"
 #include "GameObjectOgreBox2DCreator.h"
 #include "GameObjectSensorCreator.h"
+#include "DoorCreator.h"
+
+#include "StaticOgreObjectCreator.h"
 
 #include "PlatformCreator.h"
 #include "MovingPlatformCreator.h"
@@ -55,6 +58,13 @@ void GameObjectFactory::LoadFile(Ogre::String fileName)
 		CreateGameObject("ObjectSensor", *iter);
 		iter++;
 	}
+
+	TiXmlElement* staticObjects = gameObjectsNode.FirstChildElement("StaticOgreObjects").ToElement();
+	if(staticObjects)
+	{
+		CreateGameObject("StaticOgreObject", staticObjects);
+	}
+
 }
 
 GameObject* GameObjectFactory::CreateGameObject(std::string creator, TiXmlElement* element)
@@ -118,6 +128,8 @@ void GameObjectFactory::AddObjectCreators()
 	AddCreator("Platform",			new PlatformCreator(this));
 	AddCreator("MovingPlatform",	new MovingPlatformCreator(this));
 	AddCreator("ObjectSensor",		new GameObjectSensorCreator(this));
+	AddCreator("StaticOgreObject",  new StaticOgreObjectCreator(this));
+	AddCreator("Door",				new DoorCreator(this));
 }
 
 

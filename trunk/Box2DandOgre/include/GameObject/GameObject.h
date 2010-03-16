@@ -39,7 +39,8 @@ enum GameObjectType
 	GOType_MovingPlatform,
 	GOType_ElevatorEndTypes,
 	GOType_Mouse,
-	GOType_CheckPoint
+	GOType_CheckPoint,
+	GOType_Door
 };
 
 class GameObjectDef

@@ -157,6 +157,7 @@ void PhysicsState::exit()
 
 }
 
+#include "Door.h"
 
 //=============================================================================
 //							createPhysics
@@ -184,10 +185,10 @@ void PhysicsState::createPhysics()
 	GameObjectFactory* gof = new GameObjectFactory();
 	gof->AddObjectCreators();
 	gof->sceneManager = sceneManager_;
-	gof->LoadFile("..\\LevelOne.xml");
+	gof->LoadFile("..\\LevelTwo.xml");
 
 	TiXmlDocument* configXML_ = 0;
-	TiXmlHandle* handle = TinyXMLHelper::GetRootFromFile("..\\LevelOne.xml",configXML_);
+	TiXmlHandle* handle = TinyXMLHelper::GetRootFromFile("..\\LevelTwo.xml",configXML_);
 	
 	TiXmlElement* element = handle->FirstChildElement("LevelInfo").ToElement();
 	curvature_ = TinyXMLHelper::GetAttributeFloat(element, "curvature", 10);
@@ -201,6 +202,9 @@ void PhysicsState::createPhysics()
 	parker_  = new CharacterParker(sceneManager_, myMouse_, playerInfo_);
 	parker_->Initialize();
 	parker_->InitializeDebugDraw();
+	parker_->SetBodyPosition(b2Vec2(0, 1.3));
+
+	Dispatch->DispatchMessage(SEND_IMMEDIATELY, parker_->GetId(), parker_->GetId(), SET_POSITION, Ogre::Vector3(3,1,0));
 
 	//new MovingPlatform(sceneManager_, b2Vec2(10.0f, 1.0f), b2Vec2(0.0f, 1.0f), b2Vec2(5.0f, 1.0f), b2Vec2(0.0f, 5.0f), 2);
 	PressureSwitch* ps = new PressureSwitch(sceneManager_);
@@ -220,6 +224,7 @@ void PhysicsState::createPhysics()
 	myKeyHandler_->AddKey(OIS::KC_1, CHARACTER_ENTER_PLATFORMSTATE);
 	myKeyHandler_->AddKey(OIS::KC_Q, CHARACTER_EXIT_PLACINGSTATE);
 	myKeyHandler_->AddKey(OIS::KC_F, CHARACTER_GRAB_LEDGE);
+	myKeyHandler_->AddKey(OIS::KC_RETURN, CHARACTER_OPEN_DOOR);
 	
 	new CheckPoint(sceneManager_, b2Vec2(-8.0f, 2.0f),2,4);
 	new CheckPoint(sceneManager_, b2Vec2(-16.0f, 2.0f),2,4);
@@ -272,6 +277,8 @@ void PhysicsState::createPhysics()
 	ls->SetBodyPosition(b2Vec2(0,5));
 	*/
 	
+	//new Door("MrDoor", false);
+
 #if DEBUG_DRAW_ON
 	debugDraw_ = new OgreB2DebugDraw(sceneManager_, "debugDraw", 0);
 	debugDraw_->SetFlags(
