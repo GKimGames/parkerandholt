@@ -8,6 +8,7 @@
 
 #include "GameObjectOgre.h"
 #include "GameFramework.h"
+#include "MessageDispatcher.h"
 
 //=============================================================================
 //							GameObjectOgre::Constructor
@@ -43,7 +44,6 @@ GameObjectOgre::~GameObjectOgre()
 //
 bool GameObjectOgre::Initialize()
 {
-	
 	initialized_ = GameObject::Initialize();
 	return initialized_;
 }
@@ -81,7 +81,7 @@ bool GameObjectOgre::Update(double timeSinceLastFrame)
 	if(GameObject::Update(timeSinceLastFrame))
 	{
 		UpdateGraphics(timeSinceLastFrame);
-
+			
 		return true;
 	}
 	else
@@ -97,6 +97,43 @@ bool GameObjectOgre::Update(double timeSinceLastFrame)
 bool GameObjectOgre::UpdateGraphics(double timeSinceLastFrame)
 {
 	return true;
+}
+
+
+//=============================================================================
+//							HandleMessage
+//
+/// 
+bool GameObjectOgre::HandleMessage(const KGBMessage message)
+{
+	if(GameObject::HandleMessage(message))
+	{
+		return true;
+	}
+	else
+	{
+		if(message.messageType == GOO_SET_TRANSPARENCY)
+		{
+			if(message.messageData.empty() == false)
+			{	
+				Ogre::String typeName(message.messageData.type().name());
+				SetTransparency(boost::any_cast<double>(message.messageData));
+			}
+
+			return true;
+		}
+		else if(message.messageType == SET_POSITION)
+		{
+			if(message.messageData.empty() == false)
+			{	
+				Ogre::String typeName(message.messageData.type().name());
+				sceneNode_->setPosition(boost::any_cast<Ogre::Vector3>(message.messageData));
+			}
+			return false;
+		}
+	}
+
+	return false;
 }
 
 
@@ -117,23 +154,4 @@ void GameObjectOgre::SetBlendType(Ogre::SceneBlendType type)
 	}
 
 	transparency_->setSceneBlending(type);
-}
-
-
-bool GameObjectOgre::HandleMessage(const KGBMessage message)
-{
-	if(GameObject::HandleMessage(message))
-	{
-		return true;
-	}
-	else
-	{
-		if(message.messageType == GOO_SET_TRANSPARENCY)
-		{
-			SetTransparency(boost::any_cast<Ogre::Real>(message.messageData));
-		}
-
-	}
-
-	return false;
 }

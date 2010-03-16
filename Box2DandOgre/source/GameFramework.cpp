@@ -9,6 +9,7 @@
 #include "GameFramework.h"
 #include "GameObject.h"
 #include "GameObjectFactory.h"
+#include "AppStateManager.hpp"
 
 using namespace Ogre;
 

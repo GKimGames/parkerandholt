@@ -274,6 +274,10 @@ public:
 	}
 
 
+	bool Initialize()
+	{
+		return GameObjectOgreBox2D::Initialize();
+	}
 	void SetDefaultOnMessage(KGBMessageType onMessage){ defaultMessageOn_.messageType = onMessage; }
 	void SetDefaultOffMessage(KGBMessageType offMessage){ defaultMessageOff_.messageType = offMessage; }
 

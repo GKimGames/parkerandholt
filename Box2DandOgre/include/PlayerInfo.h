@@ -23,6 +23,7 @@ public:
 
 	virtual bool Initialize()
 	{
+		GameObject::GameObject();
 		initialized_ = true;
 
 		return true;

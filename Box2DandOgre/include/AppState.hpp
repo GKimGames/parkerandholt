@@ -14,11 +14,9 @@
 #ifndef APP_STATE_HPP
 #define APP_STATE_HPP
 
-
-
-#include "GameFramework.h"
 #include "Message.h"
 #include "GameCamera.h"
+#include "GameFramework.h"
 
 class AppState;
 class GameObject;

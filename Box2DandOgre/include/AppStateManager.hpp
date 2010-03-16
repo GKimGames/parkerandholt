@@ -36,6 +36,7 @@ public:
 	void changeAppState(AppState* state);
 	bool pushAppState(AppState* state);
 	void popAppState(void);
+	void popStateAfterNextUpdate();
 	void shutdown(void);
 
 protected:
@@ -47,6 +48,8 @@ protected:
 	std::vector<AppState*>			m_ActiveStateStack;
 	bool							m_bShutdown;
 	Ogre::GpuCommandBufferFlush		m_BufferFlush;
+
+	bool							popState_;
 };
 
 

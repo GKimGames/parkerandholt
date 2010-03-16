@@ -1,6 +1,6 @@
 /*=============================================================================
 
-	MessageDispatcher.cpp
+	MessageDispatcher.h
 
 	Author: Matt King
 

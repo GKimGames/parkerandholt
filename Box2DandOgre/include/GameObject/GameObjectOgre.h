@@ -17,6 +17,7 @@
 class GameObjectOgre : public GameObject
 {
 
+	friend class StaticOgreObjectCreator;
 	friend class ObjectOgreCreator;
 
 public:

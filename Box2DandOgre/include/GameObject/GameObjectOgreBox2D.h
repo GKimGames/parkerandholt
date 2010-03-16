@@ -119,6 +119,7 @@ public:
 		body_->SetTransform(pos, body_->GetAngle());
 	}
 
+
 	void SetBodyAngle(float32 angle)
 	{
 		body_->SetTransform(body_->GetPosition(), angle);

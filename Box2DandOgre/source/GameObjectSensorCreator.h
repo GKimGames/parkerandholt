@@ -38,71 +38,83 @@ public:
 
 	virtual CreatorResult LoadFromXML(TiXmlElement* element, GameObjectSensor* gameObjectSensor )
 	{
-		CreatorResult result;
+		CreatorResult result = CREATOR_OK;
+
 		if(element != 0)
 		{
 			if(gameObjectSensor != 0)
 			{
-				result = GameObjectOgreBox2DCreator::LoadFromXML(element, gameObjectSensor);
-				
-				if(result == CREATOR_OK)
-				{ 
-					gameObjectSensor->Initialize();
+				Ogre::String sensorTypeString = TinyXMLHelper::GetAttribute(element, "sensorType", "");
+				gameObjectSensor->sensorType_ = StringToSensorType(sensorTypeString);
+
+				if(gameObjectSensor->sensorType_ == SENSORTYPE_LEDGE)
+				{
+					Ogre::String bodyId;
+					element->QueryValueAttribute("bodyID", &bodyId);
+					gameObjectSensor->body_ = gameObjectFactory_->GetBody(bodyId);
 					gameObjectSensor->body_->SetUserData(gameObjectSensor);
+					gameObjectSensor->Initialize();
 					gameObjectSensor->gameObjectType_ = GOType_Sensor;
-					
-					TiXmlElement* sensorElement = element->FirstChildElement( "ObjectSensor");
-					TiXmlElement* messages = sensorElement->FirstChildElement("Messages");
- 
-					std::map<Ogre::String, KGBMessage> messageList;
 
-					if(messages != 0)
-					{
-						TiXmlElement* messageElement = messages->FirstChildElement("Message");
-						
-						while(messageElement)
+				}
+				else
+				{
+					result = GameObjectOgreBox2DCreator::LoadFromXML(element, gameObjectSensor);
+
+					if(result == CREATOR_OK)
+					{ 
+						gameObjectSensor->Initialize();
+						gameObjectSensor->body_->SetUserData(gameObjectSensor);
+						gameObjectSensor->gameObjectType_ = GOType_Sensor;
+
+						TiXmlElement* sensorElement = element->FirstChildElement( "ObjectSensor");
+						TiXmlElement* messages = sensorElement->FirstChildElement("Messages");
+
+						std::map<Ogre::String, KGBMessage> messageList;
+
+						if(messages != 0)
 						{
-							Ogre::String messageId = TinyXMLHelper::GetAttribute(messageElement, "id", "");
-							double sendDelay = TinyXMLHelper::GetAttributeReal(messageElement, "delay", SEND_IMMEDIATELY);
-							KGBMessageType type = TinyXMLHelper::GetMessage(messageElement, "type", MESSAGE_NULL);
-							TiXmlElement* dataElement = messages->FirstChildElement("Data");
-							boost::any data = GetData(dataElement);
+							TiXmlElement* messageElement = messages->FirstChildElement("Message");
 
-							KGBMessage message(sendDelay,gameObjectSensor->objectId_, 0,type, data);
+							while(messageElement)
+							{
+								Ogre::String messageId = TinyXMLHelper::GetAttribute(messageElement, "id", "");
+								double sendDelay = TinyXMLHelper::GetAttributeReal(messageElement, "delay", SEND_IMMEDIATELY);
+								KGBMessageType type = TinyXMLHelper::GetMessage(messageElement, "type", MESSAGE_NULL);
+								TiXmlElement* dataElement = messages->FirstChildElement("Data");
+								boost::any data = GetData(dataElement);
 
-							messageList.insert(std::make_pair(messageId, message));
-							messageElement = messageElement->NextSiblingElement("Message");
-						}
-					}
-					
-					gameObjectSensor->defaultMessageOn_.messageType = TinyXMLHelper::GetMessage(sensorElement, "on", GAME_SENSOR_ON);
-					gameObjectSensor->defaultMessageOff_.messageType = TinyXMLHelper::GetMessage(sensorElement, "off", GAME_SENSOR_ON);
-					gameObjectSensor->messageObjectOnContact_ = TinyXMLHelper::GetAttributeBool(sensorElement, "messageOnContact");
+								KGBMessage message(sendDelay,gameObjectSensor->objectId_, 0,type, data);
 
-					TiXmlElement* objects = sensorElement->FirstChildElement("Object");
- 
-					if(objects != 0)
-					{
-						Ogre::String objectID = TinyXMLHelper::GetAttribute(objects, "objectID", "");
-						GameObject* go = GameObject::GetObjectById(objectID);
-						
-						if(go)
-						{
-							KGBMessageType onMessage = TinyXMLHelper::GetMessage(objects, "on", GAME_SENSOR_ON);
-							KGBMessageType offMessage = TinyXMLHelper::GetMessage(objects, "off", GAME_SENSOR_ON);
-							Ogre::String sensorTypeString = TinyXMLHelper::GetAttribute(objects, "sensorType", "");
-							gameObjectSensor->sensorType_ = StringToSensorType(sensorTypeString);
-							gameObjectSensor->gameObjectType_ = GOType_Sensor;
-
-							GameObjectId id = go->GetId();
-							gameObjectSensor->AddToMessageList(id, onMessage, offMessage);
+								messageList.insert(std::make_pair(messageId, message));
+								messageElement = messageElement->NextSiblingElement("Message");
+							}
 						}
 
-						objects = objects->NextSiblingElement("Object");
-					}
-					
+						gameObjectSensor->defaultMessageOn_.messageType = TinyXMLHelper::GetMessage(sensorElement, "on", GAME_SENSOR_ON);
+						gameObjectSensor->defaultMessageOff_.messageType = TinyXMLHelper::GetMessage(sensorElement, "off", GAME_SENSOR_ON);
+						gameObjectSensor->messageObjectOnContact_ = TinyXMLHelper::GetAttributeBool(sensorElement, "messageOnContact");
 
-					
+						TiXmlElement* objects = sensorElement->FirstChildElement("Object");
+
+						if(objects != 0)
+						{
+							Ogre::String objectID = TinyXMLHelper::GetAttribute(objects, "objectID", "");
+							GameObject* go = GameObject::GetObjectById(objectID);
+
+							if(go)
+							{
+								KGBMessageType onMessage = TinyXMLHelper::GetMessage(objects, "on", GAME_SENSOR_ON);
+								KGBMessageType offMessage = TinyXMLHelper::GetMessage(objects, "off", GAME_SENSOR_ON);
+
+								GameObjectId id = go->GetId();
+								gameObjectSensor->AddToMessageList(id, onMessage, offMessage);
+							}
+
+							objects = objects->NextSiblingElement("Object");
+						}
+
+					}
 				}
 	
 			}// end if(gameObjectOgreBox2D != 0)

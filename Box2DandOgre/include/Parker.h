@@ -21,6 +21,7 @@
 #include "ParkerState.h"
 
 class MousePicking;
+class Door;
 
 /// Parkers class
 class CharacterParker : public Character, public b2RayCastCallback
@@ -119,6 +120,8 @@ private:
 
 	GameObjectSensor*	ledge_;
 	b2Fixture*			sensorLedge_;
+
+	Door*				door_;
 };
 
 
