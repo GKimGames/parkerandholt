@@ -5,7 +5,7 @@ PlayerInfo::PlayerInfo()
 {
 	inventory_ = 0;
 	checkPoint_ = b2Vec2(0.0f, 3.0f);
-
+	deaths_ = 0;
 
 }
 
@@ -33,12 +33,12 @@ bool PlayerInfo::HandleMessage(const KGBMessage message)
 {
 	switch(message.messageType)
 	{
-	case UPDATE_CHECKPOINT:
+		case UPDATE_CHECKPOINT:
 		{
 			checkPoint_ = boost::any_cast<b2Vec2>(message.messageData);
 			return true;
 		}
-	case ADD_ITEM:
+		case ADD_ITEM:
 		{
 			AddToInventory(boost::any_cast<int>(message.messageData));
 			//inventory_ += boost::any_cast<int>(message.messageData);
@@ -52,4 +52,9 @@ bool PlayerInfo::HandleMessage(const KGBMessage message)
 bool PlayerInfo::Update(double timeSinceLastFrame)
 {
 	return true;
+}
+
+void PlayerInfo::PlayerDied()
+{
+	deaths_++;
 }

@@ -87,7 +87,7 @@ bool GameCamera::Update(double timeSinceLastFrame)
 }
 
 //=============================================================================
-//							Update
+//							InitializeDef
 //
 void GameCamera::InitializeDef(CameraStateDef* cameraStateDef)
 {
@@ -97,6 +97,7 @@ void GameCamera::InitializeDef(CameraStateDef* cameraStateDef)
 
 	if(cameraStateDef->type == CAMERASTATE_WATCH)
 	{
+
 		cameraStateWatch_->InitializeDef(cameraStateDef);
 		stateMachine_->ChangeState(cameraStateWatch_);
 	}

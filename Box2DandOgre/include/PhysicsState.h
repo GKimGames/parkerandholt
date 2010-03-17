@@ -48,6 +48,8 @@
 #include "PlayerInfo.h"
 #include "PickUp.h"
 
+#include "Triangle.h"
+
 #define DEBUG_DRAW_ON 1
 class CharacterParker;
 
@@ -112,6 +114,8 @@ public:
 		m_bQuit = true;
 	}
 
+	CharacterParker* active_;
+
 protected:
 
 	/// My GUI Stuff
@@ -120,6 +124,8 @@ protected:
 
 	GameObject* gameObject_;
 	CharacterParker* parker_;
+	CharacterParker* holt_;
+	
 
 	b2World* world;
 	double timeStep; 
@@ -152,7 +158,8 @@ private:
 
 	MousePicking*				myMouse_;
 	KeyHandler*					myKeyHandler_;
-	PlayerInfo*					playerInfo_;
+	PlayerInfo*					parkerInfo_;
+	PlayerInfo*					holtInfo_;
 	
 	b2Vec2						gravity_;
 	

@@ -6,7 +6,7 @@
 
 =============================================================================*/
 
-#include "HoltStatePlacingPlatform.h"
+#include "HoltStatePlacingStatic.h"
 
 #include "ParkerStateOnGround.h"
 #include "ParkerStateInAir.h"
@@ -16,25 +16,20 @@
 //=============================================================================
 //								Constructor
 //
-HoltStatePlacingPlatform::HoltStatePlacingPlatform(	
+HoltStatePlacingStatic::HoltStatePlacingStatic(	
 	CharacterParker* parker,
 	FSMStateMachine<CharacterParker>* stateMachine):
 	ParkerState(parker,stateMachine)
 {
 	feetContactCount_ = 0;
-	platform_ = 0;
-	box_[0] = 0;
-	box_[1] = 0;
-	box_[2] = 0;
 	incrimenter_ = 0;
-	gravityVector_ = new GravityVector(driver_->sceneManager_, b2Vec2(0,0), b2Vec2(1,1));
 	leftMouseDown_ = false;
 }
 
 //=============================================================================
 //								Enter
 //
-void HoltStatePlacingPlatform::Enter()
+void HoltStatePlacingStatic::Enter()
 {
 	
 	blendingRun_ = false;
@@ -45,7 +40,7 @@ void HoltStatePlacingPlatform::Enter()
 		driver_->animationBlender_->Blend("run", AnimationBlender::BlendWhileAnimating, 0.2, true);
 	}
 
-	driver_->mousePicking_->boxSize_ = 0.2f;
+	driver_->mousePicking_->boxSize_ = 0.5f;
 	driver_->mousePicking_->UpdateMouseFromCamera();
 	driver_->mousePicking_->SetVisibility(true);
 }
@@ -53,7 +48,7 @@ void HoltStatePlacingPlatform::Enter()
 //=============================================================================
 //								Update
 //
-bool HoltStatePlacingPlatform::Update()
+bool HoltStatePlacingStatic::Update()
 {
 
 	if(driver_->moveLeft_)
@@ -112,24 +107,24 @@ bool HoltStatePlacingPlatform::Update()
 		}
 	}
 
-	if(leftMouseDown_)
-	{
-		endPosition_.x = driver_->mousePicking_->GetPosition().x;
-		endPosition_.y = driver_->mousePicking_->GetPosition().y;
-		float tempLength = sqrt((startPosition_.x - endPosition_.x) * (startPosition_.x - endPosition_.x)
-							 + (startPosition_.y - endPosition_.y) * (startPosition_.y - endPosition_.y));
-		if(tempLength > 0.5)
-		{
-			if(platform_ == 0)
-			{
-				SpawnPlatform();
-			}
-			b2Vec2 tempPosition(startPosition_.x - (startPosition_.x - endPosition_.x)/2,
-								startPosition_.y - (startPosition_.y - endPosition_.y)/2);
-			float angle = atan2((endPosition_.y - startPosition_.y)/2,(endPosition_.x - startPosition_.x)/2);
-			platform_->SetGraphics(tempPosition, tempLength, angle, false);
-		}
-	}
+	//if(leftMouseDown_)
+	//{
+	//	endPosition_.x = driver_->mousePicking_->GetPosition().x;
+	//	endPosition_.y = driver_->mousePicking_->GetPosition().y;
+	//	float tempLength = sqrt((startPosition_.x - endPosition_.x) * (startPosition_.x - endPosition_.x)
+	//						 + (startPosition_.y - endPosition_.y) * (startPosition_.y - endPosition_.y));
+	//	if(tempLength > 0.5)
+	//	{
+	//		if(platform_ == 0)
+	//		{
+	//			SpawnPlatform();
+	//		}
+	//		b2Vec2 tempPosition(startPosition_.x - (startPosition_.x - endPosition_.x)/2,
+	//							startPosition_.y - (startPosition_.y - endPosition_.y)/2);
+	//		float angle = atan2((endPosition_.y - startPosition_.y)/2,(endPosition_.x - startPosition_.x)/2);
+	//		platform_->SetGraphics(tempPosition, tempLength, angle, false);
+	//	}
+	//}
 
 
 	return true;
@@ -138,7 +133,7 @@ bool HoltStatePlacingPlatform::Update()
 //=============================================================================
 //								HandleMessage
 //
-bool HoltStatePlacingPlatform::HandleMessage(const KGBMessage message)
+bool HoltStatePlacingStatic::HandleMessage(const KGBMessage message)
 {
   std::string* gameObject = 0;
   if(driver_->active_)
@@ -152,48 +147,15 @@ bool HoltStatePlacingPlatform::HandleMessage(const KGBMessage message)
 		}
 		case LEFT_MOUSE_PLUS:
 		{	
-			startPosition_.x = driver_->mousePicking_->GetPosition().x;
-			startPosition_.y = driver_->mousePicking_->GetPosition().y;
-			endPosition_.x = driver_->mousePicking_->GetPosition().x;
-			endPosition_.y = driver_->mousePicking_->GetPosition().y;
-			leftMouseDown_ = true;
 			return true;
 		}
 		case LEFT_MOUSE_MINUS:
 		{
-			endPosition_.x = driver_->mousePicking_->GetPosition().x;
-			endPosition_.y = driver_->mousePicking_->GetPosition().y;
-			//SpawnPlatform();
-			float tempLength = sqrt((startPosition_.x - endPosition_.x) * (startPosition_.x - endPosition_.x)
-								 + (startPosition_.y - endPosition_.y) * (startPosition_.y - endPosition_.y));
-			if(platform_ == 0)
-			{
-				leftMouseDown_ = false;
-			}
-			else if(tempLength < .5)
-			{
-				leftMouseDown_ = false;
-				//delete platform_;
-			}
-			else
-			{
-				platform_->GetBody()->SetActive(true);
-				leftMouseDown_ = false;
-				trans_->setTransparency(0.0);
-
-				platform_->SetGraphics(platform_->GetBody()->GetPosition(), tempLength, platform_->GetBody()->GetAngle(), true);
-				platform_ = 0;
-			}
-			/*startPosition_.x = 0; startPosition_.y = 0;
-			endPosition_.x = 0; endPosition_.y = 0;*/
-			
-			
-
+			SpawnBox();
 			return true;
 		}
 		case MIDDLE_MOUSE_MINUS:
 		{
-			SpawnBox();
 			return true;
 		}
 		case CHARACTER_MOVE_LEFT_PLUS:
@@ -213,7 +175,6 @@ bool HoltStatePlacingPlatform::HandleMessage(const KGBMessage message)
 		}
 		case CHARACTER_MOVE_LEFT_MINUS:
 		{
-
 			driver_->moveLeft_ = false;
 			return true;
 		}
@@ -234,22 +195,12 @@ bool HoltStatePlacingPlatform::HandleMessage(const KGBMessage message)
 		}
 		case RIGHT_MOUSE_PLUS:
 		{
-			startPosition_.x = driver_->mousePicking_->GetPosition().x;
-			startPosition_.y = driver_->mousePicking_->GetPosition().y;
-			gravityVector_->Stop();
-			
-			gravityVector_->SetPosition(startPosition_);
-
-			gravityVector_->GetEntity()->setVisible(true);
-			gravityVector_->SetParticalsVisible(false);
 			return true;
 		}
 
 		case RIGHT_MOUSE_MINUS:
 		{
-			endPosition_.x = driver_->mousePicking_->GetPosition().x;
-			endPosition_.y = driver_->mousePicking_->GetPosition().y;
-			SpawnGravityVector();
+			SpawnTempBox();
 			return true;
 		}
 	}
@@ -262,7 +213,7 @@ bool HoltStatePlacingPlatform::HandleMessage(const KGBMessage message)
 
 //								Exit
 //
-void HoltStatePlacingPlatform::Exit()
+void HoltStatePlacingStatic::Exit()
 {
 	driver_->mousePicking_->SetVisibility(false); 
 	driver_->elevator_ = NULL;
@@ -272,7 +223,7 @@ void HoltStatePlacingPlatform::Exit()
 //								BeginContact
 //
 /// Called when two fixtures begin to touch.
-void HoltStatePlacingPlatform::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+void HoltStatePlacingStatic::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
 	if(!collidedFixture->IsSensor())
 	{
@@ -302,7 +253,7 @@ void HoltStatePlacingPlatform::BeginContact(ContactPoint* contact, b2Fixture* co
 //								EndContact
 //
 /// Called when two fixtures cease to touch.
-void HoltStatePlacingPlatform::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+void HoltStatePlacingStatic::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
 	if(!collidedFixture->IsSensor())
 	{
@@ -329,7 +280,7 @@ void HoltStatePlacingPlatform::EndContact(ContactPoint* contact, b2Fixture* cont
 //								MoveLeft
 //
 ///
-void HoltStatePlacingPlatform::MoveLeft()
+void HoltStatePlacingStatic::MoveLeft()
 {
 	driver_->stateMachine_->ChangeState(driver_->onGroundState_);
 }
@@ -338,7 +289,7 @@ void HoltStatePlacingPlatform::MoveLeft()
 //								MoveRight
 //
 /// 
-void HoltStatePlacingPlatform::MoveRight()
+void HoltStatePlacingStatic::MoveRight()
 {
 	driver_->stateMachine_->ChangeState(driver_->onGroundState_);
 }
@@ -348,7 +299,7 @@ void HoltStatePlacingPlatform::MoveRight()
 //								Jump
 ///
 /// Jump!
-void HoltStatePlacingPlatform::Jump()
+void HoltStatePlacingStatic::Jump()
 {
 	driver_->stateMachine_->ChangeState(driver_->onGroundState_);
 }
@@ -356,7 +307,7 @@ void HoltStatePlacingPlatform::Jump()
 //=============================================================================
 //								UpdateAnimation
 //
-void HoltStatePlacingPlatform::UpdateAnimation()
+void HoltStatePlacingStatic::UpdateAnimation()
 {
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
@@ -401,48 +352,19 @@ void HoltStatePlacingPlatform::UpdateAnimation()
 }
 
 
-bool HoltStatePlacingPlatform::SpawnBox()
+bool HoltStatePlacingStatic::SpawnBox()
 {
-	XMLQuickVars var("..\\Myvars.xml");
-	box_[incrimenter_%3] = new HoltBox(driver_->sceneManager_, 
+	new Triangle(driver_->sceneManager_, 
 		b2Vec2((float32)driver_->mousePicking_->GetPosition().x, (float32)driver_->mousePicking_->GetPosition().y),
-		driver_->mousePicking_->boxSize_/2, var.Double("HoltBox/boxDensity"));
-	incrimenter_++;
+		driver_->mousePicking_->boxSize_/2);
 	return true;
 }
 
-bool HoltStatePlacingPlatform::SpawnPlatform()
+bool HoltStatePlacingStatic::SpawnTempBox()
 {
-	float tempLength = sqrt((startPosition_.x - endPosition_.x) * (startPosition_.x - endPosition_.x)
-						+ (startPosition_.y - endPosition_.y) * (startPosition_.y - endPosition_.y));
-
-	platform_ = new Platform(driver_->sceneManager_, b2Vec2(startPosition_.x, startPosition_.y), b2Vec2(endPosition_.x, endPosition_.y), 1);
-	platform_->GetBody()->SetActive(false);
-	trans_ = new EntityMaterialInstance(platform_->GetEntity());
-	trans_->setSceneBlending(Ogre::SceneBlendType::SBT_ADD);
-	trans_->setTransparency(0.5);
+	float timeToLive = 2;
+	new Triangle(driver_->sceneManager_, 
+		b2Vec2((float32)driver_->mousePicking_->GetPosition().x, (float32)driver_->mousePicking_->GetPosition().y),
+		driver_->mousePicking_->boxSize_/2, timeToLive);
 	return true;
-}
-
-//=============================================================================
-//								SpawnGravityVector
-//
-bool HoltStatePlacingPlatform::SpawnGravityVector()
-{
-	float tempLength = sqrt((startPosition_.x - endPosition_.x) * (startPosition_.x - endPosition_.x) + (startPosition_.y - endPosition_.y) * (startPosition_.y - endPosition_.y));
-	if(tempLength < .5)
-	{
-		gravityVector_->Stop();
-		return false;
-	}
-	else
-	{
-		gravityVector_->Start(startPosition_, endPosition_);
-	}
-
-	return false;
-}
-GravityVector* HoltStatePlacingPlatform::GetGravityVector()
-{
-	return gravityVector_;
 }

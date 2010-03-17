@@ -19,6 +19,7 @@ public:
 	void Update();
 	float GetTrauma();
 	void ResetTrauma();
+	void SetActive(bool active);
 
 protected:
 
@@ -26,6 +27,7 @@ protected:
 	double					alpha_;
 	Ogre::TextureUnitState* textureUnit_;
 	Ogre::Overlay*			overlay_;
+	bool					active_;
 
 };
 //#endif

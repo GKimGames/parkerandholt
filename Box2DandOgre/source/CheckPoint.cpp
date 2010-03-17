@@ -1,7 +1,7 @@
-
 #include "CheckPoint.h"
-#include <boost/any.hpp>
+#include "Parker.h"
 #include "MessageDispatcher.h"
+
 
 CheckPoint::CheckPoint(Ogre::SceneManager *sceneManager, b2Vec2 center, float width, float height)
 {
@@ -78,8 +78,9 @@ void CheckPoint::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, 
 			GameObjectOgreBox2D* go = (GameObjectOgreBox2D*)collidedFixture->GetBody()->GetUserData();
 			if(go->GetGameObjectType() == GameObjectType::GOType_Character_Parker)
 			{
-				Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, UPDATE_CHECKPOINT, position_);
-				triggered_ = true;
+				CharacterParker* temp = (CharacterParker*)go;
+				Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, temp->GetPlayerInfo()->GetId(), UPDATE_CHECKPOINT, position_);
+				//triggered_ = true;
 			}
 		}
 	}
