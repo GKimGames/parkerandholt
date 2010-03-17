@@ -197,8 +197,9 @@ void CharacterParker::CreatePhysics()
 
 }
 
-#include "OgreHelper.h"
-#include "DynamicLines.h"
+
+
+#include "MeshTools.h"
 //=============================================================================
 //								CreateGraphics
 //
@@ -226,53 +227,26 @@ void CharacterParker::CreateGraphics()
 	bodyNode_->scale(scaleX_,scaleY_,scaleZ_);
 	bodyNode_->translate(translate_);
 	bodyNode_->rotate(Ogre::Vector3::UNIT_Y,Ogre::Degree(rotateY));
+      
 
-	entity_->getMesh()->buildEdgeList();
+	std::vector<Ogre::Vector3> vectors = MeshTools::GetBox2DOutLine(sceneManager_->createEntity("bobby2", "BigIsland.mesh"));
 
-	size_t vertex_count,index_count;
-	Ogre::Vector3* vertices;
-	unsigned long* indices;
+	std::vector<Ogre::Vector3> myVecs = MeshTools::convexHull(vectors);
 
-	GetMeshInformation(entity_->getMesh().getPointer(),vertex_count,vertices,index_count,indices);
-	Ogre::Vector3 *vertexArray = new Ogre::Vector3[vertex_count];
-	vertexArray = vertices;
-	
-	Ogre::EdgeData* edgeData = entity_->getMesh()->getEdgeList(0);
-	Ogre::EdgeData::EdgeGroupList::iterator i, iend;
-	Ogre::EdgeData::EdgeList::iterator ei, eiend;
-
-	std::vector<Ogre::Vector3> myVecs;
-
-	Ogre::Vector3 normal(0,0,1);
-	Ogre::Plane plane(normal, 0);
-	Ogre::Ray ray;
 	DynamicLines* dynamicLines = new DynamicLines();
-	sceneNode_->attachObject(dynamicLines);
-	iend = edgeData->edgeGroups.end();
-	for (i = edgeData->edgeGroups.begin(); i != iend; ++i)
+	Ogre::SceneNode* snode = sceneManager_->getRootSceneNode()->createChildSceneNode();
+	snode->attachObject(dynamicLines);
+	snode->setPosition(-20,0,10);
+
+	for(int i = 0; i < myVecs.size(); i++)
 	{
-		int num = 0;
-		eiend = i->edges.end();
-		for (ei = i->edges.begin(); ei != eiend; ++ei, ++num)
-		{
-
-			Ogre::EdgeData::Edge& e = *ei;
-
-			Ogre::Vector3 start = Ogre::Vector3(vertexArray[e.vertIndex[0]]);
-			Ogre::Vector3 end = Ogre::Vector3(vertexArray[e.vertIndex[1]]);
-			
-			if((start.z < 0 && end.z > 0) || (start.z > 0 && end.z < 0))
-			{
-				ray.setOrigin(start);
-				ray.setDirection(end - start);
-				myVecs.push_back(ray.getPoint(ray.intersects(plane).second));
-				dynamicLines->addPoint(ray.getPoint(ray.intersects(plane).second));
-			}
-		}
+		dynamicLines->addPoint(myVecs.at(i));
 	}
+	
 
 	dynamicLines->update();
-
+	
+	  
 
 }
 

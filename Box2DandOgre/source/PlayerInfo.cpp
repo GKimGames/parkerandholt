@@ -46,8 +46,6 @@ bool PlayerInfo::HandleMessage(const KGBMessage message)
 		}
 	}
 
-	inventory_;
-
 	return false;
 }
 
