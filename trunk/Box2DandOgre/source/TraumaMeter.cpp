@@ -16,6 +16,7 @@ TraumaMeter::TraumaMeter()
 	overlay_ = Ogre::OverlayManager::getSingleton().getByName("Overlays/FadeInOut");
 	overlay_->hide();
 	trauma_ = 0;
+	active_ = false;
 }
 
 TraumaMeter::~TraumaMeter()
@@ -25,15 +26,19 @@ TraumaMeter::~TraumaMeter()
 
 void TraumaMeter::DrawTrauma(float trauma)
 {
-	if(trauma > .01)
+	if(trauma > .01 && active_)
 	{
 		overlay_->show();
 		textureUnit_->setAlphaOperation(Ogre::LayerBlendOperationEx::LBX_MODULATE, Ogre::LayerBlendSource::LBS_MANUAL, Ogre::LayerBlendSource::LBS_TEXTURE, trauma);
 		//textureUnit_->setAlphaOperation(Ogre::LayerBlendOperationEx::LBX_MODULATE bill, Ogre::LayerBlendSource LBS_MANUAL,Ogre::LayerBlendSource LBS_TEXTURE, trauma);
 	}
-	else
+	else if(trauma <= .01)
 	{
-		trauma =0;
+		trauma = 0;
+		HideOverlay();
+	}
+	else if(active_ == false)
+	{
 		HideOverlay();
 	}
 
@@ -68,4 +73,9 @@ float TraumaMeter::GetTrauma()
 void TraumaMeter::ResetTrauma()
 {
 	trauma_ = 0;
+}
+
+void TraumaMeter::SetActive(bool active)
+{
+	active_ = active;
 }

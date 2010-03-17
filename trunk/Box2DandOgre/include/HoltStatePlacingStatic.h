@@ -1,0 +1,65 @@
+#ifndef HOLT_STATE_PLACING_STATIC_H
+#define HOLT_STATE_PLACING_STATIC_H
+
+#include "FSMState.h"
+#include "ParkerState.h"
+
+#include "Parker.h"
+#include "MousePicking.h"
+#include "GravityVector.h"
+#include "Triangle.h"
+
+class CharacterParker;
+class HoltStatePlacingStatic : public ParkerState
+{
+
+public:
+
+	HoltStatePlacingStatic(CharacterParker* parker, FSMStateMachine<CharacterParker>* stateMachine);
+
+	~HoltStatePlacingStatic(){}
+
+	/// This is called when the state is entered.
+	virtual void Enter();
+
+	/// Update.
+	virtual bool Update();
+
+	/// Used to handle messages.
+	virtual bool HandleMessage(const KGBMessage message);
+
+	/// Called when two fixtures begin to touch.
+	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
+
+	/// Called when two fixtures cease to touch.
+	void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
+
+	/// This will execute when the state is exited.
+	virtual void Exit();
+
+	bool SpawnBox();
+	bool SpawnTempBox();
+
+	bool leftMouseDown_;
+	
+	
+
+protected:
+
+	void MoveLeft();
+	void MoveRight();
+	void Jump();
+	void UpdateAnimation();
+
+	bool blendingRun_;
+	bool blendingIdle_;
+
+	int				feetContactCount_;
+	b2Body*			elevator_;
+	b2Vec2			startPosition_;
+	b2Vec2			endPosition_;
+	int				incrimenter_;
+	EntityMaterialInstance*	trans_;
+};
+
+#endif

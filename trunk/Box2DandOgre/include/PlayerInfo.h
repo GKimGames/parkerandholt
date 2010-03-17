@@ -6,7 +6,7 @@
 
 
 
-class PlayerInfo : GameObject
+class PlayerInfo : public GameObject
 {
 public:
 
@@ -18,6 +18,7 @@ public:
 	int GetInventory();
 	bool HandleMessage(const KGBMessage message);
 	bool Update(double timeSinceLastFrame);
+	void PlayerDied();
 
 
 
@@ -33,6 +34,7 @@ protected:
 	b2Vec2			checkPoint_;
 	int				inventory_;
 	Ogre::String	itemDisplay_;
+	int				deaths_;
 };
 
 #endif

@@ -44,21 +44,26 @@ GravityVector::GravityVector(Ogre::SceneManager *sceneManager, b2Vec2 center, b2
 
 
 	//sceneNode_ = sceneManager_->getRootSceneNode()->createChild();
+	Ogre::String name;
+	name = "FireWorks";
+	name += Ogre::StringConverter::toString(objectId_);
 
 	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
-	Ogre::ParticleSystem* ps = sceneManager_->createParticleSystem("Fireworks", "Examples/MattAureola");
+	Ogre::ParticleSystem* ps = sceneManager_->createParticleSystem(name, "Examples/MattAureola");
 	sceneNode_->attachObject(ps);
 	tempMagnitude.Normalize();
 	ps->getEmitter(0)->setDirection(Ogre::Vector3(tempMagnitude.x,tempMagnitude.y, 0));
 
-
-	entity_ = sceneManager_->createEntity("GravMesh", "sphere.mesh");
+	name = "GravMesh";
+	name += Ogre::StringConverter::toString(objectId_);
+	entity_ = sceneManager_->createEntity(name, "sphere.mesh");
 
 	entity_->setMaterial(Ogre::MaterialManager::getSingletonPtr()->getByName("TransparentBox/Transparent125"));
 	Ogre::SceneNode* meshNode = sceneNode_->createChildSceneNode();
 	meshNode->attachObject(entity_);
 	meshNode->scale(0.05,0.05,0.05);
 
+	forcePoint_ = b2Vec2(0,0);
 
 
 	// Rotate the node to fit the points
@@ -75,7 +80,10 @@ GravityVector::GravityVector(Ogre::SceneManager *sceneManager, b2Vec2 center, b2
 GravityVector::~GravityVector()
 {	
 	sceneManager_->destroyEntity(entity_);
-	sceneManager_->destroyParticleSystem("Fireworks");
+	Ogre::String name;
+	name = "FireWorks";
+	name += Ogre::StringConverter::toString(objectId_);
+	sceneManager_->destroyParticleSystem(name);
 }
 
 
@@ -85,6 +93,10 @@ GravityVector::~GravityVector()
 void GravityVector::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
 	if(contactFixture == gravitySensor_)
+	{
+		bodyList_.push_back(collidedFixture->GetBody());
+	}
+	if(collidedFixture == gravitySensor_)
 	{
 		bodyList_.push_back(collidedFixture->GetBody());
 	}
@@ -119,47 +131,7 @@ void GravityVector::EndContact(ContactPoint* contact, b2Fixture* contactFixture,
 bool GravityVector::Update(double timeSinceLastFrame)
 {
 	if(active_)
-	{
-		/*b2ContactEdge* contacts = body_->GetContactList();
-		while(contacts)
-		{
-			if(contacts->contact->IsTouching())
-			{
-				b2Vec2 pos;
-				b2Body* body;
-
-				if(contacts->contact->GetFixtureA()->GetBody() != body_)
-				{
-					body = contacts->contact->GetFixtureA()->GetBody();
-				}
-				else
-				{
-					body = contacts->contact->GetFixtureB()->GetBody();
-				}
-
-				pos = body->GetPosition() - position_;
-				
-				if(pos.LengthSquared() < 2.25)
-				{
-					pos = body->GetPosition();
-				}
-				else
-				{
-					pos = position_;
-					b2Vec2 pos2 = body->GetPosition();
-					pos2.Normalize();
-					pos2 *= 1.5;
-					pos += pos2;
-				}
-				body->ApplyForce(forceApplied_, pos);
-				static b2Color color(1,1,0);
-				GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(position_, pos, color);
-			}
-
-			contacts = contacts->next;
-		}
-		*/
-		
+	{	
 		for(int i = 0; i < bodyList_.size(); i++)
 		{
 			listNumber_ = i;
@@ -187,7 +159,10 @@ bool GravityVector::Stop()
 	active_ = false;
 	sceneNode_->setVisible(false);
 	Ogre::ParticleSystem* tempPS;
-	tempPS = (Ogre::ParticleSystem*)sceneNode_->getAttachedObject("Fireworks");
+	Ogre::String name;
+	name = "FireWorks";
+	name += Ogre::StringConverter::toString(objectId_);
+	tempPS = (Ogre::ParticleSystem*)sceneNode_->getAttachedObject(name);
 	return true;
 }
 
@@ -208,8 +183,11 @@ bool GravityVector::Start(b2Vec2 newPosition, b2Vec2 newDirection)
 
 
 
+	Ogre::String name;
+	name = "FireWorks";
+	name += Ogre::StringConverter::toString(objectId_);
 	Ogre::ParticleSystem* tempPS;
-	tempPS = (Ogre::ParticleSystem*)sceneNode_->getAttachedObject("Fireworks");
+	tempPS = (Ogre::ParticleSystem*)sceneNode_->getAttachedObject(name);
 	tempMagnitude.Normalize();
 	tempPS->getEmitter(0)->setDirection(Ogre::Vector3(tempMagnitude.x,tempMagnitude.y, 0));
 
@@ -253,15 +231,30 @@ bool GravityVector::RemovePlayer()
 	return false;
 }
 
-
+//=============================================================================
+//								ReportFixture
+//
 float32 GravityVector::ReportFixture(b2Fixture *fixture, const b2Vec2 &point, const b2Vec2 &normal, float32 fraction)
 {
+	//returns fisrt contact point with the object being pushed, if no point is found it takes a mid point
 	if(fixture->GetBody() == bodyList_[listNumber_])
 	{
 		forcePoint_ = point;
-		return 0;
+		return 0.0f;
 	}
-	forcePoint_ = position_;
-	return 1;
+	b2Vec2 defaultPoint;
+	defaultPoint.x = position_.x + (position_.x - bodyList_[listNumber_]->GetPosition().x)/2;
+	defaultPoint.y = position_.y + (position_.y - bodyList_[listNumber_]->GetPosition().y)/2;
 
+	forcePoint_ = defaultPoint;
+	return 1.0f;
+
+}
+
+void GravityVector::SetParticalsVisible(bool visible)
+{
+	Ogre::String name;
+	name = "FireWorks";
+	name += Ogre::StringConverter::toString(objectId_);
+	sceneManager_->getParticleSystem(name)->setVisible(visible);
 }

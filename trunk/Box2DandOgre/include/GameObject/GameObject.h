@@ -20,6 +20,7 @@ typedef unsigned int GameObjectId;
 typedef std::map<GameObjectId, GameObject*> GameObjectMap;
 typedef std::map<Ogre::String, GameObject*> GameObjectNameMap;
 struct KGBMessage;
+struct KGBMessage;
 /// This will identify what type of GameObject an Object is.
 /// This is useful due to Box2D having all contact callbacks go through a single
 /// world wide callback.

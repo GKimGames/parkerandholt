@@ -296,6 +296,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\source\HoltStatePlacingStatic.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\source\Parker.cpp"
 						>
 					</File>
@@ -386,6 +390,10 @@
 				</File>
 				<File
 					RelativePath=".\source\TraumaMeter.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\source\Triangle.cpp"
 					>
 				</File>
 				<Filter
@@ -572,6 +580,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\include\HoltStatePlacingStatic.h"
+						>
+					</File>
+					<File
 						RelativePath=".\include\Parker.h"
 						>
 					</File>
@@ -690,6 +702,10 @@
 				</File>
 				<File
 					RelativePath=".\include\Teleporter.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Triangle.h"
 					>
 				</File>
 				<Filter

@@ -103,69 +103,71 @@ bool ParkerStateLedgeGrab::Update()
 //
 bool ParkerStateLedgeGrab::HandleMessage(const KGBMessage message)
 {
-
-	switch(message.messageType)
+	if(driver_->active_)
 	{
-		case CHARACTER_MOVE_LEFT_PLUS:
+		switch(message.messageType)
 		{
-			driver_->moveLeft_ = true;
-			return true;
-		}
-
-		case CHARACTER_MOVE_RIGHT_PLUS:
-		{
-			driver_->moveRight_ = true;
-			return true;
-		}
-
-		case CHARACTER_JUMP_PLUS:
-		{
-			driver_->jump_ = true;
-
-			if(!climbing_ && !driver_->moveLeft_ && !driver_->moveRight_)
+			case CHARACTER_MOVE_LEFT_PLUS:
 			{
-				climbing_ = true;
-				originalPosition_ = driver_->GetBodyPosition();
-				driver_->world_->DestroyJoint(grabJoint_);
-				grabJoint_ = 0;
-				driver_->animationBlender_->targetTime_ = 1000;
+				driver_->moveLeft_ = true;
+				return true;
 			}
-			else if(!climbing_)
+
+			case CHARACTER_MOVE_RIGHT_PLUS:
 			{
-				if(grabJoint_)
+				driver_->moveRight_ = true;
+				return true;
+			}
+
+			case CHARACTER_JUMP_PLUS:
+			{
+				driver_->jump_ = true;
+
+				if(!climbing_ && !driver_->moveLeft_ && !driver_->moveRight_)
 				{
+					climbing_ = true;
+					originalPosition_ = driver_->GetBodyPosition();
 					driver_->world_->DestroyJoint(grabJoint_);
 					grabJoint_ = 0;
+					driver_->animationBlender_->targetTime_ = 1000;
 				}
-				stateMachine_->ChangeState(driver_->inAirState_);
+				else if(!climbing_)
+				{
+					if(grabJoint_)
+					{
+						driver_->world_->DestroyJoint(grabJoint_);
+						grabJoint_ = 0;
+					}
+					stateMachine_->ChangeState(driver_->inAirState_);
+				}
+
+				return true;
 			}
 
-			return true;
-		}
+			case CHARACTER_MOVE_LEFT_MINUS:
+			{
+				driver_->moveLeft_ = false;
 
-		case CHARACTER_MOVE_LEFT_MINUS:
-		{
-			driver_->moveLeft_ = false;
+				return true;
+			}
 
-			return true;
-		}
+			case CHARACTER_MOVE_RIGHT_MINUS:
+			{
+				driver_->moveRight_ = false;
+				return true;
+			}
 
-		case CHARACTER_MOVE_RIGHT_MINUS:
-		{
-			driver_->moveRight_ = false;
-			return true;
-		}
+			case CHARACTER_JUMP_MINUS:
+			{
+				driver_->jump_ = false;
+				return true;
+			}
 
-		case CHARACTER_JUMP_MINUS:
-		{
-			driver_->jump_ = false;
-			return true;
-		}
-
-		case CHARACTER_MOVE_DOWN_PLUS:
-		{
-			stateMachine_->ChangeState(driver_->inAirState_);
-			return true;
+			case CHARACTER_MOVE_DOWN_PLUS:
+			{
+				stateMachine_->ChangeState(driver_->inAirState_);
+				return true;
+			}
 		}
 	}
 

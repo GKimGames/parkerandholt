@@ -13,6 +13,7 @@
 #include "ParkerStateInAir.h"
 #include "HoltStatePlacingGravityVector.h"
 #include "HoltStatePlacingPlatform.h"
+#include "HoltStatePlacingStatic.h"
 #include "Door.h"
 
 #include "Parker.h"
@@ -63,19 +64,22 @@ void ParkerStateOnGround::Enter()
 //
 bool ParkerStateOnGround::Update()
 {
-	if(driver_->moveLeft_)
+	if(driver_->active_)
 	{
-		MoveLeft();
-	}
+		if(driver_->moveLeft_)
+		{
+			MoveLeft();
+		}
 
-	if(driver_->moveRight_)
-	{
-		MoveRight();
-	}
+		if(driver_->moveRight_)
+		{
+			MoveRight();
+		}
 
-	if(driver_->jump_)
-	{
-		Jump();
+		if(driver_->jump_)
+		{
+			Jump();
+		}
 	}
 
 	static Ogre::Vector3 direction;
@@ -138,8 +142,9 @@ bool ParkerStateOnGround::Update()
 //
 bool ParkerStateOnGround::HandleMessage(const KGBMessage message)
 {
-	std::string* gameObject = 0;
-	
+  std::string* gameObject = 0;
+  if(driver_->active_)
+  {
 	switch(message.messageType)
 	{
 		case CHARACTER_MOVE_LEFT_PLUS:
@@ -175,7 +180,19 @@ bool ParkerStateOnGround::HandleMessage(const KGBMessage message)
 		}
 		case CHARACTER_ENTER_PLATFORMSTATE:
 		{
-			driver_->stateMachine_->ChangeState(driver_->placingPlatform_);
+			if(driver_->GetId() == driver_->GetHoltId())
+			{
+				driver_->stateMachine_->ChangeState(driver_->placingPlatform_);
+			}
+			return true;
+		}
+		case CHARACTER_ENTER_STATICSTATE:
+		{
+			if(driver_->GetId() == driver_->GetHoltId())
+			{
+				//driver_->stateMachine_->ChangeState((FSMState<CharacterParker> *)driver_->placingStatic_);
+				driver_->stateMachine_->ChangeState(driver_->placingStatic_);
+			}
 			return true;
 		}
 		case CHARACTER_ENTER_GRAVITYSTATE:
@@ -190,8 +207,8 @@ bool ParkerStateOnGround::HandleMessage(const KGBMessage message)
 			return true;
 		}
 	}
-
-	return false;
+  }
+  return false;
 }
 
 

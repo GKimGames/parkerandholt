@@ -10,6 +10,7 @@
 #define CAMERA_STATE_GO_TO_POINT_H
 
 #include "CameraState.h"
+#include "MessageDispatcher.h"
 
 class GameCamera;
 
@@ -29,6 +30,8 @@ public:
 	Ogre::Real factor;
 
 	Ogre::Real toleranceDistance;
+
+	KGBMessageType messageType;
 	
 
 };
@@ -76,6 +79,12 @@ protected:
 	Ogre::Real factor_;
 
 	Ogre::Real toleranceDistance_;
+
+	KGBMessageType messageType_;
+
+	Ogre::Vector3 diff;
+
+	bool done_;
 };
 
 #endif 

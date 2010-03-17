@@ -62,6 +62,8 @@ enum KGBMessageType
 	ADD_ITEM,
 	RIGHT_MOUSE_PLUS,
 	RIGHT_MOUSE_MINUS,
+	PLAYER_DIED,
+	CHARACTER_ENTER_STATICSTATE,
 	MESSAGE_TYPE_COUNT
 };  
 
@@ -109,6 +111,8 @@ const static char* KGBMessageTypeString[MESSAGE_TYPE_COUNT] =
 	"add item",
 	"right mouse plus",
 	"right mouse minus",
+	"player died",
+	"enter static state",
 	"MESSAGE_TYPE_COUNT"
 };
 

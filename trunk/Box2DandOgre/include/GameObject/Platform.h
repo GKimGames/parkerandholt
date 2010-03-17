@@ -26,7 +26,24 @@ public:
 
 	bool Update(double timeSinceLastFrame)
 	{ 
+		if(timeSinceLastFrame > .001)
+		{
+			placementTest_ = false;
+			if(badPlacement_)
+			{
+				entity_->setVisible(false);
+				body_->SetActive(false);
+			}
+			if(!badPlacement_)
+			{
+				body_->GetFixtureList()->SetSensor(false);
+			}
+		}
 		UpdateGraphics(timeSinceLastFrame);
+		if (badPlacement_)
+		{
+			body_->SetActive(false);
+		}
 		return true;
 	};
 
@@ -34,15 +51,18 @@ public:
 	virtual bool Initialize(Ogre::String str);
 	bool InitializePlaceable();
 	bool SetGraphics(b2Vec2 position, float length, float angle, bool final);
+	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 
 protected:
 
 	Ogre::MovablePlane* plane;
 
-	b2Vec2 point1;
-	b2Vec2 point2;
-	float32 previousAngle_;
-	float length_;
+	b2Vec2	point1;
+	b2Vec2	point2;
+	float32	previousAngle_;
+	float	length_;
+	bool	placementTest_;
+	bool	badPlacement_;
 	
 };
 

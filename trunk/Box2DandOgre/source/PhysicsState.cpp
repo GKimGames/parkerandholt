@@ -69,7 +69,7 @@ void PhysicsState::enter()
 	camera_->setAspectRatio(Real(GAMEFRAMEWORK->viewport_->getActualWidth()) / 
 		Real(GAMEFRAMEWORK->viewport_->getActualHeight()));
 
-
+	GAMEFRAMEWORK->camera_ = camera_;
 
 	GAMEFRAMEWORK->viewport_->setCamera(camera_);
 
@@ -88,6 +88,7 @@ void PhysicsState::enter()
 	//CompositorManager::getSingleton().setCompositorEnabled(GAMEFRAMEWORK->viewport_, "B&W",true);
 
 	gameCamera_ = new GameCamera(camera_);
+	GAMEFRAMEWORK->gameCamera_ = gameCamera_;
 	
 	CameraStateWatchDef def;
 	def.initialPosition = camPosition;
@@ -196,15 +197,26 @@ void PhysicsState::createPhysics()
 	delete handle;
 	delete configXML_;
 	
-	playerInfo_ = new PlayerInfo();
+	holtInfo_ = new PlayerInfo();
+	parkerInfo_ = new PlayerInfo();
+
 	myMouse_ = new MousePicking(sceneManager_, camera_);
 
-	parker_  = new CharacterParker(sceneManager_, myMouse_, playerInfo_);
+	parker_  = new CharacterParker(sceneManager_, myMouse_, parkerInfo_, camera_);
 	parker_->Initialize();
 	parker_->InitializeDebugDraw();
 	parker_->SetBodyPosition(b2Vec2(0, 1.3));
 
+
+	active_ = parker_;
+
+	holt_ = new CharacterParker(sceneManager_, myMouse_, holtInfo_, camera_, false);
+	holt_->Initialize();
+	holt_->GetBody()->SetTransform(b2Vec2(4, 1), 0);
+
+
 	Dispatch->DispatchMessage(SEND_IMMEDIATELY, parker_->GetId(), parker_->GetId(), SET_POSITION, Ogre::Vector3(3,1,0));
+
 
 	//new MovingPlatform(sceneManager_, b2Vec2(10.0f, 1.0f), b2Vec2(0.0f, 1.0f), b2Vec2(5.0f, 1.0f), b2Vec2(0.0f, 5.0f), 2);
 	PressureSwitch* ps = new PressureSwitch(sceneManager_);
@@ -222,6 +234,7 @@ void PhysicsState::createPhysics()
 	myKeyHandler_->AddKey(OIS::KC_W, CHARACTER_JUMP_PLUS, CHARACTER_JUMP_MINUS);
 	myKeyHandler_->AddKey(OIS::KC_S, CHARACTER_MOVE_DOWN_PLUS, CHARACTER_MOVE_DOWN_MINUS);
 	myKeyHandler_->AddKey(OIS::KC_1, CHARACTER_ENTER_PLATFORMSTATE);
+	myKeyHandler_->AddKey(OIS::KC_2, KGBMessageType::CHARACTER_ENTER_STATICSTATE);
 	myKeyHandler_->AddKey(OIS::KC_Q, CHARACTER_EXIT_PLACINGSTATE);
 	myKeyHandler_->AddKey(OIS::KC_F, CHARACTER_GRAB_LEDGE);
 	myKeyHandler_->AddKey(OIS::KC_RETURN, CHARACTER_OPEN_DOOR);
@@ -234,6 +247,9 @@ void PhysicsState::createPhysics()
 	new PickUp(sceneManager_, b2Vec2(-3.0f, 3.0f));
 	new PickUp(sceneManager_, b2Vec2(-6.0f, 3.0f));
 	new PickUp(sceneManager_, b2Vec2(-9.0f, 3.0f));
+
+	new PickUp(sceneManager_, b2Vec2(0.0f, 3.0f), 400.0f);
+
 	new PickUp(sceneManager_, b2Vec2(-14.0f, 3.0f));
 	new PickUp(sceneManager_, b2Vec2(120.0f, 3.0f));
 	new PickUp(sceneManager_, b2Vec2(120.0f, -15.0f));
@@ -242,6 +258,10 @@ void PhysicsState::createPhysics()
 	new PickUp(sceneManager_, b2Vec2(126.0f, -18.0f));
 	new PickUp(sceneManager_, b2Vec2(116.0f, -18.0f));
 	new PickUp(sceneManager_, b2Vec2(116.0f, -20.0f));
+
+
+	
+
 
 	/*
 	Teleporter* t1 = new Teleporter("Steeeeeeve");
@@ -505,9 +525,40 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 {
 	static bool myFlip = true;
 	myKeyHandler_->KeyPressed(keyEventRef);
+
+	if(keyEventRef.key == OIS::KC_9)
+	{
+		if(active_ != parker_)
+		{
+			myMouse_->SetVisibility(false);
+			active_ = parker_;
+			holt_->SetActive(false);
+			parker_->SetActive(true);
+			CameraStateWatchDef def;
+			def.initialPosition = camPosition;
+			def.targetObject = parker_;
+			gameCamera_->InitializeDef(&def);
+		}
+	}
+
+	if(keyEventRef.key == OIS::KC_0)
+	{
+		if(active_ != holt_)
+		{
+			active_ = holt_;
+			parker_->SetActive(false);
+			holt_->SetActive(true);
+			CameraStateWatchDef def;
+			def.initialPosition = camPosition;
+			def.targetObject = holt_;
+			gameCamera_->InitializeDef(&def);
+		}
+	}
+
+
 	if(keyEventRef.key == OIS::KC_P)
 	{
-		pause_ = true;
+		//pause_ = true;
 	}
 
 	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_ESCAPE))
@@ -531,9 +582,11 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 	{
 		CameraStateGoToPointDef def;
 		def.target = Ogre::Vector3(50,0,100);
-		def.toleranceDistance = 0.1;
+		def.toleranceDistance = 1000.0;
 		def.factor = 2.5;
 		def.initialPosition = camera_->getPosition();
+		def.messageType = KGBMessageType::NO_MESSAGE;
+		//def.type = CAMERASTATE_GOTOPOINT;
 		gameCamera_->InitializeDef(&def);
 
 	}
@@ -542,7 +595,7 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 	{
 		CameraStateWatchDef def;
 		def.initialPosition = camPosition;
-		def.targetObject = parker_;
+		def.targetObject = active_;
 		gameCamera_->InitializeDef(&def);
 	}
 
@@ -550,7 +603,7 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 	{
 		CameraStateWatchDef def;
 		def.initialPosition = Ogre::Vector3(0,8,50);
-		def.targetObject = parker_;
+		def.targetObject = active_;
 		gameCamera_->InitializeDef(&def);
 	}
 
@@ -566,6 +619,11 @@ bool PhysicsState::keyReleased(const OIS::KeyEvent &keyEventRef)
 {
 	GameFramework::getSingletonPtr()->KeyReleased(keyEventRef);
 	myKeyHandler_->KeyReleased(keyEventRef);
+
+	if(keyEventRef.key == OIS::KC_Y)
+	{
+		active_->ReturnToCheckPoint(active_->GetPlayerInfo()->GetCheckPoint());
+	}
 
 #if DEBUG_DRAW_ON
 	if(keyEventRef.key == OIS::KC_C)
@@ -744,10 +802,10 @@ void PhysicsState::getInput()
 			camera_->pitch(-m_RotScale);
 		}
 
-		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_Y))
+		/*if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_Y))
 		{
-			parker_->ReturnToCheckPoint(playerInfo_->GetCheckPoint());
-		}
+			active_->ReturnToCheckPoint(active_->GetPlayerInfo()->GetCheckPoint());
+		}*/
 
 		/*
 		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_NUMPAD4))

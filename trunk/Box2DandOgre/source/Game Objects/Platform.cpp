@@ -30,6 +30,8 @@ Platform::Platform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2, int te
 	point1.y = p1.y;
 	point2.x = p2.x;
 	point2.y = p2.y;
+	placementTest_ = false;
+	badPlacement_ = false;
 	
 	InitializePlaceable();
 }
@@ -225,6 +227,7 @@ bool Platform::InitializePlaceable()
 	fd.shape = &bodyShapeDef;
 
 	fd.density = 25;
+	fd.isSensor = true;
 	fd.friction = DEFAULT_FRICTION;
 	//fd.filter.groupIndex = STATIC_MAP_GROUP;
 
@@ -274,17 +277,35 @@ bool Platform::SetGraphics(b2Vec2 position, float length, float angle, bool fina
 
 	if(final)
 	{
+		body_->DestroyFixture(body_->GetFixtureList());
 		b2PolygonShape bodyShapeDef;
 		bodyShapeDef.SetAsBox(length/2, 0.05f); //body_->GetPosition(), previousAngle_);
 		b2FixtureDef fd;
 		fd.shape = &bodyShapeDef;
-
+		fd.isSensor = true;
 		fd.density = 25;
 		fd.friction = DEFAULT_FRICTION;
 		//fd.filter.groupIndex = STATIC_MAP_GROUP;
 
 		body_->CreateFixture(&fd);
+		
+		placementTest_ = true;
+		world_->Step(0.001, 1, 1);
 	}
 
 	return true;
+}
+
+
+void Platform::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+{
+	if(placementTest_)
+	{
+		if(contactFixture->GetBody() == body_  && !collidedFixture->IsSensor())
+		{
+			body_->GetFixtureList()->SetSensor(true);
+			badPlacement_ = true;
+			placementTest_ = false;
+		}
+	}
 }

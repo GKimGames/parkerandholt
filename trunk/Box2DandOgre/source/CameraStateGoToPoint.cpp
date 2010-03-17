@@ -20,6 +20,7 @@ CameraState(camera, stateMachine)
 	target_ = Ogre::Vector3(-20,5,14);
 	factor_ = 2;
 	toleranceDistance_ = 0.01;
+	done_ = false;
 }
 
 
@@ -32,7 +33,7 @@ bool CameraStateGoToPoint::Update()
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 	Ogre::Vector3 camPos = driver_->camera_->getPosition();
 
-	Ogre::Vector3 diff(0,0,0);
+	//Ogre::Vector3 diff(0,0,0);
 
 	diff.x = camPos.x - target_.x;
 	diff.y = camPos.y - target_.y;
@@ -44,9 +45,12 @@ bool CameraStateGoToPoint::Update()
 	{
 		camPos -= diff;
 		driver_->camera_->setPosition(camPos);
+		done_ = false;
 	}
-	else
+	if(distance < toleranceDistance_ && !done_)
 	{
+		Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, messageType_, NULL);
+		done_ = true;
 		return true;
 	}
 
@@ -61,10 +65,11 @@ bool CameraStateGoToPoint::Update()
 void CameraStateGoToPoint::InitializeDef(const CameraStateDef* cameraStateDef)
 {
 	CameraStateGoToPointDef* def = (CameraStateGoToPointDef*) cameraStateDef;
-
+	messageType_ = def->messageType;
 	factor_ = def->factor;
 	target_ = def->target;
 	toleranceDistance_ = def->toleranceDistance;
+	//done_ = false;
 
 }
 
@@ -75,7 +80,7 @@ void CameraStateGoToPoint::InitializeDef(const CameraStateDef* cameraStateDef)
 //
 void CameraStateGoToPoint::Enter()
 {
-
+	//done_ = false;
 }
 
 

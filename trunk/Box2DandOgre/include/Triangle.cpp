@@ -1,14 +1,14 @@
 /*=============================================================================
 
-	HoltBox.cpp
+	Triangle.cpp
 
-	Author: Matt King
+	Author: Greg King
 
 =============================================================================*/
 
-#include "HoltBox.h"
+#include "Triangle.h"
 
-HoltBox::HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center)
+Triangle::Triangle(Ogre::SceneManager* sceneManager, b2Vec2 center, double size)
 {
 
 	position_ = center;
@@ -16,78 +16,74 @@ HoltBox::HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center)
 	gameObjectType_ = GOType_HoltBox;
 
 	sceneManager_ = sceneManager;
-	Ogre::String entityName = "HoltBox";
+	Ogre::String entityName = "Triangle";
 
 	// Add the entity number to the HoltBox name to make it unique.
 	entityName += Ogre::StringConverter::toString(objectId_);
 
-	entity_ = sceneManager_->createEntity(entityName, "cube.1m.mesh");
-
+	/*entity_ = sceneManager_->createEntity(entityName, "cube.1m.mesh");
 	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
 	sceneNode_->attachObject(entity_);
-	sceneNode_->setPosition(center.x, center.y, 0);
+	sceneNode_->setPosition(center.x, center.y, 0);*/
 	
-	boxWidth_ = 0.6;
+	triangleWidth_ = size;
 
-	ModifyBoxWidth(-0.1);
+	ModifyWidth(-0.1);
 
 	placementTest_ = false;
 	badPlacement_ = false;
 
-	CreateBox2DBox();
+	CreateTriangle();
 	
 }
 
-HoltBox::HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center, double size, double density)
+Triangle::Triangle(Ogre::SceneManager *sceneManager, b2Vec2 center, double size, float TTL)
 {
-	position_ = center;
-	density_ = density;
-	boxWidth_ = size;
 	
+	position_ = center;
+	density_ =  10;
 	gameObjectType_ = GOType_HoltBox;
 
-
 	sceneManager_ = sceneManager;
-	Ogre::String entityName = "HoltBox";
+	Ogre::String entityName = "Triangle";
 
 	// Add the entity number to the HoltBox name to make it unique.
 	entityName += Ogre::StringConverter::toString(objectId_);
+	
+	triangleWidth_ = size;
 
-	entity_ = sceneManager_->createEntity(entityName, "cube.1m.mesh");
-
-	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
-	sceneNode_->attachObject(entity_);
-
-	sceneNode_->setPosition(center.x, center.y, 0);
-
-	ModifyBoxWidth(0.0);
+	ModifyWidth(-0.1);
 
 	placementTest_ = false;
 	badPlacement_ = false;
 
-	CreateBox2DBox();
+	TTL_ = TTL;
+	temporary_ = true;
+	timeAlive_ = 0;
+
+	CreateTriangle();
+	
 }
 
 
-bool HoltBox::CreateBox2DBox()
+bool Triangle::CreateTriangle()
 {
 	if(initialized_ == true)
 	{
 		return true;
 	}
 
-
-	b2BodyDef boxDef;
-	boxDef.position = position_;
-	boxDef.type = b2_dynamicBody;
-	boxDef.fixedRotation = false;
-	body_ = world_->CreateBody(&boxDef);
+	b2BodyDef def;
+	def.position = position_;
+	def.type = b2_dynamicBody;
+	def.fixedRotation = false;
+	body_ = world_->CreateBody(&def);
 	body_->SetUserData(this);
 
 	if(body_)
 	{
 		b2PolygonShape sd;
-		sd.SetAsBox(boxWidth_, boxWidth_);
+		sd.SetAsBox(triangleWidth_, triangleWidth_);
 
 		b2FixtureDef fd;
 		fd.shape = &sd;
@@ -109,14 +105,13 @@ bool HoltBox::CreateBox2DBox()
 	return false;	
 }
 
-bool HoltBox::Update(double timeSinceLastFrame)
+bool Triangle::Update(double timeSinceLastFrame)
 {
 	if(timeSinceLastFrame > .001)
 	{
 		placementTest_ = false;
 		if(badPlacement_)
 		{
-			entity_->setVisible(false);
 			body_->SetActive(false);
 		}
 		if(!badPlacement_)
@@ -124,11 +119,19 @@ bool HoltBox::Update(double timeSinceLastFrame)
 			body_->GetFixtureList()->SetSensor(false);
 		}
 	}
+	if(temporary_)
+	{
+		timeAlive_ += timeSinceLastFrame;
+		if(timeAlive_ > TTL_)
+		{
+			body_->SetActive(false);
+		}
+	}
 	UpdateGraphics(timeSinceLastFrame);
 	return true;
 }
 
-void HoltBox::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+void Triangle::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
 	if(placementTest_)
 	{

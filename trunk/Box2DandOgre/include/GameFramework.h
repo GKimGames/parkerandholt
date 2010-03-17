@@ -108,6 +108,8 @@ public:
 
 	Ogre::SceneManager* sceneManager;
 
+	GameCamera*					gameCamera_;
+
 
 private:
 	

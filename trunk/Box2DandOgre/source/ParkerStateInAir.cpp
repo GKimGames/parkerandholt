@@ -172,7 +172,8 @@ bool ParkerStateInAir::Update()
 //
 bool ParkerStateInAir::HandleMessage(const KGBMessage message)
 {
-
+  if(driver_->active_)
+  {
 	switch(message.messageType)
 	{
 		case CHARACTER_MOVE_LEFT_PLUS:
@@ -213,8 +214,8 @@ bool ParkerStateInAir::HandleMessage(const KGBMessage message)
 			}
 		}
 	}
-
-	return false;
+  }
+  return false;
 }
 
 
