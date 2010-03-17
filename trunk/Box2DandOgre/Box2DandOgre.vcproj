@@ -257,6 +257,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\source\MeshTools.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\source\OgreApplication.cpp"
 					>
 				</File>
@@ -518,6 +522,10 @@
 				</File>
 				<File
 					RelativePath=".\include\ManualObjectHelper.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\MeshTools.h"
 					>
 				</File>
 				<File

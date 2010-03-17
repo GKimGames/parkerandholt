@@ -19,6 +19,7 @@
 
 #include "LedgeSensor.h"
 #include "ParkerState.h"
+#include "DynamicLines.h"
 
 class MousePicking;
 class Door;

@@ -14,6 +14,8 @@
 #include "OgreXMLLoader.h"
 #include "Ogre.h"
 
+#include "MeshTools.h"
+
 class ObjectOgreCreator : public GameObjectCreator
 {
 

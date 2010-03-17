@@ -872,8 +872,6 @@ bool Box2DXMLLoader::Getb2FixtureDefAttributes(b2FixtureDef* fixtureDef, TiXmlEl
 
 				polyDef->SetAsEdge(point1,point2);
 
-				//fixtureDef->filter.maskBits = 0x0001;
-				//fixtureDef->filter.categoryBits = 0x0100;
 				fixtureDef->filter.groupIndex = STATIC_MAP_GROUP;
 				fixtureDef->shape = polyDef;
 			}

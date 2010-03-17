@@ -41,7 +41,10 @@ ParkerStateInAir::ParkerStateInAir(
 void ParkerStateInAir::Enter()
 {
 	driver_->feetSensorHitCount_ = 0;
-	jumpTimer_ = 0.0;
+	if(driver_->onGroundState_->isJumping_)
+	{
+		jumpTimer_ = 0.0;
+	}
 	if(driver_->stateMachine_->GetPreviousState() == (ParkerState*) driver_->ledgeGrabState_)
 	{
 		driver_->animationBlender_->Blend("jump_idle", AnimationBlender::BlendThenAnimate, 0.3, true);

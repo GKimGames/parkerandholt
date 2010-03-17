@@ -13,6 +13,8 @@
 #include "GameObjectOgre.h"
 #include "OgreXMLLoader.h"
 #include "Ogre.h"
+#include "MeshTools.h"
+#include <Box2D/Box2D.h>
 
 class StaticOgreObjectCreator : public GameObjectCreator
 {
@@ -100,6 +102,38 @@ public:
 
 				gameObjectOgre->sceneNode_->setScale(length / v3.x, sceneNodeScale.y, sceneNodeScale.z);
 				//meshSceneNode->roll(point1.angleBetween(point2));
+			}
+
+			if(TinyXMLHelper::GetAttributeBool(element, "box2DitUp"))
+			{
+				std::vector<Ogre::Vector3> vectors = MeshTools::GetBox2DOutLine(meshEntity);
+				std::vector<Ogre::Vector3> myVecs = MeshTools::convexHull(vectors);
+
+				b2World* world = GAMEFRAMEWORK->world_;
+				b2Body* body;
+
+				b2BodyDef bd;
+				bd.position.Set(sceneNodePosition.x, sceneNodePosition.y);
+				bd.angle = rotation.z * 3.14159 / 180;
+				bd.fixedRotation = true;
+				body = world->CreateBody(&bd);
+
+				b2FixtureDef fd;
+				b2PolygonShape polyDef;
+				fd.filter.groupIndex = STATIC_MAP_GROUP;
+
+				fd.friction = DEFAULT_FRICTION;
+				fd.restitution = 0.1;
+				fd.filter.groupIndex = STATIC_MAP_GROUP;
+
+				for(int i = 0; i < myVecs.size() - 1;i++)
+				{
+					polyDef.SetAsEdge( b2Vec2(myVecs.at(i).x, myVecs.at(i).y), b2Vec2(myVecs.at(i+1).x,myVecs.at(i+1).y) );
+					fd.shape = &polyDef;
+					
+					body->CreateFixture(&fd);
+				}
+
 			}
 
 		}
