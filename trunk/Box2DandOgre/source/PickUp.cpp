@@ -159,7 +159,7 @@ void PickUp::PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture*
 				float totalImpulse = abs(impulse->normalImpulses[0]);
 				if(totalImpulse > breakingForce_ && totalImpulse < 500000)
 				{
-					Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, CharacterParker::GetHoltId(), ADD_ITEM, 1);
+					Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, CharacterParker::GetHoltId(), ADD_ITEM, 1);
 					pickedUp_ = true;
 					body_->SetActive(false);
 				}			
@@ -177,7 +177,7 @@ void PickUp::PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture*
 				float totalImpulse = abs(impulse->normalImpulses[0]);
 				if(totalImpulse > breakingForce_ && totalImpulse < 500000)
 				{
-					Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, CharacterParker::GetHoltId(), ADD_ITEM, 1);
+					Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, CharacterParker::GetHoltId(), ADD_ITEM, 1);
 					pickedUp_ = true;
 					body_->SetActive(false);
 				}

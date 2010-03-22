@@ -8,14 +8,13 @@ CheckPoint::CheckPoint(Ogre::SceneManager *sceneManager, b2Vec2 center, float wi
 	triggered_ = false;
 	gameObjectType_ = GOType_CheckPoint;
 	sceneManager_ = sceneManager;
+	center.y += height /2.0;
 	position_ = center;
 	width_ = width;
 	height_ = height;
 
 	b2BodyDef bd;
 	bd.position.Set(center.x, center.y);
-	bd.type = b2_staticBody;
-	bd.fixedRotation = false;
 	body_= world_->CreateBody(&bd);
 	
 	body_->SetUserData(this);
@@ -25,17 +24,10 @@ CheckPoint::CheckPoint(Ogre::SceneManager *sceneManager, b2Vec2 center, float wi
 	b2FixtureDef fd;
 	fd.shape = &bodyShapeDef;
 
-	fd.density = 5;
 	fd.isSensor = true;
-	fd.friction = DEFAULT_FRICTION;
-
 
 	b2PolygonShape checkPointSensor_Def;
-	checkPointSensor_Def.m_vertexCount = 4;
-	checkPointSensor_Def.m_vertices[0].Set(-width_/2,  height_/2);
-	checkPointSensor_Def.m_vertices[1].Set(-width_/2, -height_/2);
-	checkPointSensor_Def.m_vertices[2].Set(width_/2,  -height_/2);
-	checkPointSensor_Def.m_vertices[3].Set(width_/2,   height_/2);
+	checkPointSensor_Def.SetAsBox(width / 2.0,height / 2.0);
 
 	fd.shape = &checkPointSensor_Def;
 	fd.isSensor = true;
@@ -44,11 +36,9 @@ CheckPoint::CheckPoint(Ogre::SceneManager *sceneManager, b2Vec2 center, float wi
 
 	body_->SetUserData(this);
 
-
 	Ogre::String name = "CheckPoint";
 	name += Ogre::StringConverter::toString(objectId_);
 	entity_ = sceneManager_->createEntity(name, "CheckPoint.mesh");
-
 
 	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
 	sceneNode_->attachObject(entity_);

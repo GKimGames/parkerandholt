@@ -102,8 +102,55 @@ void PhysicsState::enter()
 
 
 	gameCamera_->InitializeDef(&def);
+
+	time_ = minutes_ = seconds_ = 0;
+
+	// Drawing the debug overlay, it shows FPS stats.
+	timeLeftOverlay_ = OverlayManager::getSingleton().getByName("PaH/Timer");
+	timeLeftOverlay_->show();
+
+	pickupOverlay_ = OverlayManager::getSingleton().getByName("PaH/Pickups");
+	pickupOverlay_->show();
+	
 }
 
+
+//=============================================================================
+//						UpdateOverlay
+//
+void PhysicsState::UpdateOverlay()
+{
+
+	time_ += GAMEFRAMEWORK->GetTimeSinceLastFrame();
+
+	minutes_ = time_ / 60;
+	seconds_ = (int)(time_) % 60;
+
+	OverlayElement* guiCurr = OverlayManager::getSingleton().getOverlayElement("PaH/Time"); 
+	Ogre::String strSeconds;
+	Ogre::String strMinutes;
+
+	if(minutes_ < 10)
+	{
+		strMinutes +="0" + StringConverter::toString(minutes_);
+	}
+	else
+	{
+		strMinutes += StringConverter::toString(minutes_);
+	}
+
+	if(seconds_ < 10)
+	{
+		strSeconds +="0" + StringConverter::toString(seconds_);
+	}
+	else
+	{
+		strSeconds += StringConverter::toString(seconds_);
+	}
+
+	guiCurr->setCaption(strMinutes+":"+strSeconds); 
+	guiCurr->setColour(Ogre::ColourValue(seconds_ / 60.0,1,1,1));
+}
 
 //=============================================================================
 //							pause
@@ -156,21 +203,16 @@ void PhysicsState::exit()
 		GameFramework::getSingletonPtr()->root_->destroySceneManager(sceneManager_);
 	}
 
+	timeLeftOverlay_->hide();
+	pickupOverlay_->hide();
 }
 
-#include "Door.h"
 
 //=============================================================================
 //							createPhysics
 //
 void PhysicsState::createPhysics()
 {
-	// Define the size of the world. Simulation will still work
-	// if bodies reach the end of the world, but it will be slower.
-	b2AABB worldAABB;
-	worldAABB.lowerBound.Set(-500.0f, -500.0f);
-	worldAABB.upperBound.Set(500.0f, 500.0f);
-
 	// Define the gravity vector.
 	b2Vec2 gravity(gravity_);
 
@@ -263,7 +305,7 @@ void PhysicsState::createPhysics()
 	
 
 
-	/*
+	
 	Teleporter* t1 = new Teleporter("Steeeeeeve");
 	Teleporter* t2 = new Teleporter("Steeeeve");
 
@@ -272,25 +314,36 @@ void PhysicsState::createPhysics()
 
 	
 	b2BodyDef bdef;
-	bdef.position.Set(10, 3);
-	b2CircleShape circleShape;
-	circleShape.m_radius = 0.5;
+	bdef.position.Set(12, -1);
+	bdef.angle = 3.14159/2.0;
+
+	b2PolygonShape teleShape;
+	teleShape.SetAsBox(1.1, 0.15, b2Vec2(0.125, 0), (3.14159 / 2.0));
+
+	b2PolygonShape squareBack;
+	squareBack.SetAsBox(1.3, 0.1, b2Vec2(-0.1, 0), (3.14159 / 2.0));
+	
+	b2FixtureDef fdBack;
+	fdBack.shape = &squareBack;
 
 	b2FixtureDef fd;
-	fd.shape = &circleShape;
+	fd.shape = &teleShape;
 	fd.isSensor = true;
 
 	b2Body* b = world->CreateBody(&bdef);
 	b->SetUserData(t1);
 	b->CreateFixture(&fd);
+	b->CreateFixture(&fdBack);
 	t1->SetBody(b);
 
-	bdef.position.Set(14, 3);
+	bdef.position.Set(-4, 4);
+	bdef.angle = 3.14159 / 4.0;
 	b = world->CreateBody(&bdef);
 	b->SetUserData(t2);
 	b->CreateFixture(&fd);
+	b->CreateFixture(&fdBack);
 	t2->SetBody(b);
-	*/
+	
 
 	/*
 	LedgeSensor* ls = new LedgeSensor();
@@ -411,22 +464,53 @@ void PhysicsState::createScene()
 {
 
 	sceneManager_->getRootSceneNode()->setPosition(0,0,0);
-	GameFramework::getSingletonPtr()->viewport_->setBackgroundColour(Ogre::ColourValue(0,0,0));
+	GameFramework::getSingletonPtr()->viewport_->setBackgroundColour(Ogre::ColourValue(0.231, 0.631, 1.0));
 	//sceneManager_->setSkyBox(true, "Examples/SpaceSkyBox");
 	//sceneManager_->setSkyBox(true, "Examples/WhiteSkyBox", 10000);
 	float mCurvature = 45;
 	float mTiling = 5;
 	//sceneManager_->setSkyDome(true, "Examples/WhiteSkyBox", mCurvature, mTiling);
-	sceneManager_->setSkyDome(true, "Examples/CloudySky", 4, 4);
-	
+	//sceneManager_->setSkyDome(true, "Examples/CloudySky", 20, 5);
+
+	//SceneNode* bbSceneNode = sceneManager_->getRootSceneNode()->createChildSceneNode();
+	//BillboardSet* lightbillboardset = sceneManager_->createBillboardSet("lightbbs", 1);
+	//lightbillboardset->setRenderQueueGroup(RENDER_QUEUE_9);
+	//lightbillboardset->setMaterialName("Clouds/bbCloud1");
+	//lightbillboardset->createBillboard(-50,40,-150,ColourValue(1.0,1.0,1.0f));	
+	//lightbillboardset->createBillboard(120,10,-200,ColourValue(1.0,1.0,1.0f));	
+	//lightbillboardset->createBillboard(40,-20,-175,ColourValue(1.0,1.0,1.0f));	
+	//lightbillboardset->createBillboard(-150,-50,-150,ColourValue(1.0,1.0,1.0f));	
+	//lightbillboardset->createBillboard(10,-80,-200,ColourValue(1.0,1.0,1.0f));
+	//bbSceneNode->attachObject(lightbillboardset);
+
+	//BillboardSet* lightbillboardset2 = sceneManager_->createBillboardSet("lightbbs2", 1);
+	//lightbillboardset2->setRenderQueueGroup(RENDER_QUEUE_9);
+	//lightbillboardset2->setMaterialName("Clouds/bbCloud2");
+	//lightbillboardset2->createBillboard(80,0,-152,ColourValue(1.0,1.0,1.0f));	
+	//lightbillboardset2->createBillboard(240,22,-205,ColourValue(1.0,1.0,1.0f));	
+	//lightbillboardset2->createBillboard(180,-20,-165,ColourValue(1.0,1.0,1.0f));	
+	//lightbillboardset2->createBillboard(-150,-50,-140,ColourValue(1.0,1.0,1.0f));	
+	//lightbillboardset2->createBillboard(0,-20,-225,ColourValue(1.0,1.0,1.0f));
+	//bbSceneNode->attachObject(lightbillboardset2);
+
+	//BillboardSet* lightbillboardset3 = sceneManager_->createBillboardSet("lightbbs3", 1);
+	//lightbillboardset3->setRenderQueueGroup(RENDER_QUEUE_9);
+	//lightbillboardset3->setMaterialName("Clouds/bbCloud4");
+	//lightbillboardset3->createBillboard(80,0,-150,ColourValue(1.0,1.0,1.0f));	
+	//lightbillboardset3->createBillboard(240,22,-200,ColourValue(1.0,1.0,1.0f));	
+	//lightbillboardset3->createBillboard(180,-20,-175,ColourValue(1.0,1.0,1.0f));	
+	//lightbillboardset3->createBillboard(-150,-50,-150,ColourValue(1.0,1.0,1.0f));	
+	//lightbillboardset3->createBillboard(0,-20,-225,ColourValue(1.0,1.0,1.0f));
+	//SceneNode* bbSceneNode2 = sceneManager_->getRootSceneNode()->createChildSceneNode();
+	//bbSceneNode2->attachObject(lightbillboardset3);
+	//bbSceneNode2->setPosition(170,45,-45);
+
 	Ogre::Light* light = sceneManager_->createLight("Light");
 	
 	light->setType(Light::LT_SPOTLIGHT);
 	light->setPosition(0,25,0);
 	light->setDirection(0,-1,0);
 	light->setSpotlightRange(Degree(35), Degree(50));
-	
-
 
 	Ogre::Light* light2 = sceneManager_->createLight("Light2");
 	
@@ -882,11 +966,12 @@ bool PhysicsState::update(double timeSinceLastFrame)
 
 		ProcessPostSolveData();
 
+		world->Step(0,1,1);
 		// Update all the game objects.
 		GameObject::UpdateObjectList(timeStep);
 		
 		moveCamera();
-		
+		UpdateOverlay();
 	}
 
 

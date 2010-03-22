@@ -76,6 +76,7 @@ void AnimationBlender::Blend(
 {
 	loop_ = loop;
 	targetTime_ = targetTime;
+
 	if( transition == AnimationBlender::BlendSwitch )
 	{
 		if( source_ != 0 )
