@@ -62,6 +62,7 @@ void ParkerStateInAir::Enter()
 	justWallJumped_ = false;
 	wallJumpTimer_ = -1.0;
 	wallJumpBetweenTimer_ = -1.0;
+	mySwitch = true;
 }
 
 
@@ -115,7 +116,7 @@ bool ParkerStateInAir::Update()
 		}
 
 		driver_->sceneNode_->setDirection(direction,Ogre::Node::TS_WORLD);
-		static bool mySwitch = true;
+		//static bool mySwitch = true;
 		if(justWallJumped_)
 		{
 			wallJumpTimer_ += GAMEFRAMEWORK->GetTimeSinceLastFrame();

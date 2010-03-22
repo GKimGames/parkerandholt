@@ -56,7 +56,7 @@ void TinyXMLHelper::WalkDoc(TiXmlNode * pParent, std::map<Ogre::String, Ogre::St
 //=============================================================================
 //								GetMapFromFile
 //
-/// Returns a handle to the root node of a file or 0 if it can't find it.
+/// Populates a map with strings from an XML file.
 bool TinyXMLHelper::GetMapFromFile(Ogre::String fileName, std::map<Ogre::String, Ogre::String>* map)
 {
 	TiXmlDocument* configXML = new TiXmlDocument(fileName.c_str());
@@ -183,6 +183,22 @@ bool TinyXMLHelper::GetAttributeBool(TiXmlElement* element, const String& attrib
 	return defaultValue;
 }
 
+
+//=============================================================================
+//								GetAttributeColor
+//
+/// Returns an Ogre::ColorValue
+Ogre::ColourValue TinyXMLHelper::GetAttributeColor(TiXmlElement* element, const String& name, Ogre::ColourValue defaultValue)
+{
+	if(element->Attribute(name.c_str()))
+	{
+		return StringConverter::parseColourValue(element->Attribute(name.c_str()));
+	}
+	else
+	{
+		return defaultValue;
+	}
+}
 
 //=============================================================================
 //								GetAttributeVector2

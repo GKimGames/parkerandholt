@@ -21,6 +21,8 @@
 
 #include "PlatformCreator.h"
 #include "MovingPlatformCreator.h"
+#include "CheckPointCreator.h"
+#include "PickUpCreator.h"
 
 void GameObjectFactory::LoadFile(Ogre::String fileName)
 {
@@ -130,6 +132,8 @@ void GameObjectFactory::AddObjectCreators()
 	AddCreator("ObjectSensor",		new GameObjectSensorCreator(this));
 	AddCreator("StaticOgreObject",  new StaticOgreObjectCreator(this));
 	AddCreator("Door",				new DoorCreator(this));
+	AddCreator("CheckPoint",		new CheckPointCreator(this));
+	AddCreator("PickUp",			new PickUpCreator(this));
 }
 
 

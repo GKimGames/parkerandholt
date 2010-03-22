@@ -128,10 +128,6 @@ bool GameFramework::InitOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 	timer_ = new Ogre::Timer();
 	timer_->reset();
 
-	
-	// Drawing the debug overlay, it shows FPS stats.
-	debugOverlay_ = OverlayManager::getSingleton().getByName("Core/DebugOverlay2");
-	debugOverlay_->show();
 
 	renderWindow_->setActive(true);
 
@@ -211,18 +207,8 @@ void GameFramework::UpdateStats()
     static String worstFps = "Worst FPS: "; 
     static String tris = "Triangle Count: "; 
     static String batches = "Batch Count: "; 
-	static double time = 0;
-	static int seconds = 0;
-	static int minutes = 0;
-	time += timeSinceLastFrame_;
-
-	minutes = time / 60;
-	seconds = (int)(time) % 60;
 
 	const RenderTarget::FrameStats& stats = renderWindow_->getStatistics(); 
-	OverlayElement* guiCurr = OverlayManager::getSingleton().getOverlayElement("Core/CurrFps2"); 
-	//guiCurr->setCaption(currFps + StringConverter::toString(stats.lastFPS)); 
-	guiCurr->setCaption(StringConverter::toString(minutes)+":"+StringConverter::toString(seconds)); 
 	
 	/*
     OverlayElement* guiAvg = OverlayManager::getSingleton().getOverlayElement("Core/AverageFps"); 

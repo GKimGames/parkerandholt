@@ -57,7 +57,7 @@ void ParkerStateLedgeGrab::Enter()
 bool ParkerStateLedgeGrab::Update()
 {
 
-	static Ogre::Vector3 direction;
+	Ogre::Vector3 direction;
 	
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
