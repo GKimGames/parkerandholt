@@ -7,7 +7,7 @@ class CheckPoint : public GameObjectOgreBox2D
 {
 public:
 
-	CheckPoint(Ogre::SceneManager* sceneManager, b2Vec2 center, float width, float height);
+	CheckPoint(Ogre::SceneManager* sceneManager, b2Vec2 center, float width = 2.0f, float height = 4.0f);
 	~CheckPoint();
 	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 	void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);

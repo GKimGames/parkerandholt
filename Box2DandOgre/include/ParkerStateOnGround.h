@@ -67,6 +67,7 @@ protected:
 
 	int feetContactCount_;
 
+	//Ogre::Vector3 direction;
 	/// This is an object that will be moving the character
 	/// when the character is on it.
 	b2Body* elevator_;
