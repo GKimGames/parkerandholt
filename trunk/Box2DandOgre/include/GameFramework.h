@@ -42,6 +42,8 @@ class AppStateManager;
 
 /// GameFramework srarts up Ogre and loads resource to be used as well as
 /// storing the current states b2World reference
+///
+/// GameFramework is a singleton with 
 class GameFramework : public Ogre::Singleton<GameFramework>, OIS::KeyListener, OIS::MouseListener
 {
 public:

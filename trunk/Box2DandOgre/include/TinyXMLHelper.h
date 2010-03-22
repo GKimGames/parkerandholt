@@ -35,6 +35,7 @@ public:
 	
 	static Ogre::Vector2 GetAttributeVector2(TiXmlElement* element, const Ogre::String& name, Ogre::Vector2 defaultValue = Ogre::Vector2::ZERO);
 	static Ogre::Vector3 GetAttributeVector3(TiXmlElement* element, const Ogre::String& name, Ogre::Vector3 defaultValue = Ogre::Vector3::ZERO);
+	static Ogre::ColourValue TinyXMLHelper::GetAttributeColor(TiXmlElement* element, const Ogre::String& name, Ogre::ColourValue defaultValue = Ogre::ColourValue::Black);
 	
 	static b2Vec2 GetAttributeb2Vec2(TiXmlElement* element, const Ogre::String& name, b2Vec2 defaultValue = b2Vec2(0,0));
 };

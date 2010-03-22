@@ -50,6 +50,7 @@
 
 #include "Triangle.h"
 
+
 #define DEBUG_DRAW_ON 1
 class CharacterParker;
 
@@ -60,7 +61,6 @@ typedef std::vector<ContactPoint*> ContactList;
 typedef std::vector<PostSolveData*> PostSolveList;
 
 public:
-
 	PhysicsState();
 	
 	DECLARE_APPSTATE_CLASS(PhysicsState)
@@ -118,6 +118,7 @@ public:
 
 protected:
 
+	void UpdateOverlay();
 	/// My GUI Stuff
 	MyGUI::Gui* myGUI;
 	// End
@@ -128,7 +129,9 @@ protected:
 	
 
 	b2World* world;
-	double timeStep; 
+	double timeStep;
+
+	double levelTimeLeft_;
 
 	Character* myCharacter_;
 	TraumaMeter* myMeter_;
@@ -173,6 +176,13 @@ private:
 	int32 m_pointCount;
 
 	Ogre::Vector3	camPosition;
+
+
+	Ogre::Overlay* timeLeftOverlay_;
+	Ogre::Overlay* pickupOverlay_;
+	double time_;
+	int seconds_;
+	int minutes_;
 
 };
 

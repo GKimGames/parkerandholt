@@ -38,6 +38,7 @@ public:
 	GameObjectOgreBox2D(name,body,entity)
 	{
 		partner_ = teleporter;
+		timer_ = 0;
 	}
 
 
@@ -46,31 +47,37 @@ public:
 
 	bool Update(double timeSinceLastFrame)
 	{
-		/*
-		SetAllNotInContact();
+		timer_ -= timeSinceLastFrame;
 
-		b2ContactEdge* contacts = body_->GetContactList();
-		while(contacts)
+		if(timer_ <= 0)
 		{
-			if(contacts->contact->IsTouching())
+			SetAllNotInContact();
+
+			b2ContactEdge* contacts = body_->GetContactList();
+			while(contacts)
 			{
-				b2Body* A = contacts->contact->GetFixtureA()->GetBody();
-				b2Body* B = contacts->contact->GetFixtureB()->GetBody();
+				if(contacts->contact->IsTouching())
+				{
+					b2Body* A = contacts->contact->GetFixtureA()->GetBody();
+					b2Body* B = contacts->contact->GetFixtureB()->GetBody();
 
-				if(A != body_)
-				{
-					DoIgnoreBody(A);
+					if(A != body_)
+					{
+						DoIgnoreBody(A);
+					}
+					else
+					{
+						DoIgnoreBody(B);
+					}
 				}
-				else
-				{
-					DoIgnoreBody(B);
-				}
+				contacts = contacts->next;
 			}
-			contacts = contacts->next;
-		}
 
-		RemoveNotInContact();
-		*/
+			RemoveNotInContact();
+			
+			teleportingBodies_.clear();
+			
+		}
 
 		return true;
 	}
@@ -83,30 +90,53 @@ public:
 	/// By default this does nothing.
 	virtual void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 	{
-		b2Body* body = collidedFixture->GetBody();
-
-		bool ignoreBody = DoIgnoreBody(body);
-		if(body->GetType() == b2_dynamicBody && !ignoreBody)
+		if(contactFixture->IsSensor() && collidedFixture->IsSensor() == false)
 		{
-			if(body->GetUserData())
-			{
-				GameObjectOgreBox2D* goob = (GameObjectOgreBox2D*) body->GetUserData();
+			b2Body* body = collidedFixture->GetBody();
 
-				goob->SetBodyPosition(partner_->GetBodyPosition());
-				partner_->IgnoreThisBody(body);
-			}
-		}
-		else if(ignoreBody)
-		{
-			std::vector<IgnoreBody*>::iterator iter = ignoreBodies_.begin();
-			while(iter != ignoreBodies_.end())
+			bool ignoreBody = DoIgnoreBody(body);
+			if(body->GetType() == b2_dynamicBody && !ignoreBody)
 			{
-				if((*iter)->body == body)
+				if(body->GetUserData())
 				{
-					(*iter)->contactCount += 1;
-				}
+					
+					GameObjectOgreBox2D* goob = (GameObjectOgreBox2D*) body->GetUserData();
 
-				iter++;
+					b2Body* pBody = partner_->GetBody();
+					float32 angle = body_->GetAngle();
+					float x = cos(angle) * 1.8;
+					float y = sin(angle) * 1.8;
+					b2Vec2 position(partner_->GetBodyPosition().x + x, partner_->GetBodyPosition().y + y);
+					goob->SetBodyPosition(position);
+					
+					// Rotate the velocity
+					//float32 angle2 = (pBody->GetAngle() - body_->GetAngle() + 3.14159);
+					float32 angle2 = (angle - pBody->GetAngle() - 3.14159);
+					b2Vec2 velocity = goob->GetBody()->GetLinearVelocity();
+					velocity.x = (velocity.x * cos(angle2)) + (velocity.y * sin(angle2));
+					velocity.y = (velocity.x * sin(angle2)) + (velocity.y * cos(angle2));
+					velocity.y = 0 - velocity.y;
+					goob->GetBody()->SetLinearVelocity(velocity);
+					
+					partner_->IgnoreThisBody(body);
+					teleportingBodies_.push_back(body);
+
+					partner_->Teleport();
+					Teleport();
+				}
+			}
+			else if(ignoreBody)
+			{
+				std::vector<IgnoreBody*>::iterator iter = ignoreBodies_.begin();
+				while(iter != ignoreBodies_.end())
+				{
+					if((*iter)->body == body)
+					{
+						(*iter)->contactCount += 1;
+					}
+
+					iter++;
+				}
 			}
 		}
 	}
@@ -117,31 +147,34 @@ public:
 	/// By default this does nothing.
 	virtual void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 	{
-		b2Body* body = collidedFixture->GetBody();
-
-		bool ignoreBody = DoIgnoreBody(body);
-		if(ignoreBody)
+		if(contactFixture->IsSensor() && collidedFixture->IsSensor() == false)
 		{
-			std::vector<IgnoreBody*>::iterator iter = ignoreBodies_.begin();
-			while(iter != ignoreBodies_.end())
+			b2Body* body = collidedFixture->GetBody();
+
+			bool ignoreBody = DoIgnoreBody(body);
+			if(ignoreBody)
 			{
-				if((*iter)->body == body)
+				std::vector<IgnoreBody*>::iterator iter = ignoreBodies_.begin();
+				while(iter != ignoreBodies_.end())
 				{
-					IgnoreBody* b = (*iter);
-					b->contactCount -= 1;
-					if(b->contactCount == 0)
+					if((*iter)->body == body)
 					{
-						iter = ignoreBodies_.erase(iter);
-						delete b;
+						IgnoreBody* b = (*iter);
+						b->contactCount -= 1;
+						if(b->contactCount == 0)
+						{
+							iter = ignoreBodies_.erase(iter);
+							delete b;
+						}
+						else
+						{
+							iter++;
+						}
 					}
 					else
 					{
 						iter++;
 					}
-				}
-				else
-				{
-					iter++;
 				}
 			}
 		}
@@ -150,6 +183,11 @@ public:
 	void IgnoreThisBody(b2Body* b)
 	{
 		ignoreBodies_.push_back( new IgnoreBody(b) );
+	}
+
+	void Teleport()
+	{
+		timer_ = 0.5;
 	}
 
 protected:
@@ -169,6 +207,18 @@ protected:
 			}
 
 			iter++;
+		}
+
+		std::vector<b2Body*>::iterator iter2 = teleportingBodies_.begin();
+
+		while(iter2 != teleportingBodies_.end())
+		{
+			if((*iter2) == b)
+			{
+				return true;
+			}
+
+			iter2++;
 		}
 		
 		return false;
@@ -210,9 +260,13 @@ protected:
 	}
 
 	std::vector<IgnoreBody*> ignoreBodies_;
+	std::vector<b2Body*>	 teleportingBodies_;
 	Teleporter* partner_;
+
+	double timer_;
 	
 
 };
 
 #endif
+

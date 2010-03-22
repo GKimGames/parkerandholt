@@ -56,6 +56,8 @@ protected:
 
 	double  wallJumpBetweenTimer_;
 
+	bool mySwitch;
+
 };
 
 #endif
