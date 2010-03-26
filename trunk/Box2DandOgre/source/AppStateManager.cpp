@@ -48,6 +48,7 @@ AppStateManager::~AppStateManager()
 //=============================================================================
 //							manageAppState
 //
+// Addes a new string / state pair to the Manager
 void AppStateManager::manageAppState(Ogre::String stateName, AppState* state)
 {
 	m_AppMap[stateName] = state;

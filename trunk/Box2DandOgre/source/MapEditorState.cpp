@@ -59,14 +59,9 @@ void MapEditorState::enter()
 	//gameObject_ = new GameObject();
 	//gameObject_->SetName("MapEditorState");
 
-	TiXmlElement* objectElement = hRoot.FirstChild( "GameObject" ).Element();
-	gameObject_ = GAMEFRAMEWORK->gameObjectFactory->CreateGameObject("GameObject", objectElement);
 	
 	sceneManager_ = GAMEFRAMEWORK->root_->createSceneManager(ST_GENERIC, "MapEditorSceneMgr");
 	sceneManager_->setAmbientLight(Ogre::ColourValue(0.7, 0.7, 0.7));	
-
-	GAMEFRAMEWORK->gameObjectFactory->sceneManager = sceneManager_;
-	GAMEFRAMEWORK->sceneManager = sceneManager_;
 
 	camera_ = sceneManager_->createCamera("MapEditorCamera");
 	camera_->setPosition(Vector3(x, y, z));
@@ -274,11 +269,6 @@ void MapEditorState::createPhysics()
 
 	hRoot = TiXmlHandle(pElem);
 
-	TiXmlElement* platformElement = hRoot.FirstChild( "Platform" ).Element();
-	GAMEFRAMEWORK->gameObjectFactory->CreateGameObject("Platform", platformElement);
-
-	TiXmlElement* objectOgreElement = hRoot.FirstChild( "Object3" ).Element();
-	GAMEFRAMEWORK->gameObjectFactory->CreateGameObject(objectOgreElement);
 
 
 	//TiXmlElement* ogreBox2DElement = hRoot.FirstChild( "Object" ).Element();

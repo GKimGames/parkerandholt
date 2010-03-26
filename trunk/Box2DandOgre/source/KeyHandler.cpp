@@ -26,7 +26,7 @@ bool KeyHandler::KeyPressed(const OIS::KeyEvent &keyEventRef)
 	}
 	else
 	{
-		Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, currentKey_->second, NULL);
+		Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, SEND_TO_ALL, currentKey_->second, NULL);
 		return true;
 	}
 
@@ -42,7 +42,7 @@ bool KeyHandler::KeyReleased(const OIS::KeyEvent &keyEventRef)
 	}
 	else
 	{
-		Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, currentKey_->second, NULL);
+		Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, SEND_TO_ALL, currentKey_->second, NULL);
 		return true;
 	}
 
@@ -75,7 +75,7 @@ void KeyHandler::CheckKeys()
 	{
 		if(keyBoard_->isKeyDown(it->first))
 		{
-			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, it->second, NULL);
+			Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, SEND_TO_ALL, it->second, NULL);
 		}
 	}
 
@@ -83,7 +83,7 @@ void KeyHandler::CheckKeys()
 	{
 		if(keyBoard_->isKeyDown(it->first))
 		{
-			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, it->second, NULL);
+			Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, SEND_TO_ALL, it->second, NULL);
 		}
 	}
 }

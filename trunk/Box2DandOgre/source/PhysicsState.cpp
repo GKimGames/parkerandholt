@@ -35,6 +35,8 @@ PhysicsState::PhysicsState()
 void PhysicsState::enter()
 {
 
+	//new Level("LevelTwo.xml");
+
 	//GAMEFRAMEWORK->time = 0;
 	testing_ = .5;
 
@@ -58,6 +60,15 @@ void PhysicsState::enter()
 
 	sceneManager_ = GAMEFRAMEWORK->root_->createSceneManager(ST_GENERIC, "PhysicsSceneMgr");
 	GAMEFRAMEWORK->sceneManager = sceneManager_;
+
+	myGUI = new MyGUI::Gui();
+	myGUI->initialise(GAMEFRAMEWORK->renderWindow_);
+	myGUI->setSceneManager(sceneManager_);
+	//MyGUI::LayoutManager::getInstance().load("Console.layout");
+	/*
+	MyGUI::ButtonPtr button = myGUI->createWidget<MyGUI::Button>("Button", 10, 10, 300, 26, MyGUI::Align::Default, "Main");
+	button->setCaption("exit");
+	*/
 
 	sceneManager_->setAmbientLight(Ogre::ColourValue(0.7, 0.7, 0.7));		
 
@@ -86,22 +97,6 @@ void PhysicsState::enter()
 
 	CompositorManager::getSingleton().addCompositor(GAMEFRAMEWORK->viewport_, "B&W");
 	//CompositorManager::getSingleton().setCompositorEnabled(GAMEFRAMEWORK->viewport_, "B&W",true);
-
-	gameCamera_ = new GameCamera(camera_);
-	GAMEFRAMEWORK->gameCamera_ = gameCamera_;
-	
-	CameraStateWatchDef def;
-	def.initialPosition = camPosition;
-	def.targetObject = parker_;
-
-	CameraStateGoToPointDef def2;
-	def2.target = Ogre::Vector3(50,-10,100);
-	def2.toleranceDistance = 0.1;
-	def2.factor = 2.5;
-	def2.initialPosition = camPosition;
-
-
-	gameCamera_->InitializeDef(&def);
 
 	time_ = minutes_ = seconds_ = 0;
 
@@ -187,6 +182,7 @@ void PhysicsState::exit()
 	CompositorManager::getSingleton().setCompositorEnabled(GAMEFRAMEWORK->viewport_, "B&W",false);
 	CompositorManager::getSingleton().removeCompositorChain(GAMEFRAMEWORK->viewport_);
 
+
 	delete world;
 
 	GameFramework::getSingletonPtr()->log_->logMessage("Leaving PhysicsState...");
@@ -234,7 +230,6 @@ void PhysicsState::createPhysics()
 	TiXmlHandle* handle = TinyXMLHelper::GetRootFromFile("..\\LevelTwo.xml",configXML_);
 	
 	TiXmlElement* element = handle->FirstChildElement("LevelInfo").ToElement();
-	curvature_ = TinyXMLHelper::GetAttributeFloat(element, "curvature", 10);
 	
 	delete handle;
 	delete configXML_;
@@ -256,6 +251,14 @@ void PhysicsState::createPhysics()
 	holt_->Initialize();
 	holt_->GetBody()->SetTransform(b2Vec2(4, 1), 0);
 
+	gameCamera_ = new GameCamera(camera_);
+	GAMEFRAMEWORK->gameCamera_ = gameCamera_;
+	
+	CameraStateWatchDef def;
+	def.initialPosition = camPosition;
+	def.targetObject = parker_;
+
+	gameCamera_->InitializeDef(&def);
 
 	Dispatch->DispatchMessage(SEND_IMMEDIATELY, parker_->GetId(), parker_->GetId(), SET_POSITION, Ogre::Vector3(3,1,0));
 
@@ -276,35 +279,10 @@ void PhysicsState::createPhysics()
 	myKeyHandler_->AddKey(OIS::KC_W, CHARACTER_JUMP_PLUS, CHARACTER_JUMP_MINUS);
 	myKeyHandler_->AddKey(OIS::KC_S, CHARACTER_MOVE_DOWN_PLUS, CHARACTER_MOVE_DOWN_MINUS);
 	myKeyHandler_->AddKey(OIS::KC_1, CHARACTER_ENTER_PLATFORMSTATE);
-	myKeyHandler_->AddKey(OIS::KC_2, KGBMessageType::CHARACTER_ENTER_STATICSTATE);
+	myKeyHandler_->AddKey(OIS::KC_2, CHARACTER_ENTER_STATICSTATE);
 	myKeyHandler_->AddKey(OIS::KC_Q, CHARACTER_EXIT_PLACINGSTATE);
 	myKeyHandler_->AddKey(OIS::KC_F, CHARACTER_GRAB_LEDGE);
 	myKeyHandler_->AddKey(OIS::KC_RETURN, CHARACTER_OPEN_DOOR);
-	
-	new CheckPoint(sceneManager_, b2Vec2(-8.0f, 2.0f),2,4);
-	new CheckPoint(sceneManager_, b2Vec2(-16.0f, 2.0f),2,4);
-	new CheckPoint(sceneManager_, b2Vec2(122.0f, -8.0f),2,4);
-
-	new PickUp(sceneManager_, b2Vec2(0.0f, 3.0f));
-	new PickUp(sceneManager_, b2Vec2(-3.0f, 3.0f));
-	new PickUp(sceneManager_, b2Vec2(-6.0f, 3.0f));
-	new PickUp(sceneManager_, b2Vec2(-9.0f, 3.0f));
-
-	new PickUp(sceneManager_, b2Vec2(0.0f, 3.0f), 400.0f);
-
-	new PickUp(sceneManager_, b2Vec2(-14.0f, 3.0f));
-	new PickUp(sceneManager_, b2Vec2(120.0f, 3.0f));
-	new PickUp(sceneManager_, b2Vec2(120.0f, -15.0f));
-	new PickUp(sceneManager_, b2Vec2(122.0f, -15.0f));
-	new PickUp(sceneManager_, b2Vec2(124.0f, -18.0f));
-	new PickUp(sceneManager_, b2Vec2(126.0f, -18.0f));
-	new PickUp(sceneManager_, b2Vec2(116.0f, -18.0f));
-	new PickUp(sceneManager_, b2Vec2(116.0f, -20.0f));
-
-
-	
-
-
 	
 	Teleporter* t1 = new Teleporter("Steeeeeeve");
 	Teleporter* t2 = new Teleporter("Steeeeve");
@@ -472,39 +450,6 @@ void PhysicsState::createScene()
 	//sceneManager_->setSkyDome(true, "Examples/WhiteSkyBox", mCurvature, mTiling);
 	//sceneManager_->setSkyDome(true, "Examples/CloudySky", 20, 5);
 
-	//SceneNode* bbSceneNode = sceneManager_->getRootSceneNode()->createChildSceneNode();
-	//BillboardSet* lightbillboardset = sceneManager_->createBillboardSet("lightbbs", 1);
-	//lightbillboardset->setRenderQueueGroup(RENDER_QUEUE_9);
-	//lightbillboardset->setMaterialName("Clouds/bbCloud1");
-	//lightbillboardset->createBillboard(-50,40,-150,ColourValue(1.0,1.0,1.0f));	
-	//lightbillboardset->createBillboard(120,10,-200,ColourValue(1.0,1.0,1.0f));	
-	//lightbillboardset->createBillboard(40,-20,-175,ColourValue(1.0,1.0,1.0f));	
-	//lightbillboardset->createBillboard(-150,-50,-150,ColourValue(1.0,1.0,1.0f));	
-	//lightbillboardset->createBillboard(10,-80,-200,ColourValue(1.0,1.0,1.0f));
-	//bbSceneNode->attachObject(lightbillboardset);
-
-	//BillboardSet* lightbillboardset2 = sceneManager_->createBillboardSet("lightbbs2", 1);
-	//lightbillboardset2->setRenderQueueGroup(RENDER_QUEUE_9);
-	//lightbillboardset2->setMaterialName("Clouds/bbCloud2");
-	//lightbillboardset2->createBillboard(80,0,-152,ColourValue(1.0,1.0,1.0f));	
-	//lightbillboardset2->createBillboard(240,22,-205,ColourValue(1.0,1.0,1.0f));	
-	//lightbillboardset2->createBillboard(180,-20,-165,ColourValue(1.0,1.0,1.0f));	
-	//lightbillboardset2->createBillboard(-150,-50,-140,ColourValue(1.0,1.0,1.0f));	
-	//lightbillboardset2->createBillboard(0,-20,-225,ColourValue(1.0,1.0,1.0f));
-	//bbSceneNode->attachObject(lightbillboardset2);
-
-	//BillboardSet* lightbillboardset3 = sceneManager_->createBillboardSet("lightbbs3", 1);
-	//lightbillboardset3->setRenderQueueGroup(RENDER_QUEUE_9);
-	//lightbillboardset3->setMaterialName("Clouds/bbCloud4");
-	//lightbillboardset3->createBillboard(80,0,-150,ColourValue(1.0,1.0,1.0f));	
-	//lightbillboardset3->createBillboard(240,22,-200,ColourValue(1.0,1.0,1.0f));	
-	//lightbillboardset3->createBillboard(180,-20,-175,ColourValue(1.0,1.0,1.0f));	
-	//lightbillboardset3->createBillboard(-150,-50,-150,ColourValue(1.0,1.0,1.0f));	
-	//lightbillboardset3->createBillboard(0,-20,-225,ColourValue(1.0,1.0,1.0f));
-	//SceneNode* bbSceneNode2 = sceneManager_->getRootSceneNode()->createChildSceneNode();
-	//bbSceneNode2->attachObject(lightbillboardset3);
-	//bbSceneNode2->setPosition(170,45,-45);
-
 	Ogre::Light* light = sceneManager_->createLight("Light");
 	
 	light->setType(Light::LT_SPOTLIGHT);
@@ -529,12 +474,6 @@ void PhysicsState::createScene()
 	//sceneManager_->setAmbientLight(ColourValue(0.09, 0.09, 0.09));
 	sceneManager_->setAmbientLight(ColourValue(0.7, 0.7, 0.7));
 	sceneManager_->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
-
-	myGUI = new MyGUI::Gui();
-	myGUI->initialise(GAMEFRAMEWORK->renderWindow_);
-	
-	MyGUI::ButtonPtr button = myGUI->createWidget<MyGUI::Button>("Button", 10, 10, 300, 26, MyGUI::Align::Default, "Main");
-	button->setCaption("exit");
 
 	//button->eventMouseButtonClick = MyGUI::newDelegate(this, &CLASS_NAME::METHOD_NAME);
 	//button->eventMouseButtonClick = MyGUI::newDelegate(this, &PhysicsState::MakeExit);
@@ -736,7 +675,7 @@ bool PhysicsState::keyReleased(const OIS::KeyEvent &keyEventRef)
 bool PhysicsState::mouseMoved(const OIS::MouseEvent &evt)
 {
 	static double angle = 0;
-	Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, myMouse_->GetId(), UPDATE_MOUSE, &evt);
+	Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, myMouse_->GetId(), UPDATE_MOUSE, &evt);
 	myGUI->injectMouseMove(evt);
 	//myPicking_->MouseMoved(evt);
 
@@ -764,17 +703,17 @@ bool PhysicsState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID i
 
 	if(id == OIS::MB_Left)
 	{
-		Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, LEFT_MOUSE_PLUS, NULL);
+		Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, SEND_TO_ALL, LEFT_MOUSE_PLUS, NULL);
 		m_bLMouseDown = true;
 	} 
 	else if(id == OIS::MB_Right)
 	{
-		Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, RIGHT_MOUSE_PLUS, NULL);
+		Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, SEND_TO_ALL, RIGHT_MOUSE_PLUS, NULL);
 		m_bRMouseDown = true;
 	} 
 	else if(id == OIS::MB_Middle)
 	{
-		Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, MIDDLE_MOUSE_PLUS, NULL);
+		Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, SEND_TO_ALL, MIDDLE_MOUSE_PLUS, NULL);
 	}
 
 	return true;
@@ -791,17 +730,17 @@ bool PhysicsState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID 
 	myGUI->injectMouseRelease(evt, id);
 	if(id == OIS::MB_Left)
 	{
-		Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, LEFT_MOUSE_MINUS, NULL);
+		Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, SEND_TO_ALL, LEFT_MOUSE_MINUS, NULL);
 		m_bLMouseDown = false;
 	} 
 	else if(id == OIS::MB_Right)
 	{
-		Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, RIGHT_MOUSE_MINUS, NULL);
+		Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, SEND_TO_ALL, RIGHT_MOUSE_MINUS, NULL);
 		m_bRMouseDown = false;
 	}
 	else if(id == OIS::MB_Middle)
 	{
-		Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, SEND_TO_ALL, MIDDLE_MOUSE_MINUS, NULL);
+		Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, SEND_TO_ALL, MIDDLE_MOUSE_MINUS, NULL);
 	}
 
 	return true;

@@ -325,6 +325,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\source\Level.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\source\MapEditorState.cpp"
 					>
 				</File>
@@ -617,6 +621,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Level.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\MapEditorState.h"
 					>
 				</File>
@@ -708,9 +716,17 @@
 					RelativePath=".\include\Triangle.h"
 					>
 				</File>
+				<File
+					RelativePath=".\include\UserProfile.h"
+					>
+				</File>
 				<Filter
 					Name="Object Creators"
 					>
+					<File
+						RelativePath=".\include\CheckPointCreator.h"
+						>
+					</File>
 					<File
 						RelativePath=".\include\DoorCreator.h"
 						>
@@ -737,6 +753,10 @@
 					</File>
 					<File
 						RelativePath=".\include\ObjectOgreCreator.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\PickUpCreator.h"
 						>
 					</File>
 					<File

@@ -57,7 +57,7 @@ public:
 					Box2DXMLLoader::GetB2Vec2(platformNode, "point1", &platform->point1);
 					Box2DXMLLoader::GetB2Vec2(platformNode, "point2", &platform->point2);
 
-					platform->sceneManager_ = GAMEFRAMEWORK->gameObjectFactory->sceneManager;
+					platform->sceneManager_ = GAMEFRAMEWORK->sceneManager;
 
 					platform->Initialize();
 				}

@@ -8,7 +8,6 @@
 
 #include "GameFramework.h"
 #include "GameObject.h"
-#include "GameObjectFactory.h"
 #include "AppStateManager.hpp"
 
 using namespace Ogre;
@@ -130,10 +129,6 @@ bool GameFramework::InitOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 
 
 	renderWindow_->setActive(true);
-
-	gameObjectFactory = new GameObjectFactory();
-	gameObjectFactory->AddObjectCreators();
-	
 	
 	return true;
 }

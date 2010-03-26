@@ -32,11 +32,13 @@
 
 #include "GameCamera.h"
 
+#include "GameObjectFactory.h"
+
 
 
 #define GAMEFRAMEWORK GameFramework::getSingletonPtr()
 
-class GameObjectFactory;
+//class GameObjectFactory;
 
 class AppStateManager;
 
@@ -104,11 +106,9 @@ public:
 
 	Ogre::Camera*				camera_;
 
-	OgreB2DebugDraw* debugDraw_;
+	OgreB2DebugDraw*			debugDraw_;
 
-	GameObjectFactory* gameObjectFactory;
-
-	Ogre::SceneManager* sceneManager;
+	Ogre::SceneManager*			sceneManager;
 
 	GameCamera*					gameCamera_;
 
