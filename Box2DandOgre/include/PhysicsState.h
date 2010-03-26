@@ -50,6 +50,8 @@
 
 #include "Triangle.h"
 
+//#include "Level.h"
+
 
 #define DEBUG_DRAW_ON 1
 class CharacterParker;
@@ -57,10 +59,11 @@ class CharacterParker;
 class PhysicsState : public AppState, public b2ContactListener, public b2DestructionListener
 {
 
-typedef std::vector<ContactPoint*> ContactList;
-typedef std::vector<PostSolveData*> PostSolveList;
-
 public:
+
+	typedef std::vector<ContactPoint*> ContactList;
+	typedef std::vector<PostSolveData*> PostSolveList;
+
 	PhysicsState();
 	
 	DECLARE_APPSTATE_CLASS(PhysicsState)
@@ -133,7 +136,6 @@ protected:
 
 	double levelTimeLeft_;
 
-	Character* myCharacter_;
 	TraumaMeter* myMeter_;
 	float testing_;
 
@@ -165,8 +167,6 @@ private:
 	PlayerInfo*					holtInfo_;
 	
 	b2Vec2						gravity_;
-	
-	int							curvature_;
 
 	ContactList beginContactList_;
 	ContactList endContactList_;
@@ -180,6 +180,7 @@ private:
 
 	Ogre::Overlay* timeLeftOverlay_;
 	Ogre::Overlay* pickupOverlay_;
+
 	double time_;
 	int seconds_;
 	int minutes_;

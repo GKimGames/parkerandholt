@@ -396,17 +396,6 @@ bool CharacterParker::ReadXMLConfig()
 	TiXmlElement* wallJumpNode = hRoot.FirstChild( "MovementInfo" ).FirstChildElement( "WallJumpInfo" ).Element();
 	wallJumpForce_ = TinyXMLHelper::GetAttributeb2Vec2(wallJumpNode, "jumpingForce");
 
-
-	TiXmlElement* objectOgreElement = hRoot.FirstChild( "Object3" ).Element();
-	GAMEFRAMEWORK->gameObjectFactory->CreateGameObject(objectOgreElement);
-
-	TiXmlElement* objectWall = hRoot.FirstChild( "Object4" ).Element();
-	GAMEFRAMEWORK->gameObjectFactory->CreateGameObject(objectWall);
-
-	objectWall = hRoot.FirstChild( "Object6" ).Element();
-	GAMEFRAMEWORK->gameObjectFactory->CreateGameObject(objectWall);
-
-
 	TiXmlElement* loaderElement = hRoot.FirstChildElement( "Bodys" ).Element();
 	Box2DXMLLoader* loader = new Box2DXMLLoader(loaderElement,world_);
 

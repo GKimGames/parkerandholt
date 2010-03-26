@@ -11,7 +11,6 @@
 
 #include <Ogre.h>
 #include "Box2DXMLLoader.h"
-
 #include <vector>
 
 class TiXmlElement;
@@ -25,7 +24,7 @@ class GameObjectFactory
 
 public:
 
-	GameObjectFactory(){}
+	GameObjectFactory();
 
 	void LoadFile(Ogre::String fileName);
 

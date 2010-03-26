@@ -23,8 +23,8 @@ GameObjectOgreBox2D::GameObjectOgreBox2D(Ogre::String name, b2Body* body, Ogre::
 	entity_ = entity;
 	body_ = body;
 
-	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
-	debugSceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
+	debugSceneNode_ = sceneNode_;
+	//debugSceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
 	
 	debugDrawInitialized_ = false;
 	debugDrawOn_ = false;

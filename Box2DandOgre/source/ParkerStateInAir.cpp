@@ -14,7 +14,6 @@
 #include "Parker.h"
 #include "Message.h"
 #include "TinyXMLHelper.h"
-#include "XMLQuickVars.h"
 
 //=============================================================================
 //								Constructor
@@ -24,12 +23,12 @@ ParkerStateInAir::ParkerStateInAir(
 	FSMStateMachine<CharacterParker>* stateMachine):
 	ParkerState(parker,stateMachine)
 {
-	XMLQuickVars vars("..\\Myvars.xml");
+	//XMLQuickVars vars("..\\Myvars.xml");
 
-	float f = vars.Float("steve2");
-	Ogre::String s = vars.String("ben");
-	b2Vec2 v = vars.B2Vec2("vecty");
-	f = f + 5;
+	//float f = vars.Float("steve2");
+	//Ogre::String s = vars.String("ben");
+	//b2Vec2 v = vars.B2Vec2("vecty");
+	//f = f + 5;
 
 }
 

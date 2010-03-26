@@ -168,11 +168,6 @@ void MenuState::getInput()
 		return;
 	}
 
-	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_RSHIFT))
-	{
-		this->pushAppState(findByName("MapEditorState"));
-		return;
-	}
 }
 
 bool MenuState::update(double timeSinceLastFrame)

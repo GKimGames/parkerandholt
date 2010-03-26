@@ -24,6 +24,12 @@
 #include "CheckPointCreator.h"
 #include "PickUpCreator.h"
 
+GameObjectFactory::GameObjectFactory()
+{
+	sceneManager = GAMEFRAMEWORK->sceneManager;
+	AddObjectCreators();
+}
+
 void GameObjectFactory::LoadFile(Ogre::String fileName)
 {
 	TiXmlDocument configXML_(fileName.c_str());
