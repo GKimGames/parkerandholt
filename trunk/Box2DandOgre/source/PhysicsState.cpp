@@ -519,7 +519,7 @@ bool PhysicsState::keyReleased(const OIS::KeyEvent &keyEventRef)
 
 	if(keyEventRef.key == OIS::KC_Y)
 	{
-		active_->ReturnToCheckPoint(active_->GetPlayerInfo()->GetCheckPoint());
+		active_->ReturnToCheckPoint();
 	}
 
 #if DEBUG_DRAW_ON
