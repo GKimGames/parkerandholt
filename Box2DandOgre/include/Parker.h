@@ -55,7 +55,7 @@ public:
 	void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 	
 	void PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse);
-	void ReturnToCheckPoint(b2Vec2);
+	void ReturnToCheckPoint();
 	bool Initialize();
 	void SetActive(bool active);
 	PlayerInfo* GetPlayerInfo();

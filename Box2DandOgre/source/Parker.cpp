@@ -604,7 +604,7 @@ bool CharacterParker::Update(double timeSinceLastFrame)
 	traumaMeter_->Update();
 	if(traumaMeter_->GetTrauma() > .5)
 	{
-		ReturnToCheckPoint(b2Vec2(0,5));
+		ReturnToCheckPoint();
 	}
 
 	if(body_->GetLinearVelocity().Length() > 40)
@@ -673,7 +673,7 @@ void CharacterParker::EndContact(ContactPoint* contact, b2Fixture* contactFixtur
 }
 
 //returns character to the currently active checkpoint
-void CharacterParker::ReturnToCheckPoint(b2Vec2 checkPoint)
+void CharacterParker::ReturnToCheckPoint()
 {
 	traumaMeter_->ResetTrauma();
 

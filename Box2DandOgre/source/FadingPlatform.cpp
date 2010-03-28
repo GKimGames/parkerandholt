@@ -122,11 +122,11 @@ bool FadingPlatform::Update(double timeSinceLastFrame)
 
 bool FadingPlatform::HandleMessage(const KGBMessage message)
 {
-	//if(GameObjectOgreBox2D::HandleMessage(message))
+	if(GameObjectOgreBox2D::HandleMessage(message))
 	{
 		return true;
 	}
-	//else
+	else
 	{
 
 	}
