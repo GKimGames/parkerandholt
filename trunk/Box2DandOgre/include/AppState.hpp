@@ -16,6 +16,7 @@
 
 #include "Message.h"
 #include "GameCamera.h"
+#include "GameObject.h"
 #include "GameFramework.h"
 
 class AppState;
@@ -49,7 +50,13 @@ public:
 	virtual void enter(void) = 0;
 	virtual void exit(void) = 0;
 	virtual bool pause(void){return false;}
-	virtual void resume(void){};
+	
+	virtual void resume(void)
+	{
+		GameObject::objectList = gameObjectList_;
+		GameObject::objectNameList = gameObjectNameList_;
+	}
+
 	virtual bool update(double timeSinceLastFrame) = 0;
 
 protected:
@@ -61,6 +68,24 @@ protected:
 	void		popAppState(void){m_pParent->popAppState();}
 	void		shutdown(void){m_pParent->shutdown();}
 	
+	void		deleteObjects()
+	{
+		
+		GameObjectMap::iterator it;
+
+		for(it = gameObjectList_->begin(); it != gameObjectList_->end();)
+		{
+			delete (*it).second;
+			gameObjectList_->erase(it++);
+		}
+
+		delete gameObjectList_;
+		
+
+		delete gameObjectNameList_;
+	}
+
+
 	AppStateListener*		m_pParent;
 	GameCamera*				gameCamera_;
 	
@@ -69,6 +94,10 @@ protected:
 
 	Ogre::Camera*			camera_;
 	Ogre::SceneManager*		sceneManager_;
+
+
+	std::map<GameObjectId, GameObject*>* gameObjectList_;
+	std::map<Ogre::String, GameObject*>* gameObjectNameList_;
 
 };
 

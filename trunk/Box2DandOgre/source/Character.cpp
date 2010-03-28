@@ -4,6 +4,8 @@
 Character::Character(Ogre::SceneManager* sceneManager)
 {
 	sceneManager_ = sceneManager;
+
+	gameObjectType_ = GOType_Character;
 }
 
 bool Character::Initialize()

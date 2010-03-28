@@ -24,6 +24,8 @@ public:
 	Door(Ogre::String name, bool isEntrance, b2Vec2 position):
 	GameObjectOgreBox2D(name, 0, 0)
 	{
+		stateName_ = "PhysicsState";
+
 		GameObject::Initialize();
 		gameObjectType_ = GOType_Door;
 
@@ -66,11 +68,7 @@ public:
 		isOpening_ = false;
 	}
 
-	~Door()
-	{
-		sceneManager_->destroySceneNode(sceneNode_);
-		sceneManager_->destroyEntity(entity_);
-	}
+	virtual ~Door(){}
 
 	bool Update(double timeSinceLastFrame)
 	{
@@ -80,10 +78,17 @@ public:
 		}
 		else if(isOpening_ && animationBlender_->complete_)
 		{
-			if(isEntrance_ == false)
+			if(isEntrance_)
+			{
+				GAMEFRAMEWORK->appStateManager->pushAppState(stateName_);
+			}
+			else
 			{
 				GAMEFRAMEWORK->appStateManager->popStateAfterNextUpdate();
 			}
+
+			isOpening_ = false;
+			animationBlender_->Initialize("open", false);
 		}
 
 		return true;
@@ -101,6 +106,8 @@ private:
 
 	bool isOpening_;
 	bool isEntrance_;
+
+	Ogre::String stateName_;
 };
 
 #endif

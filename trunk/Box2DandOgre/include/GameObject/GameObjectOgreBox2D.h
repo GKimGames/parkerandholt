@@ -37,6 +37,15 @@ struct PostSolveData
 	}
 };
 
+
+/// Structure to represent a contact point.
+struct PreSolveData
+{
+	b2Contact* contact;
+	const b2Manifold* oldManifold;
+};
+
+
 /// The default value of friction for all Box2D objects in the game.
 const static double DEFAULT_FRICTION = 0.4;
 const static signed short STATIC_MAP_GROUP = -10;
@@ -78,6 +87,9 @@ public:
 	virtual void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture){}
 
 	virtual void PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse){}
+
+	/// You cannot create/destroy Box2D entities inside this callback.
+	virtual void PreSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2Manifold* manifold){}
 
 
 	/// Sets the scene node to be positioned the same as as the Box2D body

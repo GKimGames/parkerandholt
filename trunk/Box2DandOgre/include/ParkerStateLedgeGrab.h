@@ -47,7 +47,6 @@ protected:
 
 
 	b2Body*				ledgeSensorBody_;
-	//b2RevoluteJoint*	grabJoint_;
 	b2DistanceJoint*	grabJoint_;
 
 	b2Vec2				originalPosition_;

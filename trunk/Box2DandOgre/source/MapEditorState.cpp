@@ -185,7 +185,7 @@ void MapEditorState::exit()
 
 	sceneManager_->destroyCamera(camera_);
 
-	GameObject::objectList.clear();
+	//GameObject::objectList.clear();
 
 
 	if(sceneManager_)

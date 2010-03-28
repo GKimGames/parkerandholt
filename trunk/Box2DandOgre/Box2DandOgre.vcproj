@@ -349,6 +349,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\source\FadingPlatform.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\source\Game Objects\GameObject.cpp"
 					>
 				</File>
@@ -649,6 +653,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\FadingPlatform.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\GameConstants.h"
 					>
 				</File>
@@ -729,6 +737,10 @@
 					</File>
 					<File
 						RelativePath=".\include\DoorCreator.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\FadingPlatformCreator.h"
 						>
 					</File>
 					<File

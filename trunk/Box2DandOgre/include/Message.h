@@ -101,19 +101,18 @@ const static char* KGBMessageTypeString[MESSAGE_TYPE_COUNT] =
 	"game sensor off",
 	"stupid message",
 	"create box",
-	"update mouse",
-	"left mouse plus",
-	"left mouse minus",
-	"middle mouse plus",
-	"middle mouse minus"
-	"update checkpoint",
-	"return to checkpoint",
+	"update mouse",			// UPDATE_MOUSE
+	"left mouse plus",		// LEFT_MOUSE_PLUS
+	"left mouse minus",		// LEFT_MOUSE_MINUS
+	"middle mouse plus",	// MIDDLE_MOUSE_PLUS
+	"middle mouse minus"	// MIDDLE_MOUSE_MINUS
+	"update checkpoint",	// UPDATE_CHECKPOINT
+	"return to checkpoint", // RETURN_TO_CHECKPOINT
 	"add item",
 	"right mouse plus",
 	"right mouse minus",
 	"player died",
 	"enter static state",
-	"MESSAGE_TYPE_COUNT"
 };
 
 struct KGBMessage

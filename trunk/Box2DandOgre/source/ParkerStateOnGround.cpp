@@ -32,6 +32,7 @@ ParkerStateOnGround::ParkerStateOnGround(
 	moveLeftDown_ = false;
 	moveRightDown_ = false;
 	feetContactCount_ = 0;
+	direction_ = Ogre::Vector3(0,0,1);
 }
 
 
@@ -82,11 +83,11 @@ bool ParkerStateOnGround::Update()
 		}
 	}
 
-	static Ogre::Vector3 direction;
+	//static Ogre::Vector3 direction;
+	//Ogre::Vector3 direction;
 	
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 	
-	//if(driver_->feetSensorHitCount_ == 0)
 	if(driver_->feetSensorHit_ == false)
 	{
 		stateMachine_->ChangeState(driver_->inAirState_);
@@ -113,18 +114,18 @@ bool ParkerStateOnGround::Update()
 
 		if(driver_->body_->GetLinearVelocity().x > 0.1)
 		{
-			direction = Ogre::Vector3(0,0,1);
+			direction_ = Ogre::Vector3(0,0,1);
 		}
 		else if(driver_->body_->GetLinearVelocity().x < -0.1)
 		{
-			direction = Ogre::Vector3(0,0,-1);
+			direction_ = Ogre::Vector3(0,0,-1);
 		}
 
 		UpdateAnimation();
 
 		b2Vec2 v = driver_->body_->GetPosition();
 		driver_->sceneNode_->setPosition(Ogre::Real(v.x),Ogre::Real(v.y),0);
-		driver_->sceneNode_->setDirection(direction,Ogre::Node::TS_WORLD);
+		driver_->sceneNode_->setDirection(direction_,Ogre::Node::TS_WORLD);
 
 		if(driver_->debugDrawOn_)
 		{
@@ -190,7 +191,6 @@ bool ParkerStateOnGround::HandleMessage(const KGBMessage message)
 		{
 			if(driver_->GetId() == driver_->GetHoltId())
 			{
-				//driver_->stateMachine_->ChangeState((FSMState<CharacterParker> *)driver_->placingStatic_);
 				driver_->stateMachine_->ChangeState(driver_->placingStatic_);
 			}
 			return true;

@@ -35,6 +35,7 @@ public:
 	void start(AppState* state);
 	void changeAppState(AppState* state);
 	bool pushAppState(AppState* state);
+	bool pushAppState(Ogre::String stateName);
 	void popAppState(void);
 	void popStateAfterNextUpdate();
 	void shutdown(void);
@@ -50,6 +51,8 @@ protected:
 	Ogre::GpuCommandBufferFlush		m_BufferFlush;
 
 	bool							popState_;
+	bool							pushState_;
+	Ogre::String					pushToState_;
 };
 
 

@@ -15,6 +15,11 @@ void MenuState::enter()
 {
 	GameFramework::getSingletonPtr()->log_->logMessage("Entering MenuState...");
 	
+	gameObjectList_ = new GameObjectMap();
+	gameObjectNameList_ = new GameObjectNameMap();
+	GameObject::objectList = gameObjectList_;
+	GameObject::objectNameList = gameObjectNameList_;
+
 	sceneManager_ = GAMEFRAMEWORK->root_->createSceneManager(ST_GENERIC, "MenuSceneManager");
 	GAMEFRAMEWORK->sceneManager = sceneManager_;
 
@@ -51,6 +56,8 @@ bool MenuState::pause()
 
 void MenuState::resume()
 {
+	AppState::resume();
+
 	GameFramework::getSingletonPtr()->log_->logMessage("Resuming MenuState...");
 	GameFramework::getSingletonPtr()->viewport_->setCamera(m_pCamera);
 
@@ -102,6 +109,8 @@ void MenuState::createScene()
 void MenuState::exit()
 {
 	GAMEFRAMEWORK->log_->logMessage("Leaving MenuState...");
+
+	this->deleteObjects();
 
 	sceneManager_->destroyCamera(m_pCamera);
 	if(sceneManager_)
@@ -164,7 +173,7 @@ void MenuState::getInput()
 {
 	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_RETURN))
 	{
-		this->pushAppState(findByName("PhysicsState"));
+		this->pushAppState(findByName("PhysicsState2"));
 		return;
 	}
 

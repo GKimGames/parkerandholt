@@ -21,6 +21,12 @@ GameObjectOgreBox2D::GameObjectOgreBox2D(Ogre::String name, b2Body* body, Ogre::
 	world_ = GAMEFRAMEWORK->GetWorld();
 	sceneManager_ = GAMEFRAMEWORK->sceneManager;
 	entity_ = entity;
+
+	if(entity_)
+	{
+		sceneNode_->attachObject(entity_);
+	}
+
 	body_ = body;
 
 	debugSceneNode_ = sceneNode_;
@@ -84,7 +90,7 @@ bool GameObjectOgreBox2D::Update(double timeSinceLastFrame)
 {
 	if(GameObjectOgre::Update(timeSinceLastFrame))
 	{
-	
+
 		if(debugDrawOn_)
 		{
 			UpdateDebugDraw();

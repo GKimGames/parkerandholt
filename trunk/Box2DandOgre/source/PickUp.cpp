@@ -147,7 +147,6 @@ void PickUp::PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture*
 {
 	if(breakable_)
 	{
-	//
 		if(contact->GetFixtureA()->GetBody()->GetUserData() != NULL)
 		{
 			GameObject* object = (GameObject*) contact->GetFixtureA()->GetBody()->GetUserData();
@@ -183,6 +182,5 @@ void PickUp::PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture*
 				}
 			}
 		}
-	//
 	}
 }

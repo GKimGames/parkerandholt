@@ -46,6 +46,7 @@ void KGBOgreApplication::Start()
 
 		MenuState::create(appStateManager_, "MenuState");
 		PhysicsState::create(appStateManager_, "PhysicsState");
+		PhysicsState::create(appStateManager_, "PhysicsState2", "..\\LevelTwoTwo.xml");
 
 		GAMEFRAMEWORK->appStateManager = appStateManager_;
 

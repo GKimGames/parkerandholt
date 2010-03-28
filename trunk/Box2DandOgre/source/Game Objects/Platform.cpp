@@ -194,7 +194,7 @@ bool Platform::Initialize(Ogre::String materialName)
 
 Platform::~Platform()
 {
-	delete plane;
+
 }
 
 

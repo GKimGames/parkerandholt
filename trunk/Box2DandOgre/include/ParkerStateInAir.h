@@ -49,6 +49,8 @@ protected:
 	void Jump();
 	void UpdateAnimation();
 
+	Ogre::Vector3 direction_;
+
 	double	jumpTimer_;
 	bool	wallJumpedLeft_;
 	bool	justWallJumped_;

@@ -42,7 +42,7 @@ CheckPoint::CheckPoint(Ogre::SceneManager *sceneManager, b2Vec2 center, float wi
 
 	sceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
 	sceneNode_->attachObject(entity_);
-	entity_->getParentSceneNode()->setScale(width, height, 0.1);
+	sceneNode_->setScale(width, height, width);
 	entity_->setMaterial(Ogre::MaterialManager::getSingletonPtr()->getByName("CheckPoint/CheckPoint"));
 	
 	Initialize();
@@ -66,10 +66,10 @@ void CheckPoint::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, 
 		if(collidedFixture->IsSensor() == true)
 		{
 			GameObjectOgreBox2D* go = (GameObjectOgreBox2D*)collidedFixture->GetBody()->GetUserData();
-			if(go->GetGameObjectType() == GameObjectType::GOType_Character_Parker)
+			if(go->GetGameObjectType() == GOType_Character_Parker || go->GetGameObjectType() == GOType_Character)
 			{
 				CharacterParker* temp = (CharacterParker*)go;
-				Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, temp->GetPlayerInfo()->GetId(), UPDATE_CHECKPOINT, position_);
+				Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, temp->GetPlayerInfo()->GetId(), UPDATE_CHECKPOINT, position_);
 				//triggered_ = true;
 			}
 		}
