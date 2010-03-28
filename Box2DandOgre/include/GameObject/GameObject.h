@@ -39,6 +39,7 @@ enum GameObjectType
 	GOType_ElevatorBeginTypes,
 	GOType_MovingPlatform,
 	GOType_ElevatorEndTypes,
+	GOType_FadingPlatform,
 	GOType_Mouse,
 	GOType_CheckPoint,
 	GOType_Door
@@ -46,8 +47,6 @@ enum GameObjectType
 
 class GameObjectDef
 {
-
-
 public:
 	GameObjectType			gameObjectType_;	//< \brief GameObjectType of the object.
 	Ogre::String			objectName_;		//< \brief A name for the object.
@@ -128,24 +127,24 @@ public:
 				PUBLIC static members
 =============================================================================*/
 	/// List of all Objects created. It uses their objectId.
-	static GameObjectMap objectList;
+	static GameObjectMap* objectList;
 
 	/// List of all Objects created using their names as a key.
-	static GameObjectNameMap objectNameList;
+	static GameObjectNameMap* objectNameList;
 
 	/// Update all the Objects.
 	static void UpdateObjectList(double timeSinceLastFrame)
 	{
 		GameObjectMap::iterator it;
 
-		for(it = objectList.begin(); it != objectList.end();)
+		for(it = objectList->begin(); it != objectList->end();)
 		{
 			if(!(*it).second->Update(timeSinceLastFrame))
 			{
 
-				objectNameList.erase(objectNameList.find((*it).second->objectName_));
+				objectNameList->erase(objectNameList->find((*it).second->objectName_));
 				delete (*it).second;
-				objectList.erase(it++);
+				objectList->erase(it++);
 			}
 			else
 			{
@@ -158,9 +157,9 @@ public:
 	static GameObject* GetObjectById(GameObjectId objectId)
 	{
 		// Find the Object
-		GameObjectMap::const_iterator object = objectList.find(objectId);
+		GameObjectMap::const_iterator object = objectList->find(objectId);
 
-		if(object == objectList.end())
+		if(object == objectList->end())
 		{
 			return 0;
 		}
@@ -168,7 +167,7 @@ public:
 		return object->second;
 	}
 
-	static GameObjectMap GetobjectList()
+	static GameObjectMap* GetobjectList()
 	{ 
 		return objectList;
 	}
@@ -177,9 +176,9 @@ public:
 	static GameObject* GetObjectById(Ogre::String objectName)
 	{
 		// Find the Object
-		GameObjectNameMap::const_iterator object = objectNameList.find(objectName);
+		GameObjectNameMap::const_iterator object = objectNameList->find(objectName);
 
-		if(object == objectNameList.end())
+		if(object == objectNameList->end())
 		{
 			return 0;
 		}

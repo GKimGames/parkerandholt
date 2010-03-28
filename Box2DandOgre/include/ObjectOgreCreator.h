@@ -101,7 +101,7 @@ public:
 			entityName += TinyXMLHelper::GetAttribute(element, "name", Ogre::StringConverter::toString(meshCounter));
 
 			Ogre::Entity* meshEntity = GAMEFRAMEWORK->sceneManager->createEntity(entityName,meshName);
-
+			gameObjectOgre->entity_ = meshEntity;
 			// Get the position for the sceneNode of the Game Ogre Object
 			Ogre::Vector3 sceneNodePosition = TinyXMLHelper::GetAttributeVector3(element, "position");
 			Ogre::SceneNode* meshSceneNode = gameObjectOgre->sceneNode_->createChildSceneNode();

@@ -163,7 +163,7 @@ public:
 				fd.restitution = 0.1;
 				fd.filter.groupIndex = STATIC_MAP_GROUP;
 
-				for(int i = 0; i < myVecs.size() - 1;i++)
+				for(unsigned int i = 0; i < myVecs.size() - 1;i++)
 				{
 					polyDef.SetAsEdge( b2Vec2(myVecs.at(i).x   * sceneNodeScale.x, myVecs.at(i).y   * sceneNodeScale.y),
 									   b2Vec2(myVecs.at(i+1).x * sceneNodeScale.x, myVecs.at(i+1).y * sceneNodeScale.y)
@@ -286,6 +286,31 @@ public:
 		planeNode->setPosition(Ogre::Real(point1.x + point2.x) / 2.0, Ogre::Real(point1.y + point2.y) / 2.0, 0.0);
 		Ogre::Vector3 offset = TinyXMLHelper::GetAttributeVector3(element, "offset");
 		planeNode->translate(offset);
+
+		if(TinyXMLHelper::GetAttributeBool(element, "box2D", true))
+		{
+			b2World* world = GAMEFRAMEWORK->world_;
+			b2Body* body;
+
+			b2BodyDef bd;
+			body = world->CreateBody(&bd);
+
+			b2FixtureDef fd;
+			b2PolygonShape polyDef;
+			fd.filter.groupIndex = STATIC_MAP_GROUP;
+
+			fd.friction = DEFAULT_FRICTION;
+			fd.restitution = 0.1;
+			fd.filter.groupIndex = STATIC_MAP_GROUP;
+
+
+			polyDef.SetAsEdge(point1, point2);
+
+			fd.shape = &polyDef;
+
+			body->CreateFixture(&fd);
+		}
+		
 
 	}
 

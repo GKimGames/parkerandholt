@@ -13,8 +13,8 @@ GameObjectId GameObject::staticObjectId_ = 1;
 GameObjectId GameObject::parkerId_ = -1;
 GameObjectId GameObject::holtId_ = -1;
 
-GameObjectMap GameObject::objectList;
-GameObjectNameMap GameObject::objectNameList;
+GameObjectMap* GameObject::objectList = new GameObjectMap();
+GameObjectNameMap* GameObject::objectNameList = new GameObjectNameMap();
 
 //=============================================================================
 //							GameObject::Constructor
@@ -33,7 +33,7 @@ GameObject::GameObject(Ogre::String str)
 	staticObjectId_++;
 	objectId_ = staticObjectId_;
 	objectName_ = str;
-	objectList.insert(std::make_pair(objectId_,this));
+	objectList->insert(std::make_pair(objectId_,this));
 
 	// This has to be removed - just for testing
 	gameObjectType_ = GOTYPE_GameObject;
@@ -48,7 +48,7 @@ GameObject::GameObject(Ogre::String str)
 /// The destructor removes it from the objectList and objectNameList
 GameObject::~GameObject()
 {
-	//objectList.erase(objectList.find(objectId_));
+	//objectList->erase(objectList.find(objectId_));
 }
 
 //=============================================================================
@@ -76,7 +76,7 @@ bool GameObject::Initialize()
 	{
 		std::pair<std::map<Ogre::String, GameObject*>::iterator,bool> ret;
 
-		ret = objectNameList.insert(std::make_pair(objectName_,this));
+		ret = objectNameList->insert(std::make_pair(objectName_,this));
 		
 		if(ret.second == false || objectName_.empty())
 		{
@@ -92,7 +92,7 @@ bool GameObject::Initialize()
 			DEBUG_LOG(s);
 		}
 		
-		objectNameList.insert(std::make_pair(objectName_,this));
+		objectNameList->insert(std::make_pair(objectName_,this));
 
 		initialized_ = true;
 	}

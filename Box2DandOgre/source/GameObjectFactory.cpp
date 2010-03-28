@@ -23,6 +23,7 @@
 #include "MovingPlatformCreator.h"
 #include "CheckPointCreator.h"
 #include "PickUpCreator.h"
+#include "FadingPlatformCreator.h"
 
 GameObjectFactory::GameObjectFactory()
 {
@@ -140,6 +141,7 @@ void GameObjectFactory::AddObjectCreators()
 	AddCreator("Door",				new DoorCreator(this));
 	AddCreator("CheckPoint",		new CheckPointCreator(this));
 	AddCreator("PickUp",			new PickUpCreator(this));
+	AddCreator("FadingPlatform",	new FadingPlatformCreator(this));
 }
 
 

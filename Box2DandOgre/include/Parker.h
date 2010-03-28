@@ -36,8 +36,8 @@ class CharacterParker : public Character, public b2RayCastCallback
 
 public:
 
-	CharacterParker(Ogre::SceneManager* sceneManager, MousePicking* mousePicking, PlayerInfo* info, Ogre::Camera* camera);
-	CharacterParker(Ogre::SceneManager* sceneManager, MousePicking* mousePicking, PlayerInfo* info, Ogre::Camera* camera, bool holtActive);
+	CharacterParker(Ogre::SceneManager* sceneManager, MousePicking* mousePicking, PlayerInfo* info);
+	CharacterParker(Ogre::SceneManager* sceneManager, MousePicking* mousePicking, PlayerInfo* info, bool holtActive);
 
 	~CharacterParker(){}
 
@@ -59,6 +59,8 @@ public:
 	bool Initialize();
 	void SetActive(bool active);
 	PlayerInfo* GetPlayerInfo();
+
+	bool IsFootSensor(b2Fixture* fixture);
 
 protected:
 

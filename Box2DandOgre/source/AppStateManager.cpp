@@ -26,6 +26,9 @@ AppStateManager::AppStateManager()
 {
 	m_bShutdown = false;
 	popState_ = false;
+	pushState_ = false;
+	pushToState_ = "";
+
 }
 
 
@@ -166,6 +169,12 @@ void AppStateManager::start(AppState* state)
 				popAppState();
 			}
 
+			if(pushState_)
+			{
+				pushAppState( findByName(pushToState_) );
+				pushState_ = false;
+			}
+
 			/*
 			GAMEFRAMEWORK->SetTimeSinceLastFrame(timeSinceLastFrame);
 			GAMEFRAMEWORK->keyboard_->capture();
@@ -229,6 +238,17 @@ bool AppStateManager::pushAppState(AppState* state)
 }
 
 //=============================================================================
+//							pushAppState
+//
+bool AppStateManager::pushAppState(Ogre::String stateName)
+{
+	pushState_ = true;
+	pushToState_ = stateName;
+
+	return true;
+}
+
+//=============================================================================
 //						popStateAfterNextUpdate
 //
 void AppStateManager::popStateAfterNextUpdate()
@@ -263,7 +283,7 @@ void AppStateManager::popAppState(void)
 //
 void AppStateManager::shutdown()
 {
-	m_bShutdown=true;
+	m_bShutdown = true;
 }
 
 //=============================================================================

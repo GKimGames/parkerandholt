@@ -115,9 +115,9 @@ void KGBMessageDispatcher::DischargeToAll(const KGBMessage pMsg)
 	
 	GameObjectMap::iterator it;
 
-	GameObjectMap objectList = GameObject::objectList;
+	GameObjectMap* objectList = GameObject::objectList;
 
-	for (it = objectList.begin(); it != objectList.end(); it++)
+	for (it = objectList->begin(); it != objectList->end(); it++)
 	{
 		(*it).second->HandleMessage(pMsg);	
 	}

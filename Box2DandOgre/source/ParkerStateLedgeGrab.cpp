@@ -245,7 +245,7 @@ void ParkerStateLedgeGrab::Climb()
 		climbing_ = false;
 
 		driver_->animationBlender_->Blend("idle",AnimationBlender::BlendWhileAnimating, 0.1);
-		stateMachine_->ChangeState(driver_->onGroundState_);
+		stateMachine_->ChangeState(driver_->inAirState_);
 	}
 
 

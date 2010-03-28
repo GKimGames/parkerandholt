@@ -4,7 +4,7 @@
 
 		Author: Matt King
 
-==================== =========================================================*/
+==============================================================================*/
 
 #include "Parker.h"
 #include "GameFramework.h"
@@ -27,7 +27,7 @@
 //=============================================================================
 //								Constructor
 //
-CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager, MousePicking* mousePicking, PlayerInfo* info, Ogre::Camera* camera)
+CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager, MousePicking* mousePicking, PlayerInfo* info)
 :Character(sceneManager)
 {
 	mousePicking_ = mousePicking;
@@ -51,8 +51,6 @@ CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager, MousePicking*
 	objectName_ = "Parker";
 	playerInfo_ = info;
 
-	camera_ = camera;
-	//gameCamera_ = new GameCamera(camera);
 	active_ = true;
 }
 
@@ -60,7 +58,7 @@ CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager, MousePicking*
 //=============================================================================
 //								Constructor
 //
-CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager, MousePicking* mousePicking, PlayerInfo* info, Ogre::Camera* camera, bool holtActive)
+CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager, MousePicking* mousePicking, PlayerInfo* info, bool holtActive)
 :Character(sceneManager)
 {
 	mousePicking_ = mousePicking;
@@ -84,8 +82,6 @@ CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager, MousePicking*
 	objectName_ = "Holt";
 	playerInfo_ = info;
 
-	camera_ = camera;
-	gameCamera_ = new GameCamera(camera);
 	active_ = holtActive;
 }
 
@@ -288,54 +284,7 @@ void CharacterParker::CreateGraphics()
 	{
 		entity_->setMaterial(Ogre::MaterialManager::getSingletonPtr()->getByName("CheckPoint/CheckPoint"));
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
-
-
-
-
 
 //=============================================================================
 //								ReadXMLConfig
@@ -503,10 +452,11 @@ bool CharacterParker::HandleMessage(const KGBMessage message)
 		if(message.messageType == KGBMessageType::PLAYER_DIED)
 		{
 			body_->SetActive(true);
-			b2Vec2 temp(-1, 1.3);
+			b2Vec2 temp(playerInfo_->GetCheckPoint());
 			SetBodyPosition(temp);
+
 			CameraStateWatchDef def;
-			def.initialPosition = Ogre::Vector3(0,6,18);//camera_->getPosition();
+			def.initialPosition = Ogre::Vector3(0, 6, 18);
 			def.targetObject = this;
 			GAMEFRAMEWORK->gameCamera_->InitializeDef(&def);			
 		}
@@ -731,16 +681,15 @@ void CharacterParker::ReturnToCheckPoint(b2Vec2 checkPoint)
 	body_->SetActive(false);
 
 	CameraStateGoToPointDef def;
-	//def.target = Ogre::Vector3(10,0,18);
-	def.target = Ogre::Vector3(playerInfo_->GetCheckPoint().x, playerInfo_->GetCheckPoint().y, 18);
-	def.toleranceDistance = 50.0;
+	def.target = Ogre::Vector3(playerInfo_->GetCheckPoint().x, playerInfo_->GetCheckPoint().y + 6, 18);
+	def.toleranceDistance = 0.1;
 	def.factor = 5.0;
-	def.initialPosition = camera_->getPosition();
+	def.initialPosition = GAMEFRAMEWORK->camera_->getPosition();
 	def.messageType = KGBMessageType::PLAYER_DIED;
 	GAMEFRAMEWORK->gameCamera_->InitializeDef(&def);
 
-	
 	placingPlatform_->GetGravityVector()->RemovePlayer();
+
 }
 
 
@@ -784,7 +733,19 @@ void CharacterParker::PostSolve(b2Contact* contact, b2Fixture* contactFixture, b
 	stateMachine_->PostSolve(contact,contactFixture, collidedFixture, impulse);
 
 }
+//=============================================================================
+//				IsFootSensor
+//
+bool CharacterParker::IsFootSensor(b2Fixture* fixture)
+{
 
+	if(fixture == feetSensor_)
+	{
+		return true;
+	}
+
+	return false;
+}
 
 void CharacterParker::SetActive(bool active)
 {

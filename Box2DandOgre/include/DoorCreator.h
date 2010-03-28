@@ -31,6 +31,8 @@ public:
 			b2Vec2 position = TinyXMLHelper::GetAttributeb2Vec2(element, "position");
 			door = new Door("SomeDoor", isEntrance, position);
 
+			door->stateName_ = TinyXMLHelper::GetAttribute(element, "stateName");
+
 		}
 		return door;
 

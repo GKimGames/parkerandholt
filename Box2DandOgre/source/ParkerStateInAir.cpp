@@ -23,13 +23,8 @@ ParkerStateInAir::ParkerStateInAir(
 	FSMStateMachine<CharacterParker>* stateMachine):
 	ParkerState(parker,stateMachine)
 {
-	//XMLQuickVars vars("..\\Myvars.xml");
 
-	//float f = vars.Float("steve2");
-	//Ogre::String s = vars.String("ben");
-	//b2Vec2 v = vars.B2Vec2("vecty");
-	//f = f + 5;
-
+	direction_ = Ogre::Vector3(0,0,1);
 }
 
 
@@ -40,10 +35,12 @@ ParkerStateInAir::ParkerStateInAir(
 void ParkerStateInAir::Enter()
 {
 	driver_->feetSensorHitCount_ = 0;
+
 	if(driver_->onGroundState_->isJumping_)
 	{
 		jumpTimer_ = 0.0;
 	}
+
 	if(driver_->stateMachine_->GetPreviousState() == (ParkerState*) driver_->ledgeGrabState_)
 	{
 		driver_->animationBlender_->Blend("jump_idle", AnimationBlender::BlendThenAnimate, 0.3, true);
@@ -71,7 +68,6 @@ void ParkerStateInAir::Enter()
 //
 bool ParkerStateInAir::Update()
 {
-	static Ogre::Vector3 direction;
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 	
 	
@@ -107,14 +103,14 @@ bool ParkerStateInAir::Update()
 		// Make the sceneNode face the direction the body is moving
 		if(driver_->body_->GetLinearVelocity().x > 0.3)
 		{
-			direction = Ogre::Vector3(0,0,1);
+			direction_ = Ogre::Vector3(0,0,1);
 		}
 		else if(driver_->body_->GetLinearVelocity().x < -0.3)
 		{
-			direction = Ogre::Vector3(0,0,-1);
+			direction_ = Ogre::Vector3(0,0,-1);
 		}
 
-		driver_->sceneNode_->setDirection(direction,Ogre::Node::TS_WORLD);
+		driver_->sceneNode_->setDirection(direction_,Ogre::Node::TS_WORLD);
 		//static bool mySwitch = true;
 		if(justWallJumped_)
 		{

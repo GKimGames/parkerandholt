@@ -61,12 +61,18 @@ class PhysicsState : public AppState, public b2ContactListener, public b2Destruc
 
 public:
 
-	typedef std::vector<ContactPoint*> ContactList;
+	typedef std::vector<ContactPoint*>	ContactList;
 	typedef std::vector<PostSolveData*> PostSolveList;
+	typedef std::vector<PreSolveData*>	PreSolveList;
 
-	PhysicsState();
+	PhysicsState(Ogre::String levelName);
 	
-	DECLARE_APPSTATE_CLASS(PhysicsState)
+	static void create(AppStateListener* parent, const Ogre::String name, Ogre::String levelName = "..\\LevelTwo.xml")	
+	{																		
+		PhysicsState* myAppState = new PhysicsState(levelName);											
+		myAppState->m_pParent = parent;										
+		parent->manageAppState(name, myAppState);							
+	}
 
 	void enter();
 	void createScene();
@@ -85,14 +91,15 @@ public:
 	bool mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id); 
 	bool mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
 
-
 	bool update(double timeSinceLastFrame);
 
 	void setBufferedMode();
 	void setUnbufferedMode();
 
+	void PreSolve(b2Contact* contact, const b2Manifold* oldManifold);
 	void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse);
 	void ProcessPostSolveData();
+	void ProcessPreSolveData();
 
 	/// Called when two fixtures begin to touch.
 	void BeginContact(b2Contact* contact);
@@ -121,6 +128,7 @@ public:
 
 protected:
 
+	Ogre::String levelName_;
 	void UpdateOverlay();
 	/// My GUI Stuff
 	MyGUI::Gui* myGUI;
@@ -168,9 +176,11 @@ private:
 	
 	b2Vec2						gravity_;
 
-	ContactList beginContactList_;
-	ContactList endContactList_;
-	PostSolveList postSolveList_;
+	ContactList		beginContactList_;
+	ContactList		endContactList_;
+	PostSolveList	postSolveList_;
+
+	PreSolveList	preSolveList_;
 
 	//ContactPoint m_points[k_maxContactPoints];
 	int32 m_pointCount;
