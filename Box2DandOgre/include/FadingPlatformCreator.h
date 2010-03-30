@@ -52,6 +52,7 @@ public:
 			fadingPlatform->fadeReappearTime_ = TinyXMLHelper::GetAttributeReal(platformElement,"reappearTime", 1.0);
 			fadingPlatform->fadeSpeed_ = TinyXMLHelper::GetAttributeReal(platformElement,"fadeSpeed", 0.4);
 			fadingPlatform->fadeTime_ = TinyXMLHelper::GetAttributeReal(platformElement,"fadeTime", 1.4);
+			fadingPlatform->emitterSize_ = TinyXMLHelper::GetAttributeVector3(platformElement,"emitterSize");
 
 			fadingPlatform->Initialize();
 			
