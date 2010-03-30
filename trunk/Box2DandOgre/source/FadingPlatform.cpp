@@ -20,6 +20,13 @@ GameObjectOgreBox2D(name, body, entity)
 	fadeReappearTime_ = 1.5 + fadeTime_;
 
 	gameObjectType_ = GOType_FadingPlatform;
+
+	GameObject::Initialize();
+
+	particleSystem_ = sceneManager_->createParticleSystem(objectName_ + "psystem", "PaH/fadingPlatform");
+	//particleSystem_->setVisible(false);
+	particleSystem_->getEmitter(0)->setEnabled(false);
+	sceneNode_->attachObject(particleSystem_);
 }
 
 FadingPlatform::~FadingPlatform()
@@ -35,7 +42,7 @@ bool FadingPlatform::Initialize()
 	}
 
 	fadeReappearTime_ = fadeReappearTime_ + fadeTime_;
-
+	
 	return GameObjectOgreBox2D::Initialize();
 }
 
@@ -77,6 +84,14 @@ bool FadingPlatform::Update(double timeSinceLastFrame)
 								isFading_ = true;
 								fadeTimer_ = 0.0;
 								body_->SetLinearVelocity(b2Vec2(0, fadeSpeed_));
+
+								Ogre::ParticleEmitter* emitter = particleSystem_->getEmitter(0);
+		
+								emitter->setParameter("height", Ogre::StringConverter::toString(emitterSize_.y));
+								emitter->setParameter("width", Ogre::StringConverter::toString(emitterSize_.x));
+								emitter->setParameter("depth", Ogre::StringConverter::toString(emitterSize_.z));
+
+								particleSystem_->getEmitter(0)->setEnabled(true);
 							}
 						}
 					}
@@ -99,6 +114,8 @@ bool FadingPlatform::Update(double timeSinceLastFrame)
 			{
 				body_->SetLinearVelocity(b2Vec2(0,0));
 				body_->SetActive(false);
+				//particleSystem_->setVisible(false);
+				particleSystem_->getEmitter(0)->setEnabled(false);
 
 				if(fadeTimer_ >= fadeReappearTime_)
 				{
@@ -106,7 +123,7 @@ bool FadingPlatform::Update(double timeSinceLastFrame)
 					SetBodyPosition(initialPosition_);
 					SetTransparency(0.0);
 					isFading_ = false;
-					fadeTimer_ = 0.0;
+					fadeTimer_ = 0.0;	
 				}
 			}
 

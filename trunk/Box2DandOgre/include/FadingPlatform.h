@@ -39,6 +39,8 @@ protected:
 
 	b2Vec2	initialPosition_;
 
+	Ogre::Vector3 emitterSize_;
+
 
 };
 
