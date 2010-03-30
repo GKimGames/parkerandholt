@@ -126,7 +126,6 @@ protected:
 	b2Fixture*			wallJumpSensor_;
 
 	int					shinSensorHitCount_;
-	int					thighSensorHitCount_;
 	int					torsoSensorHitCount_;
 
 	double				mass_;

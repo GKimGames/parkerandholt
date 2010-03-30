@@ -70,7 +70,7 @@ bool HoltStatePlacingStatic::Update()
 
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 	
-	if(driver_->feetSensorHitCount_ == 0)
+	if(driver_->feetSensorHit_ == false)
 	{
 		stateMachine_->ChangeState(driver_->inAirState_);
 	}

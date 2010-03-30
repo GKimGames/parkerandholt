@@ -34,8 +34,6 @@ ParkerStateInAir::ParkerStateInAir(
 //
 void ParkerStateInAir::Enter()
 {
-	driver_->feetSensorHitCount_ = 0;
-
 	if(driver_->onGroundState_->isJumping_)
 	{
 		jumpTimer_ = 0.0;
