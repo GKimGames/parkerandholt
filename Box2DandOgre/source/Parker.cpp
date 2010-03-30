@@ -123,10 +123,6 @@ void CharacterParker::InitVariables()
 
 	// Set up the sensors hit counts
 	canJump_ = 0;
-	shinSensorHitCount_ = 0;
-	thighSensorHitCount_ = 0;
-	torsoSensorHitCount_ = 0;
-	feetSensorHitCount_ = 0;
 
 	timeBetweenJump_ = .08;
 
@@ -647,28 +643,12 @@ float32 CharacterParker::ReportFixture(b2Fixture* fixture, const b2Vec2& point,
 /// Called when two fixtures begin to touch.
 void CharacterParker::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
-	if(collidedFixture->IsSensor() == false)
-	{
-		if(contactFixture == feetSensor_ && collidedFixture != feetCircle_)
-		{
-			feetSensorHitCount_++;
-		}
-	}
-
 	stateMachine_->BeginContact(contact,contactFixture, collidedFixture);
 }
 
 /// Called when two fixtures cease to touch.
 void CharacterParker::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
-	if(collidedFixture->IsSensor() == false)
-	{
-		if(contactFixture == feetSensor_ && collidedFixture != feetCircle_)
-		{
-			feetSensorHitCount_--;
-		}
-	}
-
 	stateMachine_->EndContact(contact,contactFixture, collidedFixture);
 }
 

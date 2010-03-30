@@ -90,13 +90,6 @@ private:
 	bool				feetSensorHit_;
 	b2Fixture*			feetCircle_;
 
-	b2Vec2				bodyVec1;
-	b2Vec2				bodyVec2;
-	b2Vec2				feetVec1;
-	b2Vec2				feetVec2;
-
-	int					rayCastId;
-
 	// These sensors are used to tell where things are in front of Parker
 	// Such as if something is only shin high, thigh high, or up to the torso.
 	// Used to check if something above the character is within a grabbable reach.
@@ -110,10 +103,6 @@ private:
 	b2Fixture*			torsoSensorLeft_;
 	bool				torsoLeftHit_;
 
-	int					shinSensorHitCount_;
-	int					thighSensorHitCount_;
-	int					torsoSensorHitCount_;
-	int					feetSensorHitCount_;
 	MousePicking*		mousePicking_;
 
 	double boundingBoxHeight_;

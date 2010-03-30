@@ -244,9 +244,7 @@ void Character::InitVariables()
 
 	// Set up the sensors hit counts
 	canJump_ = 0;
-	shinSensorHitCount_ = 0;
-	thighSensorHitCount_ = 0;
-	torsoSensorHitCount_ = 0;
+
 }
 
 Character::~Character()
@@ -456,41 +454,10 @@ void Character::UpdateAnimation(double timeSinceLastFrame)
 /// Called when two fixtures begin to touch.
 void Character::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
-	if(contactFixture == feetSensor_)
-	{
-		canJump_++;
-	}
-	else if(contactFixture == torsoSensor_)
-	{
-		torsoSensorHitCount_++;
-	}
-	else if(contactFixture == shinSensor_)
-	{
-		shinSensorHitCount_++;
-	}
-	else if(contactFixture == thighSensor_)
-	{
-		thighSensorHitCount_++;
-	}
 }
 
 /// Called when two fixtures cease to touch.
 void Character::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
-	if(contactFixture == feetSensor_)
-	{
-		canJump_--;
-	}
-	else if(contactFixture == torsoSensor_)
-	{
-		torsoSensorHitCount_--;
-	}
-	else if(contactFixture == shinSensor_)
-	{
-		shinSensorHitCount_--;
-	}
-	else if(contactFixture == thighSensor_)
-	{
-		thighSensorHitCount_--;
-	}
+
 }

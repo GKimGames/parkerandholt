@@ -75,7 +75,7 @@ bool HoltStatePlacingGravityVector::Update()
 
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 	
-	if(driver_->feetSensorHitCount_ == 0)
+	if(driver_->feetSensorHit_ == false)
 	{
 		stateMachine_->ChangeState(driver_->inAirState_);
 	}
@@ -222,7 +222,6 @@ void HoltStatePlacingGravityVector::BeginContact(ContactPoint* contact, b2Fixtur
 	{
 		if(contactFixture == driver_->feetSensor_)
 		{
-			driver_->feetSensorHitCount_;
 			feetContactCount_++;
 
 			if(collidedFixture->GetBody()->GetUserData())
