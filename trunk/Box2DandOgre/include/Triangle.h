@@ -20,7 +20,7 @@ public:
 	// Center is where the box is centered at. 
 	Triangle(Ogre::SceneManager* sceneManager, b2Vec2 center, double size);
 	Triangle(Ogre::SceneManager* sceneManager, b2Vec2 center, double size, float TTL);
-	~Triangle()
+	virtual ~Triangle()
 	{
 
 	}
@@ -52,6 +52,7 @@ public:
 	bool Update(double timeSinceLastFrame);
 	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 
+	void SetInactive();
 	
 
 protected:
@@ -68,6 +69,7 @@ protected:
 	bool	temporary_;
 	float	TTL_;
 	float	timeAlive_;
+	Ogre::Vector3 emitterSize_;
 };
 
 

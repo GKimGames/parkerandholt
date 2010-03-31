@@ -123,7 +123,7 @@ void PickUp::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fi
 		if(collidedFixture->IsSensor() == true)
 		{
 			GameObjectOgreBox2D* go = (GameObjectOgreBox2D*)collidedFixture->GetBody()->GetUserData();
-			if(go->GetGameObjectType() == GameObjectType::GOType_Character_Parker)
+			if(go->GetGameObjectType() == GameObjectType::GOType_Character_Parker || go->GetGameObjectType() == GameObjectType::GOType_Character_Holt)
 			{
 				CharacterParker* temp = (CharacterParker*)go;
 				Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, temp->GetPlayerInfo()->GetId(), ADD_ITEM, 1);

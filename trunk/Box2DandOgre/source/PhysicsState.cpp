@@ -13,6 +13,7 @@
 #include "CameraStateGoToPoint.h"
 #include "Teleporter.h"
 #include "Parker.h"
+#include "Holt.h"
 
 #include "FadingPlatform.h"
 
@@ -252,7 +253,7 @@ void PhysicsState::createPhysics()
 
 	myMouse_ = new MousePicking(sceneManager_, camera_);
 
-	parker_  = new CharacterParker(sceneManager_, myMouse_, parkerInfo_);
+	parker_  = new CharacterParker(sceneManager_, myMouse_);
 	parker_->Initialize();
 	parker_->InitializeDebugDraw();
 	parker_->SetBodyPosition(b2Vec2(0, 1.3));
@@ -260,7 +261,7 @@ void PhysicsState::createPhysics()
 
 	active_ = parker_;
 
-	holt_ = new CharacterParker(sceneManager_, myMouse_, holtInfo_, false);
+	holt_ = new CharacterHolt(sceneManager_, myMouse_);
 	holt_->Initialize();
 	holt_->GetBody()->SetTransform(b2Vec2(4, 1), 0);
 
@@ -292,7 +293,7 @@ void PhysicsState::createPhysics()
 	myKeyHandler_->AddKey(OIS::KC_W, CHARACTER_JUMP_PLUS, CHARACTER_JUMP_MINUS);
 	myKeyHandler_->AddKey(OIS::KC_S, CHARACTER_MOVE_DOWN_PLUS, CHARACTER_MOVE_DOWN_MINUS);
 	myKeyHandler_->AddKey(OIS::KC_1, CHARACTER_ENTER_PLATFORMSTATE);
-	myKeyHandler_->AddKey(OIS::KC_2, CHARACTER_ENTER_STATICSTATE);
+	myKeyHandler_->AddKey(OIS::KC_2, CHARACTER_ENTER_GRAVITYSTATE);
 	myKeyHandler_->AddKey(OIS::KC_Q, CHARACTER_EXIT_PLACINGSTATE);
 	myKeyHandler_->AddKey(OIS::KC_F, CHARACTER_GRAB_LEDGE);
 	myKeyHandler_->AddKey(OIS::KC_RETURN, CHARACTER_OPEN_DOOR);
@@ -484,6 +485,7 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 		def.factor = 2.5;
 		def.initialPosition = camera_->getPosition();
 		def.messageType = KGBMessageType::NO_MESSAGE;
+		def.messageTarget = SEND_TO_ALL;
 		gameCamera_->InitializeDef(&def);
 
 	}

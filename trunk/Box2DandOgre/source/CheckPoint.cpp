@@ -66,7 +66,7 @@ void CheckPoint::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, 
 		if(collidedFixture->IsSensor() == true)
 		{
 			GameObjectOgreBox2D* go = (GameObjectOgreBox2D*)collidedFixture->GetBody()->GetUserData();
-			if(go->GetGameObjectType() == GOType_Character_Parker || go->GetGameObjectType() == GOType_Character)
+			if(go->GetGameObjectType() == GOType_Character_Parker || go->GetGameObjectType() == GOType_Character_Holt)
 			{
 				CharacterParker* temp = (CharacterParker*)go;
 				Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, temp->GetPlayerInfo()->GetId(), UPDATE_CHECKPOINT, position_);

@@ -32,8 +32,9 @@ public:
 	Ogre::Real toleranceDistance;
 
 	KGBMessageType messageType;
-	
 
+	GameObjectId messageTarget;
+	
 };
 
 class CameraStateGoToPoint : public CameraState
@@ -81,6 +82,8 @@ protected:
 	Ogre::Real toleranceDistance_;
 
 	KGBMessageType messageType_;
+
+	GameObjectId messageTarget_;
 
 	Ogre::Vector3 diff;
 

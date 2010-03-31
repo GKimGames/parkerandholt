@@ -1,65 +1,64 @@
 /*=============================================================================
 
-		Parker.cpp
+		Holt.cpp
 
 		Author: Matt King
 
 ==============================================================================*/
 
-#include "Parker.h"
+#include "Holt.h"
 #include "GameFramework.h"
 #include "GameObjectFactory.h"
 
-#include "ParkerStateOnGround.h"
-#include "ParkerStateInAir.h"
-#include "ParkerStateLedgeGrab.h"
-
+#include "HoltStateOnGround.h"
+#include "HoltStateInAir.h"
+#include "HoltStatePlacingPlatform.h"
+#include "HoltStatePlacingGravityVector.h"
+#include "HoltStatePlacingStatic.h"
 
 #include "CameraStateWatch.h"
 #include "CameraStateGoToPoint.h"
 
 #include "TinyXMLHelper.h"
-#include "HoltBox.h"
-
 #include "Door.h"
+
+class Character;
 
 //=============================================================================
 //								Constructor
 //
-CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager, MousePicking* mousePicking)
-:Character(sceneManager)
+//CharacterHolt::CharacterHolt(Ogre::SceneManager* sceneManager, MousePicking *mousePicking, Ogre::Camera *camera, bool yup):Character(sceneManager)
+CharacterHolt::CharacterHolt(Ogre::SceneManager* sceneManager, MousePicking* mousePicking)
+:CharacterParker(sceneManager, mousePicking)
 {
 	mousePicking_ = mousePicking;
-	parkerId_ = objectId_;
+	holtId_ = objectId_;
 
-	stateMachine_ = new FSMStateMachine<CharacterParker>(this);
+	stateMachine_ = new FSMStateMachine<CharacterHolt>(this);
 
-	onGroundState_ = new ParkerStateOnGround(this, stateMachine_);
-	inAirState_ = new ParkerStateInAir(this, stateMachine_);
-	ledgeGrabState_ = new ParkerStateLedgeGrab(this, stateMachine_);
-
-
+	onGroundState_ = new HoltStateOnGround(this, stateMachine_);
+	inAirState_ = new HoltStateInAir(this, stateMachine_);
+	placingPlatform_ = new HoltStatePlacingPlatform(this, stateMachine_);
+	placingStatic_ = new HoltStatePlacingStatic(this, stateMachine_);
 	
+
+
 	stateMachine_->SetCurrentState(onGroundState_);
 	stateMachine_->ChangeState(onGroundState_);
 
 	elevator_ = NULL;
 
-	traumaMeter_ = new TraumaMeter();
-	objectName_ = "Parker";
+	traumaMeter_ = new TraumaMeter(1);
+	objectName_ = "Holt";
 	playerInfo_ = new PlayerInfo();
 
-	active_ = true;
+	active_ = false;
 }
-
-
-
-
 
 //=============================================================================
 //								Initialize
 //
-bool CharacterParker::Initialize()
+bool CharacterHolt::Initialize()
 {
 	InitVariables();
 
@@ -82,16 +81,17 @@ bool CharacterParker::Initialize()
 //								InitVariables
 //
 /// Initialize some variables.
-void CharacterParker::InitVariables()
+void CharacterHolt::InitVariables()
 {
 
-	gameObjectType_ = GOType_Character_Parker;
+	gameObjectType_ = GOType_Character_Holt;
 
 	justJumped = false;
 	justWallJumped_ = false;
 
 	// Set up the sensors hit counts
 	canJump_ = 0;
+
 
 	timeBetweenJump_ = .08;
 
@@ -104,7 +104,7 @@ void CharacterParker::InitVariables()
 //								CreatePhysics
 //
 /// Create the Box2D representation of Parker.
-void CharacterParker::CreatePhysics()
+void CharacterHolt::CreatePhysics()
 {
 	b2BodyDef bd;
 	bd.position.Set(-5, 5);
@@ -209,7 +209,7 @@ void CharacterParker::CreatePhysics()
 //								CreateGraphics
 //
 /// Create the OGRE stuff for Parker.
-void CharacterParker::CreateGraphics()
+void CharacterHolt::CreateGraphics()
 {
 	// Set up the Graphics part of Parker
 	entity_ = sceneManager_->createEntity(objectName_, meshName_);
@@ -249,20 +249,16 @@ void CharacterParker::CreateGraphics()
 	{
 		entity_->setMaterial(Ogre::MaterialManager::getSingletonPtr()->getByName("CheckPoint/CheckPoint"));
 	}
-	
+
 }
-
-
-
-
 
 //=============================================================================
 //								ReadXMLConfig
 //
 /// Read the XML config file for Parker.
-bool CharacterParker::ReadXMLConfig()
+bool CharacterHolt::ReadXMLConfig()
 {
-	TiXmlDocument configXML_( "..\\ParkerSettings.xml" );
+	TiXmlDocument configXML_( "..\\HoltSettings.xml" );
 	configXML_.LoadFile();
 	TiXmlHandle hDoc(&configXML_);
 
@@ -286,6 +282,7 @@ bool CharacterParker::ReadXMLConfig()
 
 	sizeNode->QueryDoubleAttribute("width", &boundingBoxWidth_);
 	sizeNode->QueryDoubleAttribute("height", &boundingBoxHeight_);
+	boundingBoxHeight_ *= .09/.11;
 	sizeNode->QueryDoubleAttribute("scaleX", &scaleX_);
 	sizeNode->QueryDoubleAttribute("scaleY", &scaleY_);
 	sizeNode->QueryDoubleAttribute("scaleZ", &scaleZ_);
@@ -314,6 +311,8 @@ bool CharacterParker::ReadXMLConfig()
 	// The force Parker can jump off the wall with
 	TiXmlElement* wallJumpNode = hRoot.FirstChild( "MovementInfo" ).FirstChildElement( "WallJumpInfo" ).Element();
 	wallJumpForce_ = TinyXMLHelper::GetAttributeb2Vec2(wallJumpNode, "jumpingForce");
+
+
 
 	TiXmlElement* loaderElement = hRoot.FirstChildElement( "Bodys" ).Element();
 	Box2DXMLLoader* loader = new Box2DXMLLoader(loaderElement,world_);
@@ -352,7 +351,7 @@ bool CharacterParker::ReadXMLConfig()
 /// Applies "friction" to the character if they are on a surface.
 /// It applies a force in the opposite direction the character's velocity is
 /// going. 
-void CharacterParker::ApplyWalkingFriction(double timeSinceLastFrame)
+void CharacterHolt::ApplyWalkingFriction(double timeSinceLastFrame)
 {
 
 
@@ -390,7 +389,7 @@ void CharacterParker::ApplyWalkingFriction(double timeSinceLastFrame)
 
 //=============================================================================
 //								UpdateAnimation
-void CharacterParker::UpdateAnimation(double timeSinceLastFrame)
+void CharacterHolt::UpdateAnimation(double timeSinceLastFrame)
 {
 	double maxVel = 0;
 
@@ -410,14 +409,14 @@ void CharacterParker::UpdateAnimation(double timeSinceLastFrame)
 	//animationState_->addTime(timeSinceLastFrame);
 }
 
-bool CharacterParker::HandleMessage(const KGBMessage message)
+bool CharacterHolt::HandleMessage(const KGBMessage message)
 { 
 
 	if(GameObjectOgreBox2D::HandleMessage(message))
 	{
 		return true;
 	}
-	if(active_)
+	//if(active_)
 	{
 		if(message.messageType == KGBMessageType::PLAYER_DIED)
 		{
@@ -428,7 +427,8 @@ bool CharacterParker::HandleMessage(const KGBMessage message)
 			CameraStateWatchDef def;
 			def.initialPosition = Ogre::Vector3(0, 6, 18);
 			def.targetObject = this;
-			GAMEFRAMEWORK->gameCamera_->InitializeDef(&def);			
+			GAMEFRAMEWORK->gameCamera_->InitializeDef(&def);	
+
 		}
 
 		else
@@ -445,31 +445,10 @@ bool CharacterParker::HandleMessage(const KGBMessage message)
 
 
 
-bool CharacterParker::Update(double timeSinceLastFrame)
+bool CharacterHolt::Update(double timeSinceLastFrame)
 {
 	
 	static b2Color color(1,1,0);
-	//bodyVec1 = body_->GetWorldPoint(b2Vec2(-boundingBoxWidth_/2,	0));
-	//bodyVec2 = body_->GetWorldPoint(b2Vec2(boundingBoxWidth_/2,	0));
-	//feetVec1 = body_->GetWorldPoint(b2Vec2(-boundingBoxWidth_/2,	-boundingBoxHeight_/2 - .3));
-	//feetVec2 = body_->GetWorldPoint(b2Vec2(boundingBoxWidth_/2,	-boundingBoxHeight_/2  - .3));
-
-
-	/*bodyVec1 = body_->GetWorldPoint(b2Vec2(-boundingBoxWidth_/2 - .1,	-boundingBoxHeight_/2));
-	bodyVec2 = body_->GetWorldPoint(b2Vec2(boundingBoxWidth_/2 + .1,	-boundingBoxHeight_/2));
-	feetVec1 = body_->GetWorldPoint(b2Vec2(-boundingBoxWidth_/2 - .1,	-boundingBoxHeight_/2 - .1));
-	feetVec2 = body_->GetWorldPoint(b2Vec2(boundingBoxWidth_/2 + .1,	-boundingBoxHeight_/2  - .1));
-
-	world_->RayCast(this, bodyVec1, feetVec1);
-	rayCastId = 0;
-	world_->RayCast(this, bodyVec2, feetVec2);
-	rayCastId = 1;
-
-	if(GAMEFRAMEWORK->GetDebugDraw())
-	{
-		GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec1, feetVec1, color);
-		GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec2, feetVec2, color);
-	}*/
 
 	if(GameObjectOgreBox2D::Update(timeSinceLastFrame))
 	{
@@ -593,7 +572,7 @@ bool CharacterParker::Update(double timeSinceLastFrame)
 	return stateMachine_->Update();
 }
 
-float32 CharacterParker::ReportFixture(b2Fixture* fixture, const b2Vec2& point,
+float32 CharacterHolt::ReportFixture(b2Fixture* fixture, const b2Vec2& point,
 									   const b2Vec2& normal, float32 fraction)
 {
 	
@@ -624,19 +603,21 @@ float32 CharacterParker::ReportFixture(b2Fixture* fixture, const b2Vec2& point,
 }
 
 /// Called when two fixtures begin to touch.
-void CharacterParker::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+void CharacterHolt::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
+
 	stateMachine_->BeginContact(contact,contactFixture, collidedFixture);
 }
 
 /// Called when two fixtures cease to touch.
-void CharacterParker::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+void CharacterHolt::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
+
 	stateMachine_->EndContact(contact,contactFixture, collidedFixture);
 }
 
 //returns character to the currently active checkpoint
-void CharacterParker::ReturnToCheckPoint()
+void CharacterHolt::ReturnToCheckPoint()
 {
 	traumaMeter_->ResetTrauma();
 
@@ -645,17 +626,19 @@ void CharacterParker::ReturnToCheckPoint()
 
 	CameraStateGoToPointDef def;
 	def.target = Ogre::Vector3(playerInfo_->GetCheckPoint().x, playerInfo_->GetCheckPoint().y + 6, 18);
+	def.messageTarget = this->GetId();
 	def.toleranceDistance = 0.1;
 	def.factor = 5.0;
 	def.initialPosition = GAMEFRAMEWORK->camera_->getPosition();
 	def.messageType = KGBMessageType::PLAYER_DIED;
-	def.messageTarget = this->GetId();
 	GAMEFRAMEWORK->gameCamera_->InitializeDef(&def);
 
+	
+	placingPlatform_->GetGravityVector()->RemovePlayer();
 }
 
 
-void CharacterParker::PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse)
+void CharacterHolt::PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse)
 {
 	if(contact->GetFixtureA()->GetBody()->GetUserData() != NULL)
 	{
@@ -695,10 +678,11 @@ void CharacterParker::PostSolve(b2Contact* contact, b2Fixture* contactFixture, b
 	stateMachine_->PostSolve(contact,contactFixture, collidedFixture, impulse);
 
 }
+
 //=============================================================================
 //				IsFootSensor
 //
-bool CharacterParker::IsFootSensor(b2Fixture* fixture)
+bool CharacterHolt::IsFootSensor(b2Fixture* fixture)
 {
 
 	if(fixture == feetSensor_)
@@ -709,13 +693,19 @@ bool CharacterParker::IsFootSensor(b2Fixture* fixture)
 	return false;
 }
 
-void CharacterParker::SetActive(bool active)
+//=============================================================================
+//				SetActive
+//
+void CharacterHolt::SetActive(bool active)
 {
 	traumaMeter_->SetActive(active);
 	active_ = active;
 }
 
-PlayerInfo* CharacterParker::GetPlayerInfo()
+//=============================================================================
+//				GetPlayerInfo
+//
+PlayerInfo* CharacterHolt::GetPlayerInfo()
 {
 	return playerInfo_;
 }

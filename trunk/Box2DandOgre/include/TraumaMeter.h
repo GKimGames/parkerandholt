@@ -12,6 +12,7 @@ class TraumaMeter
 public:
 
 	TraumaMeter();
+	TraumaMeter(int test);
 	~TraumaMeter();
 	void DrawTrauma(float trauma);
 	void HideOverlay();

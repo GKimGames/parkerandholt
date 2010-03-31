@@ -92,7 +92,7 @@ GravityVector::~GravityVector()
 //
 void GravityVector::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
-	if(contactFixture == gravitySensor_)
+	if(contactFixture == gravitySensor_ && collidedFixture->GetBody()->GetUserData() != 0)
 	{
 		bodyList_.push_back(collidedFixture->GetBody());
 	}
@@ -143,7 +143,7 @@ bool GravityVector::Update(double timeSinceLastFrame)
 	}
 	else
 	{
-		bodyList_.clear();
+		//bodyList_.clear();
 	}
 
 
@@ -163,6 +163,8 @@ bool GravityVector::Stop()
 	name = "FireWorks";
 	name += Ogre::StringConverter::toString(objectId_);
 	tempPS = (Ogre::ParticleSystem*)sceneNode_->getAttachedObject(name);
+	bodyList_.clear();
+
 	return true;
 }
 
@@ -180,8 +182,6 @@ bool GravityVector::Start(b2Vec2 newPosition, b2Vec2 newDirection)
 	tempMagnitude.y = (newDirection.y - position_.y) / (abs(newDirection.x - position_.x) + abs(newDirection.y - position_.y));
 	forceApplied_.x = maxForce_ * tempMagnitude.x;
 	forceApplied_.y = maxForce_ * tempMagnitude.y;
-
-
 
 	Ogre::String name;
 	name = "FireWorks";

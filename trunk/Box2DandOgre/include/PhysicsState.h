@@ -29,6 +29,7 @@
 
 #include "LedgeSensor.h"
 #include "HoltBox.h"
+#include "Holt.h"
 
 #include "GameObjectOgreBox2D.h"
 
@@ -136,7 +137,7 @@ protected:
 
 	GameObject* gameObject_;
 	CharacterParker* parker_;
-	CharacterParker* holt_;
+	CharacterHolt* holt_;
 	
 
 	b2World* world;

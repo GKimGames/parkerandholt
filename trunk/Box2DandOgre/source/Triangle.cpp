@@ -13,7 +13,7 @@ Triangle::Triangle(Ogre::SceneManager* sceneManager, b2Vec2 center, double size)
 
 	position_ = center;
 	density_ =  10;
-	gameObjectType_ = GOType_HoltBox;
+	gameObjectType_ = GOType_Triangle;
 
 	sceneManager_ = sceneManager;
 	Ogre::String entityName = "Triangle";
@@ -32,6 +32,8 @@ Triangle::Triangle(Ogre::SceneManager* sceneManager, b2Vec2 center, double size)
 
 	placementTest_ = false;
 	badPlacement_ = false;
+
+	temporary_ = false;
 
 	CreateTriangle();
 	
@@ -62,8 +64,19 @@ Triangle::Triangle(Ogre::SceneManager *sceneManager, b2Vec2 center, double size,
 	placementTest_ = false;
 	badPlacement_ = false;
 
+	particleSystem_ = sceneManager_->createParticleSystem(entityName + "psystem", "PaH/fadingBox");
+	particleSystem_->getEmitter(0)->setEnabled(false);
+	sceneNode_->attachObject(particleSystem_);
+	emitterSize_ = Ogre::Vector3(size * 1.3, size * 1.3, size * 1.3);
+
 	TTL_ = TTL;
 	temporary_ = true;
+	Ogre::ParticleEmitter* emitter = particleSystem_->getEmitter(0);
+		
+	emitter->setParameter("height", Ogre::StringConverter::toString(emitterSize_.y));
+	emitter->setParameter("width", Ogre::StringConverter::toString(emitterSize_.x));
+	emitter->setParameter("depth", Ogre::StringConverter::toString(emitterSize_.z));
+	//particleSystem_->getEmitter(0)->setEnabled(true);
 	timeAlive_ = 0;
 
 	CreateTriangle();
@@ -127,11 +140,26 @@ bool Triangle::Update(double timeSinceLastFrame)
 	if(temporary_)
 	{
 		timeAlive_ += timeSinceLastFrame;
+		Ogre::ParticleEmitter* emitter = particleSystem_->getEmitter(0);
+		//
+		//emitter->setParameter("height", Ogre::StringConverter::toString(emitterSize_.y));
+		//emitter->setParameter("width", Ogre::StringConverter::toString(emitterSize_.x));
+		//emitter->setParameter("depth", Ogre::StringConverter::toString(emitterSize_.z));
+
+		//particleSystem_->getEmitter(0)->setEnabled(true);
+
 		if(timeAlive_ > TTL_)
 		{
 			entity_->setVisible(false);
 			body_->SetActive(false);
+			particleSystem_->getEmitter(0)->setEnabled(false);
+			//return false;
 		}
+		else if(TTL_ - timeAlive_ < 2.0)
+		{
+			particleSystem_->getEmitter(0)->setEnabled(true);
+		}
+
 	}
 	UpdateGraphics(timeSinceLastFrame);
 	return true;
@@ -148,4 +176,11 @@ void Triangle::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2
 			placementTest_ = false;
 		}
 	}
+}
+
+
+void Triangle::SetInactive()
+{
+	entity_->setVisible(false);
+	body_->SetActive(false);
 }

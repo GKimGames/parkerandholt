@@ -75,7 +75,7 @@ bool FadingPlatform::Update(double timeSinceLastFrame)
 					if(collidedObject)
 					{
 						// If the collided object is the character then the platform starts to fade
-						if(collidedObject->GetGameObjectType() == GOType_Character ||
+						if(collidedObject->GetGameObjectType() == GOType_Character_Holt ||
 							collidedObject->GetGameObjectType() == GOType_Character_Parker)
 						{
 							CharacterParker* cp = (CharacterParker*) collidedObject;

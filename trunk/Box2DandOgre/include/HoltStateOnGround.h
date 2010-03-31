@@ -1,24 +1,29 @@
-#ifndef HOLT_STATE_PLACING_PLATFORM_H
-#define HOLT_STATE_PLACING_PLATFORM_H
+/*=============================================================================
+
+	HoltStateOnGround.h
+
+	Author: Matt King
+
+	State for Holt on the ground.
+
+=============================================================================*/
+#ifndef HOLT_STATE_ON_GROUND_H
+#define HOLT_STATE_ON_GROUND_H
 
 #include "FSMState.h"
 #include "HoltState.h"
 
-#include "Holt.h"
-#include "MousePicking.h"
-#include "GravityVector.h"
-#include "HoltBox.h"
-#include "Platform.h"
-
 class CharacterHolt;
-class HoltStatePlacingPlatform : public HoltState
+class HoltStateOnGround : public HoltState
 {
 
 public:
 
-	HoltStatePlacingPlatform(CharacterHolt* Holt, FSMStateMachine<CharacterHolt>* stateMachine);
+	friend class HoltStateInAir;
 
-	~HoltStatePlacingPlatform(){}
+	HoltStateOnGround(CharacterHolt* holt, HoltStateMachine* stateMachine);
+
+	~HoltStateOnGround(){}
 
 	/// This is called when the state is entered.
 	virtual void Enter();
@@ -37,14 +42,8 @@ public:
 
 	/// This will execute when the state is exited.
 	virtual void Exit();
-
-	GravityVector* GetGravityVector();
-
-	bool SpawnBox();
-	bool SpawnPlatform();
-	bool SpawnGravityVector();
-	bool leftMouseDown_;
 	
+	int GetFeetContactCount();
 	
 
 protected:
@@ -54,18 +53,25 @@ protected:
 	void Jump();
 	void UpdateAnimation();
 
+	Ogre::Vector3 direction_;	
+
+	bool isJumping_;
+
 	bool blendingRun_;
 	bool blendingIdle_;
 
-	int				feetContactCount_;
-	b2Body*			elevator_;
-	b2Vec2			startPosition_;
-	b2Vec2			endPosition_;
-	HoltBox*		box_[3];
-	Platform*		platform_;
-	int				incrimenter_;
-	GravityVector*	gravityVector_;
-	EntityMaterialInstance*	trans_;
+	double jumpTimer_;
+
+	bool moveLeftDown_;
+	bool moveRightDown_;
+
+	int feetContactCount_;
+
+	//Ogre::Vector3 direction;
+	/// This is an object that will be moving the character
+	/// when the character is on it.
+	b2Body* elevator_;
+
 };
 
 #endif

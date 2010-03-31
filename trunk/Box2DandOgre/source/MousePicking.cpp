@@ -12,6 +12,9 @@
 #include <OISKeyboard.h>
 #include <OISMouse.h>
 #include <boost/any.hpp>
+#include "HoltBox.h"
+#include "Platform.h"
+#include "Triangle.h"
 
 #include "Message.h"
 #include "MessageDispatcher.h"
@@ -35,12 +38,36 @@ MousePicking::MousePicking(Ogre::SceneManager* sceneManager, Ogre::Camera* camer
 	sceneNode_->attachObject(entity_);
 	entity_->getParentSceneNode()->setScale(1,1,1);
 
-	//sceneNode_->setVisible(false);
+	deleteCheck_ = false;
 	box_[0] = 0;
 	box_[1] = 0;
 	box_[2] = 0;
 	incrementer_ = 0;
 	entity_->setVisible(false);
+
+
+	b2BodyDef def;
+	def.position = b2Vec2(0, 0);
+	def.type = b2BodyType::b2_staticBody;
+	def.fixedRotation = false;
+	body_ = world_->CreateBody(&def);
+	body_->SetUserData(this);
+
+	b2PolygonShape sd;
+	sd.SetAsBox(.25, .25);
+
+	b2FixtureDef fd;
+	fd.shape = &sd;
+	fd.isSensor = true;
+
+	body_->CreateFixture(&fd);
+
+	Initialize();
+
+	body_->GetFixtureList()->SetSensor(true);
+	body_->SetActive(false);
+
+	
 }
 
 
@@ -174,4 +201,55 @@ bool MousePicking::SpawnBox()
 void MousePicking::SetVisibility(bool visible)
 {
 	sceneNode_->setVisible(visible);
+
+}
+
+void MousePicking::DeletePlaceables()
+{
+	deleteCheck_ = true;
+	body_->SetActive(true);
+	world_->Step(0.001, 1, 1);
+}
+
+
+void MousePicking::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+{
+	if(deleteCheck_)
+	{
+		if(contactFixture->GetBody() == body_ && collidedFixture->GetBody()->GetUserData() != 0)
+		{
+			GameObjectOgreBox2D* temp = (GameObjectOgreBox2D*)collidedFixture->GetBody()->GetUserData();
+			if(temp->GetGameObjectType() == GOType_PlaceablePlatform)
+			{
+				Platform* temp2 = (Platform*)temp;
+				temp2->SetInactive();
+			}
+			else if(temp->GetGameObjectType() == GOType_HoltBox)
+			{
+				HoltBox* temp2 = (HoltBox*)temp;
+				temp2->SetInactive();
+			}
+			else if(temp->GetGameObjectType() == GOType_Triangle)
+			{
+				Triangle* temp2 = (Triangle*)temp;
+				temp2->SetInactive();
+			}
+		}
+		deleteCheck_ = false;
+	}
+}
+
+bool MousePicking::Update(double timeSinceLastFrame)
+{
+	if(timeSinceLastFrame > .001)
+	{
+		deleteCheck_ = false;
+		body_->SetActive(false);
+	}
+
+	
+	SetBodyPosition(b2Vec2(position_.x, position_.y));
+	UpdateGraphics(timeSinceLastFrame);
+	
+	return true;
 }

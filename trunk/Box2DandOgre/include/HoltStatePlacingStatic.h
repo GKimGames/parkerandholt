@@ -2,20 +2,20 @@
 #define HOLT_STATE_PLACING_STATIC_H
 
 #include "FSMState.h"
-#include "ParkerState.h"
+#include "HoltState.h"
 
-#include "Parker.h"
+#include "Holt.h"
 #include "MousePicking.h"
 #include "GravityVector.h"
 #include "Triangle.h"
 
-class CharacterParker;
-class HoltStatePlacingStatic : public ParkerState
+class CharacterHolt;
+class HoltStatePlacingStatic : public HoltState
 {
 
 public:
 
-	HoltStatePlacingStatic(CharacterParker* parker, FSMStateMachine<CharacterParker>* stateMachine);
+	HoltStatePlacingStatic(CharacterHolt* holt, FSMStateMachine<CharacterHolt>* stateMachine);
 
 	~HoltStatePlacingStatic(){}
 
