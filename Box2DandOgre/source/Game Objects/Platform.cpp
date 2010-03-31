@@ -200,7 +200,7 @@ Platform::~Platform()
 
 bool Platform::InitializePlaceable()
 {
-	gameObjectType_ = GOType_Platform;
+	gameObjectType_ = GOType_PlaceablePlatform;
 
 	if(point1.x > point2.x)
 	{
@@ -308,4 +308,10 @@ void Platform::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2
 			placementTest_ = false;
 		}
 	}
+}
+
+void Platform::SetInactive()
+{
+	entity_->setVisible(false);
+	body_->SetActive(false);
 }

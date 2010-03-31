@@ -48,7 +48,7 @@ bool CameraStateGoToPoint::Update()
 	}
 	else if(distance < toleranceDistance_ && !done_)
 	{
-		Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, SEND_TO_ALL, messageType_, NULL);
+		Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, messageTarget_, messageType_, NULL);
 		done_ = true;
 		return true;
 	}
@@ -65,9 +65,11 @@ void CameraStateGoToPoint::InitializeDef(const CameraStateDef* cameraStateDef)
 {
 	const CameraStateGoToPointDef* def = (const CameraStateGoToPointDef*) cameraStateDef;
 	messageType_ = def->messageType;
+	messageTarget_ = def->messageTarget;
 	factor_ = def->factor;
 	target_ = Ogre::Vector3(def->target);
 	toleranceDistance_ = def->toleranceDistance;
+	messageTarget_ = def->messageTarget;
 	done_ = false;
 
 }

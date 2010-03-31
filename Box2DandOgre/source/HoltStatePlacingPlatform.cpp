@@ -8,18 +8,19 @@
 
 #include "HoltStatePlacingPlatform.h"
 
-#include "ParkerStateOnGround.h"
-#include "ParkerStateInAir.h"
+#include "HoltStateOnGround.h"
+#include "HoltStateInAir.h"
 #include "HoltStatePlacingGravityVector.h"
+#include "HoltStatePlacingStatic.h"
 #include "XMLQuickVars.h"
 
 //=============================================================================
 //								Constructor
 //
 HoltStatePlacingPlatform::HoltStatePlacingPlatform(	
-	CharacterParker* parker,
-	FSMStateMachine<CharacterParker>* stateMachine):
-	ParkerState(parker,stateMachine)
+	CharacterHolt* holt,
+	FSMStateMachine<CharacterHolt>* stateMachine):
+	HoltState(holt,stateMachine)
 {
 	feetContactCount_ = 0;
 	platform_ = 0;
@@ -229,7 +230,7 @@ bool HoltStatePlacingPlatform::HandleMessage(const KGBMessage message)
 		}
 		case CHARACTER_ENTER_GRAVITYSTATE:
 		{
-			driver_->stateMachine_->ChangeState(driver_->placingGravityVector_);
+			driver_->stateMachine_->ChangeState(driver_->placingStatic_);
 			return true;
 		}
 		case RIGHT_MOUSE_PLUS:

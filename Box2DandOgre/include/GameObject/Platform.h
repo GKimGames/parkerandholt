@@ -53,6 +53,8 @@ public:
 	bool SetGraphics(b2Vec2 position, float length, float angle, bool final);
 	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 
+	void SetInactive();
+
 protected:
 
 	Ogre::MovablePlane* plane;

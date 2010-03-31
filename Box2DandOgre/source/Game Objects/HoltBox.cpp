@@ -7,6 +7,7 @@
 =============================================================================*/
 
 #include "HoltBox.h"
+#include "MessageDispatcher.h"
 
 HoltBox::HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center)
 {
@@ -139,4 +140,10 @@ void HoltBox::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2F
 			placementTest_ = false;
 		}
 	}
+}
+
+void HoltBox::SetInactive()
+{
+	entity_->setVisible(false);
+	body_->SetActive(false);
 }

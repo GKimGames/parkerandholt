@@ -8,18 +8,19 @@
 
 #include "HoltStatePlacingStatic.h"
 
-#include "ParkerStateOnGround.h"
-#include "ParkerStateInAir.h"
+#include "HoltStateOnGround.h"
+#include "HoltStateInAir.h"
 #include "HoltStatePlacingGravityVector.h"
+#include "HoltStatePlacingPlatform.h"
 #include "XMLQuickVars.h"
 
 //=============================================================================
 //								Constructor
 //
 HoltStatePlacingStatic::HoltStatePlacingStatic(	
-	CharacterParker* parker,
-	FSMStateMachine<CharacterParker>* stateMachine):
-	ParkerState(parker,stateMachine)
+	CharacterHolt* holt,
+	FSMStateMachine<CharacterHolt>* stateMachine):
+	HoltState(holt,stateMachine)
 {
 	feetContactCount_ = 0;
 	incrimenter_ = 0;
@@ -82,10 +83,6 @@ bool HoltStatePlacingStatic::Update()
 			driver_->ApplyWalkingFriction(timeSinceLastFrame);
 		}
 
-		//moveRightDown_ = false;
-		//moveLeftDown_ = false;
-		
-
 		if(driver_->body_->GetLinearVelocity().x > 0.1)
 		{
 			direction = Ogre::Vector3(0,0,1);
@@ -106,26 +103,6 @@ bool HoltStatePlacingStatic::Update()
 			driver_->UpdateDebugDraw();
 		}
 	}
-
-	//if(leftMouseDown_)
-	//{
-	//	endPosition_.x = driver_->mousePicking_->GetPosition().x;
-	//	endPosition_.y = driver_->mousePicking_->GetPosition().y;
-	//	float tempLength = sqrt((startPosition_.x - endPosition_.x) * (startPosition_.x - endPosition_.x)
-	//						 + (startPosition_.y - endPosition_.y) * (startPosition_.y - endPosition_.y));
-	//	if(tempLength > 0.5)
-	//	{
-	//		if(platform_ == 0)
-	//		{
-	//			SpawnPlatform();
-	//		}
-	//		b2Vec2 tempPosition(startPosition_.x - (startPosition_.x - endPosition_.x)/2,
-	//							startPosition_.y - (startPosition_.y - endPosition_.y)/2);
-	//		float angle = atan2((endPosition_.y - startPosition_.y)/2,(endPosition_.x - startPosition_.x)/2);
-	//		platform_->SetGraphics(tempPosition, tempLength, angle, false);
-	//	}
-	//}
-
 
 	return true;
 }
@@ -156,6 +133,7 @@ bool HoltStatePlacingStatic::HandleMessage(const KGBMessage message)
 		}
 		case MIDDLE_MOUSE_MINUS:
 		{
+			driver_->mousePicking_->DeletePlaceables();
 			return true;
 		}
 		case CHARACTER_MOVE_LEFT_PLUS:
@@ -188,9 +166,9 @@ bool HoltStatePlacingStatic::HandleMessage(const KGBMessage message)
 			driver_->jump_ = false;
 			return true;
 		}
-		case CHARACTER_ENTER_GRAVITYSTATE:
+		case CHARACTER_ENTER_PLATFORMSTATE:
 		{
-			driver_->stateMachine_->ChangeState(driver_->placingGravityVector_);
+			driver_->stateMachine_->ChangeState(driver_->placingPlatform_);
 			return true;
 		}
 		case RIGHT_MOUSE_PLUS:
@@ -362,9 +340,11 @@ bool HoltStatePlacingStatic::SpawnBox()
 
 bool HoltStatePlacingStatic::SpawnTempBox()
 {
-	float timeToLive = 2;
+	float timeToLive = 4;
 	new Triangle(driver_->sceneManager_, 
 		b2Vec2((float32)driver_->mousePicking_->GetPosition().x, (float32)driver_->mousePicking_->GetPosition().y),
 		driver_->mousePicking_->boxSize_/2, timeToLive);
 	return true;
 }
+
+

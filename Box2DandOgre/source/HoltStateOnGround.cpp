@@ -1,32 +1,30 @@
 /*=============================================================================
 
-	ParkerStateOnGround.cpp
+	HoltStateOnGround.cpp
 
-	Author: Matt King
-
-	State for Parker on the ground.
+	State for Holt on the ground.
 
 =============================================================================*/
 
-#include "ParkerStateOnGround.h"
+#include "HoltStateOnGround.h"
 
-#include "ParkerStateInAir.h"
+#include "HoltStateInAir.h"
 #include "HoltStatePlacingGravityVector.h"
 #include "HoltStatePlacingPlatform.h"
 #include "HoltStatePlacingStatic.h"
 #include "Door.h"
 
-#include "Parker.h"
+#include "Holt.h"
 #include "Message.h"
 
 
 //=============================================================================
 //								Constructor
 //
-ParkerStateOnGround::ParkerStateOnGround(	
-	CharacterParker* parker,
-	ParkerStateMachine* stateMachine):
-	ParkerState(parker,stateMachine)
+HoltStateOnGround::HoltStateOnGround(	
+	CharacterHolt* holt,
+	HoltStateMachine* stateMachine):
+	HoltState(holt,stateMachine)
 {
 	isJumping_ = false;
 	moveLeftDown_ = false;
@@ -40,7 +38,7 @@ ParkerStateOnGround::ParkerStateOnGround(
 //=============================================================================
 //								Enter
 //
-void ParkerStateOnGround::Enter()
+void HoltStateOnGround::Enter()
 {
 
 	blendingRun_ = false;
@@ -63,7 +61,7 @@ void ParkerStateOnGround::Enter()
 //=============================================================================
 //								Update
 //
-bool ParkerStateOnGround::Update()
+bool HoltStateOnGround::Update()
 {
 	if(driver_->active_)
 	{
@@ -88,6 +86,7 @@ bool ParkerStateOnGround::Update()
 	
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 	
+	//if(driver_->feetSensorHitCount_ == 0)
 	if(driver_->feetSensorHit_ == false)
 	{
 		stateMachine_->ChangeState(driver_->inAirState_);
@@ -141,7 +140,7 @@ bool ParkerStateOnGround::Update()
 //=============================================================================
 //								HandleMessage
 //
-bool ParkerStateOnGround::HandleMessage(const KGBMessage message)
+bool HoltStateOnGround::HandleMessage(const KGBMessage message)
 {
   std::string* gameObject = 0;
   if(driver_->active_)
@@ -185,6 +184,16 @@ bool ParkerStateOnGround::HandleMessage(const KGBMessage message)
 
 			return true;
 		}
+		case CHARACTER_ENTER_PLATFORMSTATE:
+		{
+			driver_->stateMachine_->ChangeState(driver_->placingPlatform_);
+			return true;
+		}
+		case CHARACTER_ENTER_GRAVITYSTATE:
+		{
+			driver_->stateMachine_->ChangeState(driver_->placingStatic_);
+			return true;
+		}
 	}
   }
   return false;
@@ -195,7 +204,7 @@ bool ParkerStateOnGround::HandleMessage(const KGBMessage message)
 //=============================================================================
 //								Exit
 //
-void ParkerStateOnGround::Exit()
+void HoltStateOnGround::Exit()
 {
 	driver_->elevator_ = 0;                                                             
 }
@@ -206,7 +215,7 @@ void ParkerStateOnGround::Exit()
 //								BeginContact
 //
 /// Called when two fixtures begin to touch.
-void ParkerStateOnGround::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+void HoltStateOnGround::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
 	if(!collidedFixture->IsSensor())
 	{
@@ -236,7 +245,7 @@ void ParkerStateOnGround::BeginContact(ContactPoint* contact, b2Fixture* contact
 //								EndContact
 //
 /// Called when two fixtures cease to touch.
-void ParkerStateOnGround::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
+void HoltStateOnGround::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
 	if(!collidedFixture->IsSensor())
 	{
@@ -264,7 +273,7 @@ void ParkerStateOnGround::EndContact(ContactPoint* contact, b2Fixture* contactFi
 //								MoveLeft
 //
 ///
-void ParkerStateOnGround::MoveLeft()
+void HoltStateOnGround::MoveLeft()
 {
 
 	if(isJumping_ == false)
@@ -286,7 +295,7 @@ void ParkerStateOnGround::MoveLeft()
 //								MoveRight
 //
 /// 
-void ParkerStateOnGround::MoveRight()
+void HoltStateOnGround::MoveRight()
 {
 	if(isJumping_ == false)
 	{
@@ -307,7 +316,7 @@ void ParkerStateOnGround::MoveRight()
 //								Jump
 ///
 /// Jump!
-void ParkerStateOnGround::Jump()
+void HoltStateOnGround::Jump()
 {
 
 	if(jumpTimer_ > 0)
@@ -335,7 +344,7 @@ void ParkerStateOnGround::Jump()
 //=============================================================================
 //								UpdateAnimation
 //
-void ParkerStateOnGround::UpdateAnimation()
+void HoltStateOnGround::UpdateAnimation()
 {
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
@@ -382,7 +391,7 @@ void ParkerStateOnGround::UpdateAnimation()
 	}
 }
 
-int ParkerStateOnGround::GetFeetContactCount()
+int HoltStateOnGround::GetFeetContactCount()
 {
 	return feetContactCount_;
 }

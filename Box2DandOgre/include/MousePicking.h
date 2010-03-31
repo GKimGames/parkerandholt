@@ -36,7 +36,18 @@ public:
 	bool SpawnBox();
 	void SetVisibility(bool visible);
 	const Ogre::Vector3 GetPosition();
-	
+	void DeletePlaceables();
+	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
+	bool Update(double timeSinceLastFrame);
+
+	bool Initialize()
+	{
+		prevAngle = 0;
+		initialized_ = true;
+
+		return true;
+	}
+
 	double		boxSize_;
 
 protected:
@@ -54,6 +65,7 @@ protected:
 	double						boxSizeIncrement_;
 	double						boxMaxSize_;
 	int							incrementer_;
+	bool						deleteCheck_;
 
 };
 #endif 

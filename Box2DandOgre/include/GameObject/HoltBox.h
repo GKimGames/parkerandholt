@@ -20,7 +20,7 @@ public:
 	// Center is where the box is centered at. 
 	HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center);
 	HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center, double size, double density = 10);
-	~HoltBox()
+	virtual ~HoltBox()
 	{
 
 	}
@@ -51,6 +51,7 @@ public:
 	bool CreateBox2DBox();
 	bool Update(double timeSinceLastFrame);
 	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
+	void SetInactive();
 
 	
 

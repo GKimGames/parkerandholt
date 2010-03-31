@@ -42,7 +42,9 @@ enum GameObjectType
 	GOType_FadingPlatform,
 	GOType_Mouse,
 	GOType_CheckPoint,
-	GOType_Door
+	GOType_Door,
+	GOType_PlaceablePlatform,
+	GOType_Triangle
 };
 
 class GameObjectDef

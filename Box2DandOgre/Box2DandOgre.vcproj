@@ -288,18 +288,6 @@
 					Name="Parker"
 					>
 					<File
-						RelativePath=".\source\HoltStatePlacingGravityVector.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\source\HoltStatePlacingPlatform.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\source\HoltStatePlacingStatic.cpp"
-						>
-					</File>
-					<File
 						RelativePath=".\source\Parker.cpp"
 						>
 					</File>
@@ -313,6 +301,34 @@
 					</File>
 					<File
 						RelativePath=".\source\ParkerStateOnGround.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Holt"
+					>
+					<File
+						RelativePath=".\source\Holt.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\source\HoltStateInAir.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\source\HoltStateOnGround.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\source\HoltStatePlacingGravityVector.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\source\HoltStatePlacingPlatform.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\source\HoltStatePlacingStatic.cpp"
 						>
 					</File>
 				</Filter>
@@ -580,18 +596,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\include\HoltStatePlacingGravityVector.h"
-						>
-					</File>
-					<File
-						RelativePath=".\include\HoltStatePlacingPlatform.h"
-						>
-					</File>
-					<File
-						RelativePath=".\include\HoltStatePlacingStatic.h"
-						>
-					</File>
-					<File
 						RelativePath=".\include\Parker.h"
 						>
 					</File>
@@ -609,6 +613,38 @@
 					</File>
 					<File
 						RelativePath=".\include\ParkerStateOnGround.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Holt"
+					>
+					<File
+						RelativePath=".\include\Holt.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\HoltState.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\HoltStateInAir.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\HoltStateOnGround.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\HoltStatePlacingGravityVector.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\HoltStatePlacingPlatform.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\HoltStatePlacingStatic.h"
 						>
 					</File>
 				</Filter>
