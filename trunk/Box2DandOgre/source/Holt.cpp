@@ -27,9 +27,7 @@ class Character;
 //=============================================================================
 //								Constructor
 //
-//CharacterHolt::CharacterHolt(Ogre::SceneManager* sceneManager, MousePicking *mousePicking, Ogre::Camera *camera, bool yup):Character(sceneManager)
-CharacterHolt::CharacterHolt(Ogre::SceneManager* sceneManager, MousePicking* mousePicking)
-:CharacterParker(sceneManager, mousePicking)
+CharacterHolt::CharacterHolt(MousePicking* mousePicking) : CharacterParker()
 {
 	mousePicking_ = mousePicking;
 	holtId_ = objectId_;

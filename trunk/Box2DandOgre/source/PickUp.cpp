@@ -106,7 +106,7 @@ bool PickUp::Update(double timeSinceLastFrame)
 	if(pickedUp_)
 	{
 		sceneNode_->setVisible(false);
-		return false;
+		//return false;
 	}
 
 	return true;
@@ -126,7 +126,7 @@ void PickUp::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fi
 			if(go->GetGameObjectType() == GameObjectType::GOType_Character_Parker || go->GetGameObjectType() == GameObjectType::GOType_Character_Holt)
 			{
 				CharacterParker* temp = (CharacterParker*)go;
-				Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, temp->GetPlayerInfo()->GetId(), ADD_ITEM, 1);
+				Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, temp->GetPlayerInfo()->GetId(), ADD_ITEM, 1);
 				pickedUp_ = true;
 				body_->SetActive(false);
 			}

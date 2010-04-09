@@ -11,6 +11,9 @@
 
 using namespace Ogre;
 
+b2Vec2 TinyXMLHelper::boxOffset = b2Vec2(0,0);
+Ogre::Vector3 TinyXMLHelper::ogreOffset = Vector3::ZERO;
+
 void TinyXMLHelper::WalkDoc(TiXmlNode * pParent, std::map<Ogre::String, Ogre::String>* map, Ogre::String pName )
 {
     if ( !pParent ) return;
@@ -222,14 +225,17 @@ Vector2 TinyXMLHelper::GetAttributeVector2(TiXmlElement* element, const String& 
 /// Returns an Ogre::Vector3 from "element" from attribute "name"
 Vector3 TinyXMLHelper::GetAttributeVector3(TiXmlElement* element, const String& name, Vector3 defaultValue)
 {
+
 	if(element->Attribute(name.c_str()))
 	{
-		return StringConverter::parseVector3(element->Attribute(name.c_str()));
+		Ogre::Vector3 result = StringConverter::parseVector3(element->Attribute(name.c_str()));
+		return result;
 	}
 	else
 	{
 		return defaultValue;
 	}
+	
 }
 
 //=============================================================================
@@ -244,6 +250,6 @@ b2Vec2 TinyXMLHelper::GetAttributeb2Vec2(TiXmlElement* element, const Ogre::Stri
 		return b2Vec2(vector.x,vector.y);
 	}
 
-	return defaultValue;
+	return (defaultValue);
 	
 }

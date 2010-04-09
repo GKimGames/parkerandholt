@@ -20,90 +20,50 @@
 #include "FSMStateMachine.h"
 
 #include "OgreXMLLoader.h"
+
+
 /// Base class for a character. Character extends GameObjectOgreBox2D
 class Character :public GameObjectOgreBox2D
 {
 public:
 
-	Character(Ogre::SceneManager* sceneManager);
+	/// Sets gameObjectType_ to GOType_Character.
+	Character();
 	
 	~Character();
 
-	virtual bool Update(double timeSinceLastFrame);
+	/// Update applies the walking friction to the character and updates the 
+	/// models animation and direction.
+	virtual bool Update(double timeSinceLastFrame)=0;
 
 	/// Called when two fixtures begin to touch.
-	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
+	virtual void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)=0;
 
 	/// Called when two fixtures cease to touch.
-	void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
-	
-	//virtual bool UpdateGraphics(double timeSinceLastFrame)
+	virtual void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)=0;
 
-	virtual void Jump();
+	virtual bool HandleMessage(const KGBMessage message)=0;
 
-	virtual bool HandleMessage(const KGBMessage message)
-	{
-
-		switch(message.messageType)
-		{
-		case CHARACTER_MOVE_LEFT_PLUS:
-			{
-				moveLeft_ = true;
-				//MoveLeft();
-				return true;
-			}
-		case CHARACTER_MOVE_RIGHT_PLUS:
-			{
-				moveRight_ = true;
-				//MoveRight();
-				return true;
-			}
-		case CHARACTER_JUMP_PLUS:
-			{
-				jump_ = true;
-				//Jump();
-				return true;
-			}
-		case CHARACTER_MOVE_LEFT_MINUS:
-			{
-				moveLeft_ = false;
-				//MoveLeft();
-				return true;
-			}
-		case CHARACTER_MOVE_RIGHT_MINUS:
-			{
-				moveRight_ = false;
-				//MoveRight();
-				return true;
-			}
-		case CHARACTER_JUMP_MINUS:
-			{
-				jump_ = false;
-				//Jump();
-				return true;
-			}
-	
-		}
-
-		return false;
-	}
-
-	virtual bool Initialize();
+	virtual bool Initialize()=0;
 
 protected:
 		 
-	virtual void UpdateAnimation(double timeSinceLastFrame);
+	virtual void UpdateAnimation(double timeSinceLastFrame)=0;
 	
-	virtual void InitVariables();
-	virtual bool ReadXMLConfig();
-	virtual void CreatePhysics();
-	virtual void CreateGraphics();
+	/// Sets the default values for variables.
+	virtual void InitVariables()=0;
+
+	/// Read in variables values from XML.
+	virtual bool ReadXMLConfig()=0;
+
+	/// Create Box2D representation of the character.
+	virtual void CreatePhysics()=0;
+
+	/// Create the mesh and animation object for the character.
+	virtual void CreateGraphics()=0;
 
 	/// Applies "friction" to the character if they are on a surface.
-	virtual void ApplyWalkingFriction(double timeSinceLastFrame);
-
-	virtual void MoveLeft();
-	virtual void MoveRight();
+	virtual void ApplyWalkingFriction(double timeSinceLastFrame)=0;
 
 	// There needs to be a finite state machine but I didn't want to have to 
 	// template the character class so I left this here as a reminder.

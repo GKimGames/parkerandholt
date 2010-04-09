@@ -5,9 +5,11 @@
 		Author: spacegaier
 		This was taken from the Advanced Ogre Framework by spacegaier.
 
-		Updated by: Matt King
+		Updated by Matt King
 
 		+ Changed from struct and vector of AppStates to std::map.
+		+ Comments
+		+ popStateAfterNextUpdate
 		
 =============================================================================*/
 
@@ -51,7 +53,7 @@ AppStateManager::~AppStateManager()
 //=============================================================================
 //							manageAppState
 //
-// Addes a new string / state pair to the Manager
+/// Adds a new string / state pair to the Manager
 void AppStateManager::manageAppState(Ogre::String stateName, AppState* state)
 {
 	m_AppMap[stateName] = state;
@@ -62,7 +64,7 @@ void AppStateManager::manageAppState(Ogre::String stateName, AppState* state)
 //=============================================================================
 //							findByName
 //
-/// 
+/// Returns an AppState given it's name.
 AppState* AppStateManager::findByName(Ogre::String stateName)
 {
 	AppMap::iterator iter = m_AppMap.find(stateName);
@@ -90,16 +92,16 @@ void AppStateManager::start(AppState* state)
 	static double timeAccum = 0;
 	static double currentTime = 0;
 
-	//m_BufferFlush.start(2);
-
+	// This is a way to get a more accurate time between frames.
 	LARGE_INTEGER frequency;        // ticks per second
 	LARGE_INTEGER t1, t2;           // ticks
 	t1.QuadPart = t2.QuadPart = 0;
 
-	// get ticks per second
+	// Get ticks per second
 	QueryPerformanceFrequency(&frequency);
 	
 	double timeStep = 1.0 / 60.0;
+
 	GAMEFRAMEWORK->SetTimeSinceLastFrame(timeStep);
 
 	while(!m_bShutdown) 
@@ -133,6 +135,7 @@ void AppStateManager::start(AppState* state)
 			}
 			
 			timeAccum += timeSinceLastFrame;
+
 			GAMEFRAMEWORK->SetRealTimeSinceLastFrame(timeSinceLastFrame);
 			
 			// If the timeAccum is corrupted and somehow is below -0.1
@@ -142,6 +145,7 @@ void AppStateManager::start(AppState* state)
 				timeAccum = 0;
 			}
 			
+			// Update the top AppState, DispatchMessages and make Ogre render.
 			while(timeAccum >= timeStep && m_bShutdown == false)
 			{
 
@@ -175,19 +179,6 @@ void AppStateManager::start(AppState* state)
 				pushState_ = false;
 			}
 
-			/*
-			GAMEFRAMEWORK->SetTimeSinceLastFrame(timeSinceLastFrame);
-			GAMEFRAMEWORK->keyboard_->capture();
-			GAMEFRAMEWORK->mouse_->capture();
-
-			m_ActiveStateStack.back()->update(timeSinceLastFrame);
-
-			Dispatch->DispatchDelayedMessages();
-
-			GAMEFRAMEWORK->UpdateOgre(timeSinceLastFrame);
-			GAMEFRAMEWORK->root_->renderOneFrame();
-			*/
-
 			// Sleep for 5ms, we can't possibly need to update this fast.
 			Sleep(5);
 		}
@@ -204,6 +195,9 @@ void AppStateManager::start(AppState* state)
 //=============================================================================
 //							changeAppState
 //
+/// Changes to a different AppState. The current AppState has nothing done to
+/// it, but it will not be updated anymore as it is notthe top AppState. The 
+/// AppState passed in is pushed onto the stack of AppStates.
 void AppStateManager::changeAppState(AppState* state)
 {
 	if(!m_ActiveStateStack.empty()) 
@@ -222,6 +216,7 @@ void AppStateManager::changeAppState(AppState* state)
 //=============================================================================
 //							pushAppState
 //
+/// Pushes an AppState to the top of the stack and pauses the current AppState.
 bool AppStateManager::pushAppState(AppState* state)
 {
 	if(!m_ActiveStateStack.empty()) 
@@ -240,6 +235,8 @@ bool AppStateManager::pushAppState(AppState* state)
 //=============================================================================
 //							pushAppState
 //
+/// Pushes an AppState, given by the state's name, to the top of the stack and
+/// pauses the current AppState.
 bool AppStateManager::pushAppState(Ogre::String stateName)
 {
 	pushState_ = true;
@@ -251,6 +248,8 @@ bool AppStateManager::pushAppState(Ogre::String stateName)
 //=============================================================================
 //						popStateAfterNextUpdate
 //
+/// This sets it so that the current state will be popped after the current
+/// update loop has finished.
 void AppStateManager::popStateAfterNextUpdate()
 {
 	popState_ = true;
@@ -259,6 +258,9 @@ void AppStateManager::popStateAfterNextUpdate()
 //=============================================================================
 //							popAppState
 //
+/// This pops an AppState off the top of the stack. It calls exit on the top
+/// AppState in the stack and then calls Resume on the new top AppState. If
+/// there are no more AppStates after popping the application is shutdown.
 void AppStateManager::popAppState(void)
 {
 	if(!m_ActiveStateStack.empty()) 
@@ -281,6 +283,7 @@ void AppStateManager::popAppState(void)
 //=============================================================================
 //							shutdown
 //
+/// ShutDown the application.
 void AppStateManager::shutdown()
 {
 	m_bShutdown = true;
@@ -289,6 +292,8 @@ void AppStateManager::shutdown()
 //=============================================================================
 //							init
 //
+/// Initialize an AppState. This sets the GameFrameworks keyboard and mouse to
+/// be that of the passed AppState.
 void AppStateManager::init(AppState* state)
 {
 	GameFramework::getSingletonPtr()->keyboard_->setEventCallback(state);

@@ -32,6 +32,8 @@ public:
 		while(meshElement)
 		{
 			GameObjectOgre* object = new GameObjectOgre("StaticMeshObject");
+
+			object->objectName_ = TinyXMLHelper::GetAttribute(meshElement, "name");
 			object->Initialize();
 
 			object->sceneNode_ = GAMEFRAMEWORK->sceneManager->getRootSceneNode()->createChildSceneNode(object->GetName() + "sceneNode");

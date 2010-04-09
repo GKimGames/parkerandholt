@@ -14,7 +14,6 @@
 #include "ParkerStateInAir.h"
 #include "ParkerStateLedgeGrab.h"
 
-
 #include "CameraStateWatch.h"
 #include "CameraStateGoToPoint.h"
 
@@ -26,10 +25,9 @@
 //=============================================================================
 //								Constructor
 //
-CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager, MousePicking* mousePicking)
-:Character(sceneManager)
+/// Create Parkers states, TraumaMeter and PlayerInfo.
+CharacterParker::CharacterParker() : Character()
 {
-	mousePicking_ = mousePicking;
 	parkerId_ = objectId_;
 
 	stateMachine_ = new FSMStateMachine<CharacterParker>(this);
@@ -38,8 +36,6 @@ CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager, MousePicking*
 	inAirState_ = new ParkerStateInAir(this, stateMachine_);
 	ledgeGrabState_ = new ParkerStateLedgeGrab(this, stateMachine_);
 
-
-	
 	stateMachine_->SetCurrentState(onGroundState_);
 	stateMachine_->ChangeState(onGroundState_);
 
@@ -54,11 +50,11 @@ CharacterParker::CharacterParker(Ogre::SceneManager* sceneManager, MousePicking*
 
 
 
-
-
 //=============================================================================
 //								Initialize
 //
+/// Initialize calls InitVariables, ReadXMLConfig, CreateGraphics,
+/// CreatePhysics, and sets up the AnimationBlender.
 bool CharacterParker::Initialize()
 {
 	InitVariables();
@@ -591,36 +587,6 @@ bool CharacterParker::Update(double timeSinceLastFrame)
 		traumaMeter_->AddTrauma(0.01);
 	}
 	return stateMachine_->Update();
-}
-
-float32 CharacterParker::ReportFixture(b2Fixture* fixture, const b2Vec2& point,
-									   const b2Vec2& normal, float32 fraction)
-{
-	
-	//static b2Color color(1,0,234.0/255.0);
-
-	//if(rayCastId == 0)
-	//{
-	//	GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec1, point, color);
-	//}
-	//else
-	//{
-	//	GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec2, point, color);
-	//}
-
-	//if(fixture != feetSensor_)
-	//{
-	//	this->SetBodyPosition(b2Vec2(body_->GetPosition().x, point.y + boundingBoxHeight_/2 + .1 ));
-
-	//	//body_->ApplyForce(b2Vec2(0,abs(body_->GetMass() * world_->GetGravity().y * 2)), body_->GetPosition());
-	//	body_->SetLinearVelocity(b2Vec2(body_->GetLinearVelocity().x,0));
-	//	b2Vec2 force((body_->GetLinearVelocity().x + 0.01) * body_->GetMass() * world_->GetGravity().x,
-	//				 (body_->GetLinearVelocity().y + 0.01) * body_->GetMass() * world_->GetGravity().y);
-	//	fixture->GetBody()->ApplyImpulse(force, point);
-	//}
-
-	return 0;
-
 }
 
 /// Called when two fixtures begin to touch.

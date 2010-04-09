@@ -75,7 +75,7 @@ void MapEditorState::enter()
 	GAMEFRAMEWORK->keyboard_->setEventCallback(this);
 	GAMEFRAMEWORK->mouse_->setEventCallback(this);
 
-	m_bQuit = false;
+	quit_ = false;
 
 	setUnbufferedMode();
 
@@ -165,7 +165,7 @@ void MapEditorState::resume()
 
 	GAMEFRAMEWORK->viewport_->setCamera(camera_);
 
-	m_bQuit = false;
+	quit_ = false;
 	pause_ = false;
 }
 
@@ -235,7 +235,7 @@ void MapEditorState::createPhysics()
 
 	new MovingPlatform(sceneManager_, b2Vec2(10.0f, 1.0f), b2Vec2(0.0f, 1.0f), b2Vec2(5.0f, 1.0f), b2Vec2(0.0f, 5.0f), 2);
 
-	new PressureSwitch(sceneManager_);
+	//new PressureSwitch(sceneManager_);
 
 
 #if DEBUG_DRAW_ON

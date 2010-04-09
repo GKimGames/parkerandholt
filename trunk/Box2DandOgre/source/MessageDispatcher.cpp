@@ -23,7 +23,7 @@ template<> KGBMessageDispatcher* Ogre::Singleton<KGBMessageDispatcher>::ms_Singl
 //=============================================================================
 //						Constructor
 //
-/// Logging of messages is by default false.
+/// Logging of messages is by default true.
 KGBMessageDispatcher::KGBMessageDispatcher()
 {
 	logMessages_ = true;

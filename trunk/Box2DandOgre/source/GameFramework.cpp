@@ -72,12 +72,40 @@ bool GameFramework::InitOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 		}
 
 	}
-
-	//renderWindow_ = root_->initialise(true, wndTitle);    
 	viewport_ = renderWindow_->addViewport(0);
-	viewport_->setBackgroundColour(ColourValue(0.8, 0.8, 0.8, 1.0));
 
-	viewport_->setCamera(0);
+	// Creating a load image
+	// First we have to load the image and material, these are stored in the loadScreen folder
+	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("../../media/materials/loadScreen", "FileSystem", "LoadScreen");
+	Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("LoadScreen");
+
+	// Create background rectangle covering the whole screen
+	Rectangle2D* rect = new Rectangle2D(true);
+	rect->setCorners(-0.5, 0.5, 0.5, -0.5);
+	rect->setMaterial("Materials/LoadMaterial");
+
+	// Use infinite AAB to always stay visible
+	AxisAlignedBox aabInf;
+	aabInf.setInfinite();
+	rect->setBoundingBox(aabInf);
+
+	Ogre::SceneManager* sceneMgr = root_->createSceneManager(ST_GENERIC, "LoadScreen");
+	sceneMgr->setAmbientLight(Ogre::ColourValue(1, 1, 1));
+	SceneNode* node = sceneMgr->getRootSceneNode()->createChildSceneNode("Background");
+	node->attachObject(rect);
+
+	camera_ = sceneMgr->createCamera("LoadCamera");
+	camera_->setNearClipDistance(1);
+	
+	camera_->setAspectRatio(Real(viewport_->getActualWidth()) / 
+		Real(viewport_->getActualHeight()));
+
+	viewport_->setCamera(camera_);
+
+	
+
+	// Render a frame so our loadScreen is drawn.
+	root_->renderOneFrame();
 
 	unsigned long hWnd = 0;
     OIS::ParamList paramList;
@@ -123,6 +151,7 @@ bool GameFramework::InitOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 
 	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+	
 
 	timer_ = new Ogre::Timer();
 	timer_->reset();

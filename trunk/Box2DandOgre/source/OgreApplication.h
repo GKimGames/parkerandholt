@@ -17,18 +17,31 @@
 #include "MessageDispatcher.h"
 
 
-
+/// KGBOgreApplication
+/// This class is created by the main method.
+/// When Start is called a new AppStateManager, a GameFramework singleton and
+/// a KGBMessageDispatcher is created.
 class KGBOgreApplication
 {
 public:
+
+	/// Does nothing
 	KGBOgreApplication();
+
+	/// Delete GameFramework and 
 	~KGBOgreApplication();
 
+	/// Start the Ogre Application.
+	/// Creates an AppStateManager, a GameFramework singleton and a 
+	/// KGBMessageDispatcher and creates the application states.
 	void Start();
 
 private:
+
 	AppStateManager*	appStateManager_;
+
 	bool				initialized_;
+
 };
 
 

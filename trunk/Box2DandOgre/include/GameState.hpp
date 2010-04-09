@@ -58,7 +58,7 @@ private:
 	Ogre::MaterialPtr			m_pOgreHeadMat;
 	Ogre::MaterialPtr			m_pOgreHeadMatHigh;
 
-	bool						m_bQuit;
+	bool						quit_;
 		
 	Ogre::Vector3				m_TranslateVector;
 	Ogre::Real					m_MoveSpeed; 
