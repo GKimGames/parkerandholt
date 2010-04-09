@@ -12,7 +12,7 @@
 //=============================================================================
 //							PressureSwitch::Constructor
 //
-PressureSwitch::PressureSwitch(Ogre::SceneManager* sceneManager,
+PressureSwitch::PressureSwitch(Ogre::SceneManager* sceneManager,b2Vec2 position,
 							   b2Body* body, Ogre::Entity* entity)
 {
 	sceneManager_ = sceneManager;
@@ -26,6 +26,7 @@ PressureSwitch::PressureSwitch(Ogre::SceneManager* sceneManager,
 	// the moving pressure plate
 	b2BodyDef bd;
 	bd.type = b2_staticBody;
+	bd.position = position;
 	staticBody_ = world_->CreateBody(&bd);
 
 	b2PolygonShape shape1;
@@ -45,7 +46,7 @@ PressureSwitch::PressureSwitch(Ogre::SceneManager* sceneManager,
 
 	bd.active = true;
 	bd.type = b2_dynamicBody;
-	bd.position.Set(0.0f, 0.0f);
+	bd.position = position;
 	body_ = world_->CreateBody(&bd);
 
 	b2FixtureDef fd;
@@ -61,8 +62,8 @@ PressureSwitch::PressureSwitch(Ogre::SceneManager* sceneManager,
 	// Create the joint for this switch.
 	b2PrismaticJointDef pjd;
 	pjd.Initialize(staticBody_, body_, // Bodies
-		b2Vec2(0.0f, 5.0f), // Anchor Point
-		b2Vec2(0.0f, 1.0f)  // Axis of movement
+		b2Vec2(position.x, position.y + 5.0f), // Anchor Point
+		b2Vec2(0, 1.0f)  // Axis of movement
 		);
 
 	pjd.motorSpeed = 10.0f;

@@ -1,22 +1,28 @@
 /*=============================================================================
 
-  OgreApplication.cpp
+	  OgreApplication.cpp
 
-  Author: Matt King
+	  Author: Matt King
 
 =============================================================================*/
 
 #include "OgreApplication.h"
 
 
-
+//=============================================================================
+//						Constructor
+//
+/// Does nothing
 KGBOgreApplication::KGBOgreApplication()
 {
 	initialized_ = false;
 }
 
 
-
+//=============================================================================
+//						Destructor
+//
+/// Delete the GameFramwork, KGBMessageDispatcher and AppStateManager.
 KGBOgreApplication::~KGBOgreApplication()
 {
 	delete GameFramework::getSingletonPtr();
@@ -29,7 +35,12 @@ KGBOgreApplication::~KGBOgreApplication()
 
 }
 
-
+//=============================================================================
+//						Start
+//
+/// Start the Ogre Application.
+/// Creates an AppStateManager, a GameFramework singleton and a 
+/// KGBMessageDispatcher and creates the application states.
 void KGBOgreApplication::Start()
 {
 

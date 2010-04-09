@@ -24,6 +24,8 @@ class TiXmlNode;
 class TinyXMLHelper
 {
 public:
+	static Ogre::Vector3 ogreOffset;
+	static b2Vec2		 boxOffset;
 	static TiXmlHandle* GetRootFromFile(Ogre::String fileName, TiXmlDocument* configXML_);
 	static Ogre::String GetAttribute(TiXmlElement* element, const Ogre::String& name, const Ogre::String& defaultValue = "");
 	static KGBMessageType GetMessage(TiXmlElement* element, const Ogre::String& name, KGBMessageType defaultValue = NO_MESSAGE);

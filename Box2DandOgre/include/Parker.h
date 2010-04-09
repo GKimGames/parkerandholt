@@ -24,24 +24,22 @@
 class MousePicking;
 class Door;
 
-/// Parkers class
-class CharacterParker : public Character, public b2RayCastCallback
+/// Parkers class, extends Character. 
+class CharacterParker : public Character
 {
 	friend class ParkerStateOnGround;
 	friend class ParkerStateInAir;
 	friend class ParkerStateLedgeGrab;
+
 public:
 
-	CharacterParker(Ogre::SceneManager* sceneManager, MousePicking* mousePicking);
+	CharacterParker();
 
 	~CharacterParker(){}
 
 	virtual bool HandleMessage(const KGBMessage message);
 
 	virtual bool Update(double timeSinceLastFrame);
-
-	virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point,
-									const b2Vec2& normal, float32 fraction);
 
 	/// Called when two fixtures begin to touch.
 	virtual void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
@@ -50,9 +48,15 @@ public:
 	virtual void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 	
 	virtual void PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse);
+	
 	virtual void ReturnToCheckPoint();
+	
+	/// Initialize calls InitVariables, ReadXMLConfig, CreateGraphics,
+	/// CreatePhysics, and sets up the AnimationBlender.
 	virtual bool Initialize();
+	
 	virtual void SetActive(bool active);
+	
 	virtual PlayerInfo* GetPlayerInfo();
 
 	virtual bool IsFootSensor(b2Fixture* fixture);

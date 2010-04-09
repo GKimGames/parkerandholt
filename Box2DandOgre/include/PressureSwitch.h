@@ -20,7 +20,7 @@ class PressureSwitch : public GameObjectSensor
 
 public:
 
-	PressureSwitch(Ogre::SceneManager* sceneManager,
+	PressureSwitch(Ogre::SceneManager* sceneManager,b2Vec2 position,
 				   b2Body* body = 0, Ogre::Entity* entity = 0);
 
 	/// Called when two fixtures begin to touch.

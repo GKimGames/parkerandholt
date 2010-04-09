@@ -35,7 +35,7 @@ class CharacterHolt: public CharacterParker
 
 public:
 
-	CharacterHolt(Ogre::SceneManager* sceneManager, MousePicking* mousePicking);
+	CharacterHolt(MousePicking* mousePicking);
 	~CharacterHolt(){}
 	bool Initialize();
 

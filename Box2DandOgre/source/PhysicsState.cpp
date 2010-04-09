@@ -28,14 +28,15 @@ class LedgeSensor;
 PhysicsState::PhysicsState(Ogre::String levelName)
 {
 	levelName_ = levelName;
-	m_MoveSpeed			= 0.1;
-	m_RotateSpeed		= 0.3;
-	m_pCurrentObject	= 0;
+
 }
 
 //=============================================================================
 //							enter
 //
+/// Enter sets up everything the state needs to render and simulate physics.
+/// Enter creates a new GameObjectList for this state, it's own sceneManager
+/// and camera. It calls createScene.
 void PhysicsState::enter()
 {
 
@@ -64,17 +65,9 @@ void PhysicsState::enter()
 	delete root;
 	delete settingsDoc;
 
+	// When creating a Scene Manager it is set as the roots new Scene Manager.
 	sceneManager_ = GAMEFRAMEWORK->root_->createSceneManager(ST_GENERIC, "PhysicsSceneMgr" + levelName_);
 	GAMEFRAMEWORK->sceneManager = sceneManager_;
-
-	//myGUI = new MyGUI::Gui();
-	//myGUI->initialise(GAMEFRAMEWORK->renderWindow_);
-	//myGUI->setSceneManager(sceneManager_);
-	//MyGUI::LayoutManager::getInstance().load("Console.layout");
-	/*
-	MyGUI::ButtonPtr button = myGUI->createWidget<MyGUI::Button>("Button", 10, 10, 300, 26, MyGUI::Align::Default, "Main");
-	button->setCaption("exit");
-	*/
 
 	sceneManager_->setAmbientLight(Ogre::ColourValue(0.7, 0.7, 0.7));		
 
@@ -93,20 +86,13 @@ void PhysicsState::enter()
 	GAMEFRAMEWORK->keyboard_->setEventCallback(this);
 	GAMEFRAMEWORK->mouse_->setEventCallback(this);
 
-	m_bLMouseDown = m_bRMouseDown = false;
-	m_bQuit = false;
-	m_bChatMode = false;
-
-	setUnbufferedMode();
+	quit_ = false;
 
 	createScene();
 
-	CompositorManager::getSingleton().addCompositor(GAMEFRAMEWORK->viewport_, "B&W");
-	//CompositorManager::getSingleton().setCompositorEnabled(GAMEFRAMEWORK->viewport_, "B&W",true);
-
+	// Show the overlays
 	time_ = minutes_ = seconds_ = 0;
 
-	// Drawing the debug overlay, it shows FPS stats.
 	timeLeftOverlay_ = OverlayManager::getSingleton().getByName("PaH/Timer");
 	timeLeftOverlay_->show();
 
@@ -119,6 +105,7 @@ void PhysicsState::enter()
 //=============================================================================
 //						UpdateOverlay
 //
+/// Update the overlays' values.
 void PhysicsState::UpdateOverlay()
 {
 
@@ -151,6 +138,31 @@ void PhysicsState::UpdateOverlay()
 
 	guiCurr->setCaption(strMinutes+":"+strSeconds); 
 	guiCurr->setColour(Ogre::ColourValue(seconds_ / 60.0,1,1,1));
+
+	guiCurr = OverlayManager::getSingleton().getOverlayElement("PaH/ParkerPickup"); 
+	Ogre::String inventoryCountStr;
+
+	if(parker_->GetPlayerInfo()->GetInventory() < 10)
+	{
+		inventoryCountStr += "0";
+	}
+
+	inventoryCountStr += StringConverter::toString(parker_->GetPlayerInfo()->GetInventory());
+
+	guiCurr->setCaption(inventoryCountStr); 
+
+	inventoryCountStr = "";
+
+	if(holt_->GetPlayerInfo()->GetInventory() < 10)
+	{
+		inventoryCountStr += "0";
+	}
+
+	inventoryCountStr += StringConverter::toString(holt_->GetPlayerInfo()->GetInventory());
+
+	guiCurr = OverlayManager::getSingleton().getOverlayElement("PaH/HoltPickup"); 
+	
+	guiCurr->setCaption(inventoryCountStr); 
 }
 
 //=============================================================================
@@ -159,8 +171,6 @@ void PhysicsState::UpdateOverlay()
 bool PhysicsState::pause()
 {
 	GameFramework::getSingletonPtr()->log_->logMessage("Pausing PhysicsState...");
-
-	//this->pushAppState(findByName("InGameMenu"));
 
 	return true;
 }
@@ -171,15 +181,15 @@ bool PhysicsState::pause()
 void PhysicsState::resume()
 {
 	
+	AppState::resume();
+
 	GameFramework::getSingletonPtr()->log_->logMessage("Resuming PhysicsState...");
 	GameFramework::getSingletonPtr()->viewport_->setCamera(camera_);
 	GAMEFRAMEWORK->sceneManager = sceneManager_;
 	GAMEFRAMEWORK->world_ = world;
 	GAMEFRAMEWORK->gameCamera_ = gameCamera_;
 
-	AppState::resume();
-
-	m_bQuit = false;
+	quit_ = false;
 	pause_ = false;
 }
 
@@ -196,9 +206,6 @@ void PhysicsState::exit()
 	GameFramework::getSingletonPtr()->log_->logMessage("Leaving PhysicsState...");
 
 	sceneManager_->destroyCamera(camera_);
-	
-	//myGUI->shutdown();
-	//delete myGUI;
 
 	this->deleteObjects();
 
@@ -221,6 +228,7 @@ void PhysicsState::exit()
 //=============================================================================
 //							createPhysics
 //
+/// Create the b2World and load the level.
 void PhysicsState::createPhysics()
 {
 	// Define the gravity vector.
@@ -234,16 +242,39 @@ void PhysicsState::createPhysics()
 	GameFramework::getSingletonPtr()->SetWorld(world);
 	world->SetContactListener(this);
 
+#if DEBUG_DRAW_ON
+	debugDraw_ = new OgreB2DebugDraw(sceneManager_, "debugDraw", 0);
+	debugDraw_->SetFlags(
+		b2DebugDraw::e_jointBit	
+		| b2DebugDraw::e_shapeBit
+		//| b2DebugDraw::e_aabbBit 
+		);
 
+	world->SetDebugDraw(debugDraw_);
+	GAMEFRAMEWORK->SetDebugDraw(debugDraw_);
+	debugDrawOn_ = false;
+
+#endif
+
+	// Create a GameObjectFactory object and tell it to load a level.
 	GameObjectFactory* gof = new GameObjectFactory();
 	gof->AddObjectCreators();
 	gof->sceneManager = sceneManager_;
 	gof->LoadFile(levelName_);
 
+	// Load some level specific settings.
 	TiXmlDocument* configXML_ = 0;
-	TiXmlHandle* handle = TinyXMLHelper::GetRootFromFile("..\\LevelTwo.xml",configXML_);
+	TiXmlHandle* handle = TinyXMLHelper::GetRootFromFile(levelName_,configXML_);
 	
 	TiXmlElement* element = handle->FirstChildElement("LevelInfo").ToElement();
+	TiXmlElement* parkerElement = element->FirstChildElement();
+	//TiXmlElement* parkerElement = element->FirstChildElement("Parker");
+
+	b2Vec2 parkerPosition = TinyXMLHelper::GetAttributeb2Vec2(parkerElement, "position", b2Vec2(0,1.3));
+
+	TiXmlElement* holtElement = element->FirstChildElement("Holt");
+
+	b2Vec2 holtPosition = TinyXMLHelper::GetAttributeb2Vec2(holtElement, "position", b2Vec2(0,1.3));
 	
 	delete handle;
 	delete configXML_;
@@ -253,17 +284,17 @@ void PhysicsState::createPhysics()
 
 	myMouse_ = new MousePicking(sceneManager_, camera_);
 
-	parker_  = new CharacterParker(sceneManager_, myMouse_);
+	parker_  = new CharacterParker();
 	parker_->Initialize();
 	parker_->InitializeDebugDraw();
-	parker_->SetBodyPosition(b2Vec2(0, 1.3));
+	parker_->SetBodyPosition(parkerPosition);
 
-
+	// Set the active character to parker.
 	active_ = parker_;
 
-	holt_ = new CharacterHolt(sceneManager_, myMouse_);
+	holt_ = new CharacterHolt(myMouse_);
 	holt_->Initialize();
-	holt_->GetBody()->SetTransform(b2Vec2(4, 1), 0);
+	holt_->GetBody()->SetTransform(holtPosition, 0);
 
 	gameCamera_ = new GameCamera(camera_);
 	GAMEFRAMEWORK->gameCamera_ = gameCamera_;
@@ -274,14 +305,26 @@ void PhysicsState::createPhysics()
 
 	gameCamera_->InitializeDef(&def);
 
-	Dispatch->DispatchMessage(SEND_IMMEDIATELY, parker_->GetId(), parker_->GetId(), SET_POSITION, Ogre::Vector3(3,1,0));
+	// Hard coded, done poorly. This is here to circumvent creating a generic
+	// level state that could be a level and the main menu.
+	//
+	// Reading complicated messages in from XML was never implemented.
+	if(levelName_.compare("..\\LevelTwo.xml") == 0)
+	{
+		PressureSwitch* ps = new PressureSwitch(sceneManager_, b2Vec2(70,23.3));
+		ps->AddToMessageList(GameObject::GetObjectById("chuteBlockA")->GetId(), GO_DESTROY);
 
+		ps = new PressureSwitch(sceneManager_, b2Vec2(42,3));
+		ps->AddToMessageList(GameObject::GetObjectById("chuteBlockB")->GetId(), GO_DESTROY);
 
-	//new MovingPlatform(sceneManager_, b2Vec2(10.0f, 1.0f), b2Vec2(0.0f, 1.0f), b2Vec2(5.0f, 1.0f), b2Vec2(0.0f, 5.0f), 2);
-	PressureSwitch* ps = new PressureSwitch(sceneManager_);
+		ps = new PressureSwitch(sceneManager_, b2Vec2(115.5,30));
+		ps->AddToMessageList(GameObject::GetObjectById("chuteBlockD")->GetId(), GO_DESTROY);
 
-	ps->AddToMessageList(parker_->GetId(), CREATE_BOX);
+		ps = new PressureSwitch(sceneManager_, b2Vec2(132, 10));
+		ps->AddToMessageList(GameObject::GetObjectById("chuteBlockC")->GetId(), GO_DESTROY);
+	}
 
+	// Create a key handler and set some key bindings.
 	myKeyHandler_ = new KeyHandler(GameFramework::getSingletonPtr()->keyboard_);
 
 	myKeyHandler_->AddKey(OIS::KC_RIGHT, CHARACTER_MOVE_RIGHT_PLUS, CHARACTER_MOVE_RIGHT_MINUS);
@@ -341,19 +384,6 @@ void PhysicsState::createPhysics()
 	ls->SetBodyPosition(b2Vec2(0,5));
 	*/
 
-#if DEBUG_DRAW_ON
-	debugDraw_ = new OgreB2DebugDraw(sceneManager_, "debugDraw", 0);
-	debugDraw_->SetFlags(
-		b2DebugDraw::e_jointBit	
-		| b2DebugDraw::e_shapeBit
-		//| b2DebugDraw::e_aabbBit 
-		);
-
-	world->SetDebugDraw(debugDraw_);
-	GAMEFRAMEWORK->SetDebugDraw(debugDraw_);
-	debugDrawOn_ = false;
-
-#endif
 
 }
 
@@ -373,17 +403,12 @@ void PhysicsState::CreateBox()
 //=============================================================================
 //							createScene
 //
+/// Create the Ogre scene, this calls createPhysics once it is done.
 void PhysicsState::createScene()
 {
 
 	sceneManager_->getRootSceneNode()->setPosition(0,0,0);
 	GAMEFRAMEWORK->viewport_->setBackgroundColour(Ogre::ColourValue(0.231, 0.631, 1.0));
-	//sceneManager_->setSkyBox(true, "Examples/SpaceSkyBox");
-	//sceneManager_->setSkyBox(true, "Examples/WhiteSkyBox", 10000);
-	float mCurvature = 45;
-	float mTiling = 5;
-	//sceneManager_->setSkyDome(true, "Examples/WhiteSkyBox", mCurvature, mTiling);
-	//sceneManager_->setSkyDome(true, "Examples/CloudySky", 20, 5);
 
 	Ogre::Light* light = sceneManager_->createLight("Light");
 	
@@ -407,11 +432,8 @@ void PhysicsState::createScene()
 	light3->setSpotlightRange(Degree(35), Degree(50));
 
 	sceneManager_->setAmbientLight(ColourValue(0.09, 0.09, 0.09));
-	//sceneManager_->setAmbientLight(ColourValue(0.7, 0.7, 0.7));
 	sceneManager_->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
 
-	//button->eventMouseButtonClick = MyGUI::newDelegate(this, &CLASS_NAME::METHOD_NAME);
-	//button->eventMouseButtonClick = MyGUI::newDelegate(this, &PhysicsState::MakeExit);
 
 	createPhysics();
 }
@@ -420,6 +442,7 @@ void PhysicsState::createScene()
 //=============================================================================
 //							keyPressed
 //
+/// OIS callback for when a key is pressed.
 bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 {
 	static bool myFlip = true;
@@ -454,15 +477,9 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 		}
 	}
 
-
-	if(keyEventRef.key == OIS::KC_P)
-	{
-		//pause_ = true;
-	}
-
 	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_ESCAPE))
 	{
-		m_bQuit = true;
+		quit_ = true;
 		return true;
 	}
 	
@@ -475,7 +492,6 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 	{
 		CompositorManager::getSingleton().setCompositorEnabled(GAMEFRAMEWORK->viewport_, "B&W",true);
 	}
-	
 
 	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_R))
 	{
@@ -514,6 +530,7 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 //=============================================================================
 //							keyReleased
 //
+/// OIS callback for when a key is released.
 bool PhysicsState::keyReleased(const OIS::KeyEvent &keyEventRef)
 {
 	GameFramework::getSingletonPtr()->KeyReleased(keyEventRef);
@@ -548,11 +565,11 @@ bool PhysicsState::keyReleased(const OIS::KeyEvent &keyEventRef)
 //=============================================================================
 //							mouseMoved
 //
+/// OIS callback for when the mouse is moved.
 bool PhysicsState::mouseMoved(const OIS::MouseEvent &evt)
 {
 	static double angle = 0;
 	Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, myMouse_->GetId(), UPDATE_MOUSE, &evt);
-	//myGUI->injectMouseMove(evt);
 
 	return true;
 }
@@ -560,19 +577,18 @@ bool PhysicsState::mouseMoved(const OIS::MouseEvent &evt)
 //=============================================================================
 //							mousePressed
 //
+/// OIS callback for when the mouse button is pressed.
 bool PhysicsState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
-	//myGUI->injectMousePress(evt, id);
 
 	if(id == OIS::MB_Left)
 	{
 		Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, SEND_TO_ALL, LEFT_MOUSE_PLUS, NULL);
-		m_bLMouseDown = true;
+
 	} 
 	else if(id == OIS::MB_Right)
 	{
 		Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, SEND_TO_ALL, RIGHT_MOUSE_PLUS, NULL);
-		m_bRMouseDown = true;
 	} 
 	else if(id == OIS::MB_Middle)
 	{
@@ -586,19 +602,19 @@ bool PhysicsState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID i
 //=============================================================================
 //							mouseReleased
 //
+/// OIS callback for when the mouse button is released.
 bool PhysicsState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
 	
-	//myGUI->injectMouseRelease(evt, id);
 	if(id == OIS::MB_Left)
 	{
 		Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, SEND_TO_ALL, LEFT_MOUSE_MINUS, NULL);
-		m_bLMouseDown = false;
+
 	} 
 	else if(id == OIS::MB_Right)
 	{
 		Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, SEND_TO_ALL, RIGHT_MOUSE_MINUS, NULL);
-		m_bRMouseDown = false;
+
 	}
 	else if(id == OIS::MB_Middle)
 	{
@@ -613,7 +629,8 @@ bool PhysicsState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID 
 //=============================================================================
 //							moveCamera
 //
-
+/// Originally used for moving the camera basd upon what keys were pressed. Now
+/// it just updates the mouse because the camera has moved.
 void PhysicsState::moveCamera()
 {
 	myMouse_->UpdateMouseFromCamera();
@@ -623,83 +640,36 @@ void PhysicsState::moveCamera()
 //=============================================================================
 //							getInput
 //
+/// Poll the input devices for the states and do stuff with them. This is done
+/// once per update.
 void PhysicsState::getInput()
 {
-	if(m_bChatMode == false)
-	{
 
-		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_A))
-		{
-			m_TranslateVector.x = -m_MoveScale;
-		}
 #if DEBUG_DRAW_ON
-		// Turn Debug Draw off
-		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_Z))
-		{
-			debugDrawOn_ = false;
-		}
-
-		// Turn Debug Draw on
-		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_X))
-		{
-			debugDrawOn_ = true;
-		}
-#endif
-
-		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_D))
-		{
-			m_TranslateVector.x = m_MoveScale;
-		}
-
-		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_W))
-		{
-			m_TranslateVector.z = -m_MoveScale;
-		}
-
-		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_S))
-		{
-			m_TranslateVector.z = m_MoveScale;
-		}
-
-		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_DOWN))
-		{
-			camera_->pitch(-m_RotScale);
-		}
-
-		/*if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_Y))
-		{
-			active_->ReturnToCheckPoint(active_->GetPlayerInfo()->GetCheckPoint());
-		}*/
-
-		/*
-		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_NUMPAD4))
-		{
-			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, myCharacter_->GetId(), CHARACTER_MOVE_LEFT, NULL);
-		}
-
-		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_NUMPAD6))
-		{
-			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, myCharacter_->GetId(), CHARACTER_MOVE_RIGHT, NULL);
-		}
-
-		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_NUMPAD8))
-		{
-			Dispatch->DispatchMessageA(SEND_IMMEDIATELY, 0, myCharacter_->GetId(), CHARACTER_JUMP, NULL);
-		}
-		*/
-		
+	// Turn Debug Draw off
+	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_Z))
+	{
+		debugDrawOn_ = false;
 	}
+
+	// Turn Debug Draw on
+	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_X))
+	{
+		debugDrawOn_ = true;
+	}
+#endif	
+	
 }
 
 //=============================================================================
 //							update
 //
-/// Main Update looped for a level
+/// Main Update loop for a level
 bool PhysicsState::update(double timeSinceLastFrame)
 {
 	static double time = 0;
 
-	if(m_bQuit == true)
+	if(quit_ == true)
 	{
 		this->popAppState();
 		return false;
@@ -712,12 +682,6 @@ bool PhysicsState::update(double timeSinceLastFrame)
 	}
 
 	time += timeSinceLastFrame;
-
-	// Update the variables that control how the camera moves
-	m_MoveScale = m_MoveSpeed   * timeSinceLastFrame;
-	m_RotScale  = m_RotateSpeed * timeSinceLastFrame;
-
-	m_TranslateVector = Vector3::ZERO;
 	
 	while(time >= timeStep)
 	{
@@ -746,11 +710,12 @@ bool PhysicsState::update(double timeSinceLastFrame)
 		ProcessPostSolveData();
 
 		world->Step(0,1,1);
+
 		// Update all the game objects.
 		GameObject::UpdateObjectList(timeStep);
-		
 
 		moveCamera();
+
 		UpdateOverlay();
 	}
 
@@ -759,28 +724,11 @@ bool PhysicsState::update(double timeSinceLastFrame)
 
 }
 
-void PhysicsState::setBufferedMode()
-{
-}
-
-void PhysicsState::setUnbufferedMode()
-{
-}
-
 //=============================================================================
 //							PreSolve
 //
 void PhysicsState::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
 {
-	/*
-	PreSolveData* psd = new PreSolveData();
-
-	contact->SetSensor
-	psd->contact = contact;
-	psd->oldManifold = new b2Manifold((*oldManifold));
-
-	preSolveList_.push_back(psd);
-	*/
 
 	// Check if fixtureA's body has some user data
 	// If it does check if the Object responds to contacts
@@ -867,6 +815,8 @@ void PhysicsState::EndContact(b2Contact* contact)
 //=============================================================================
 //						ProcessPreSolveData
 //
+/// Process the buffered PreSolve data. This processes the data of b2Contacts
+/// before they go to Box2D's contact solver.
 void PhysicsState::ProcessPreSolveData()
 {
 	PreSolveData* psData;
@@ -920,6 +870,8 @@ void PhysicsState::ProcessPreSolveData()
 //=============================================================================
 //						ProcessPostSolveData
 //
+/// Process the buffered PostSolve data. This processes the data of b2Contacts
+/// before they go to Box2D's contact solver.
 void PhysicsState::ProcessPostSolveData()
 {
 	PostSolveData* psData;
@@ -973,10 +925,11 @@ void PhysicsState::ProcessPostSolveData()
 //=============================================================================
 //							ProcessContacts
 //
+/// Process the buffered contacts. This is just when contacts are collding.
 void PhysicsState::ProcessContacts()
 {
 
-	{
+	{	// Scope the variables - easier to read.
 		ContactPoint* contact; 
 		ContactList::iterator iter;
 
@@ -1017,7 +970,7 @@ void PhysicsState::ProcessContacts()
 		}
 	}
 
-	{
+	{	// Scope the variables - easier to read.
 		ContactPoint* contact; 
 		ContactList::iterator iter;
 
@@ -1060,6 +1013,7 @@ void PhysicsState::ProcessContacts()
 
 	ContactList::iterator iter;
 
+	// Must delete the contacts we buffered.
 	for(iter = endContactList_.begin(); iter != endContactList_.end(); iter++)
 	{
 		delete (*iter);
@@ -1091,5 +1045,14 @@ void PhysicsState::SayGoodbye(b2Joint* joint)
 /// Called when any fixture is about to be destroyed due
 /// to the destruction of its parent body.
 void PhysicsState::SayGoodbye(b2Fixture* fixture)
+{
+}
+
+
+void PhysicsState::setBufferedMode()
+{
+}
+
+void PhysicsState::setUnbufferedMode()
 {
 }

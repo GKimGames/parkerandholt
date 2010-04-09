@@ -1,4 +1,10 @@
+/*=============================================================================
 
+		MenuState.h
+
+		Author: Matt King
+
+=============================================================================*/
 
 #ifndef MENU_STATE_HPP
 #define MENU_STATE_HPP
@@ -6,9 +12,12 @@
 #include "AppState.hpp"
 #include "GameFramework.h"
 
+/// This class could isn't really used anymore, only physicstate.
+/// if at some point a menu is really necessary this will be expanded.
 class MenuState : public AppState
 {
 public:
+
 	DECLARE_APPSTATE_CLASS(MenuState)
 
 	void enter();
@@ -29,7 +38,7 @@ public:
 
 
 private:
-	bool m_bQuit;
+	bool quit_;
 };
 
 

@@ -13,6 +13,8 @@
 FadingPlatform::FadingPlatform(Ogre::String name,b2Body* body,Ogre::Entity* entity):
 GameObjectOgreBox2D(name, body, entity)
 {
+	isOneShot_ = false;
+
 	fadeSpeed_ = 0.4;
 	isFading_ = false;
 	fadeTimer_ = 0.0;
@@ -119,11 +121,14 @@ bool FadingPlatform::Update(double timeSinceLastFrame)
 
 				if(fadeTimer_ >= fadeReappearTime_)
 				{
-					body_->SetActive(true);
-					SetBodyPosition(initialPosition_);
-					SetTransparency(0.0);
-					isFading_ = false;
-					fadeTimer_ = 0.0;	
+					if(!isOneShot_)
+					{
+						body_->SetActive(true);
+						SetBodyPosition(initialPosition_);
+						SetTransparency(0.0);
+						isFading_ = false;
+						fadeTimer_ = 0.0;	
+					}
 				}
 			}
 

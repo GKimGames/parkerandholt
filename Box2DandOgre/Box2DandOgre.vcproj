@@ -345,10 +345,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\source\MapEditorState.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\source\MenuState.cpp"
 					>
 				</File>
@@ -592,10 +588,6 @@
 					Name="Parker"
 					>
 					<File
-						RelativePath=".\include\BetaGUI.h"
-						>
-					</File>
-					<File
 						RelativePath=".\include\Parker.h"
 						>
 					</File>
@@ -662,10 +654,6 @@
 				</File>
 				<File
 					RelativePath=".\include\Level.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\MapEditorState.h"
 					>
 				</File>
 				<File

@@ -38,7 +38,7 @@ void MenuState::enter()
 	GameFramework::getSingletonPtr()->keyboard_->setEventCallback(this);
 	GameFramework::getSingletonPtr()->mouse_->setEventCallback(this);
 
-	m_bQuit = false;
+	quit_ = false;
 	
 	createScene();
 }
@@ -61,7 +61,7 @@ void MenuState::resume()
 	GameFramework::getSingletonPtr()->log_->logMessage("Resuming MenuState...");
 	GameFramework::getSingletonPtr()->viewport_->setCamera(m_pCamera);
 
-	m_bQuit = false;
+	quit_ = false;
 }
 
 
@@ -75,32 +75,6 @@ void MenuState::createScene()
 	gof.AddObjectCreators();
 	gof.sceneManager = sceneManager_;
 	gof.LoadFile("..\\MainMenu.xml");
-
-	/*
-	Ogre::StringVector sv = Ogre::ResourceGroupManager::getSingletonPtr()->getResourceGroups();
-	
-
-	for(int i = 0; i < sv.size(); i++)
-	{
-		Ogre::FileInfoListPtr resources = Ogre::ResourceGroupManager::getSingletonPtr()->listResourceFileInfo(sv[i]);
-		Ogre::StringVectorPtr sv2 = Ogre::ResourceGroupManager::getSingletonPtr()->findResourceNames(sv[i], Ogre::String("*.mesh"));
-		
-		Ogre::StringVector::iterator it2 = sv2->begin();
-		for(it2; it2 != (*sv2).end(); it2++)
-		{
-			Ogre::String sv3 = (*it2);
-		}
-		
-		Ogre::FileInfoList::iterator it;
-		it = resources->begin();
-		
-		for(it; it != resources->end(); it++)
-		{
-			Ogre::FileInfo fi = (*it);
-		}
-	}
-	*/
-	
 
 }
 
@@ -122,7 +96,7 @@ bool MenuState::keyPressed(const OIS::KeyEvent &keyEventRef)
 {
 	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_ESCAPE))
 	{
-		m_bQuit = true;
+		quit_ = true;
 		return true;
 	}
 
@@ -181,7 +155,7 @@ void MenuState::getInput()
 
 bool MenuState::update(double timeSinceLastFrame)
 {
-	if(m_bQuit == true)
+	if(quit_ == true)
 	{
 		this->popAppState();
 		return false;
