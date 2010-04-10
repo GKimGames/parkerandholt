@@ -72,6 +72,8 @@ public:
 
 	/// Updates the DebugDraw if it is enabled and calls it's parent's class
 	/// update method.
+	/// All children of the class must call this Update function before 
+	/// their own. This pattern should extend through all children.
 	virtual bool Update(double timeSinceLastFrame);
 
 	/// Each class that extends this class should call this HandleMessage before
