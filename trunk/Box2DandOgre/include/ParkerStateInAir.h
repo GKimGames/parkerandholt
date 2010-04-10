@@ -15,6 +15,8 @@
 
 
 class CharacterParker;
+
+/// State for Parker in the Air.
 class ParkerStateInAir : public ParkerState
 {
 
@@ -44,9 +46,16 @@ public:
 
 protected:
 
+	/// MoveLeft function.
 	void MoveLeft();
+
+	/// MoveRight function.
 	void MoveRight();
+
+	/// Jump function.
 	void Jump();
+
+	/// Update CharacterParker's AnimationBlender.
 	void UpdateAnimation();
 
 	Ogre::Vector3 direction_;

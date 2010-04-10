@@ -13,6 +13,7 @@
 #include "GameObjectOgre.h"
 
 class GameCamera;
+
 class CameraStateWatchDef : public CameraStateDef
 {
 public:
@@ -26,6 +27,7 @@ public:
 
 };
 
+/// This class follows a GameObjectOgre around.
 class CameraStateWatch : public CameraState
 {
 public:
@@ -51,6 +53,7 @@ public:
 
 protected:
 
+	/// The target object the camera will watch.
 	GameObjectOgre* targetObject_;
 
 };

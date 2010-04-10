@@ -53,9 +53,11 @@
 
 
 #define DEBUG_DRAW_ON 1
+
+
 class CharacterParker;
 
-/// This classes extends AppState and the Box2D interfaces. It creates and ogre scene
+/// This class extends AppState and the Box2D interfaces. It creates and Ogre scene
 /// and a b2World object. This allows for simulating physics with a graphical front end.
 class PhysicsState : public AppState, public b2ContactListener, public b2DestructionListener
 {
@@ -81,7 +83,9 @@ public:
 
 	/// Enter sets up everything the state needs to render and simulate physics.
 	/// Enter creates a new GameObjectList for this state, it's own sceneManager
-	/// and camera. It calls createScene.
+	/// and camera. It calls createScene. It also sets GameFramework's variables
+	/// to be of this class, so the globally available SceneManager and b2World
+	/// in GameFramework are this class'.
 	void enter();
 
 	/// Create the Ogre scene, this calls createPhysics once it is done.
@@ -90,7 +94,11 @@ public:
 	/// Create the b2World and load the level.
 	void createPhysics();
 
+	/// Delete all the GameObjects created, the camera, the SceneManager and
+	/// disable the overlays.
 	void exit();
+
+	// These aren't used right now.
 	bool pause();
 	void resume();
 
@@ -120,9 +128,8 @@ public:
 
 
 	// ==== Box2D Callbacks
-
 	// These callbacks can't do much while Box2D is being updated so
-	// they're buffered and handles afterwards.
+	// they're buffered and handled afterwards.
 	void PreSolve(b2Contact* contact, const b2Manifold* oldManifold);
 	void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse);
 

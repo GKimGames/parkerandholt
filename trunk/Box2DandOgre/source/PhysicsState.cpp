@@ -195,11 +195,10 @@ void PhysicsState::resume()
 //=============================================================================
 //							exit
 //
+/// Delete all the GameObjects created, the camera, the SceneManager and
+/// disable the overlays.
 void PhysicsState::exit()
 {
-
-	CompositorManager::getSingleton().setCompositorEnabled(GAMEFRAMEWORK->viewport_, "B&W",false);
-	CompositorManager::getSingleton().removeCompositorChain(GAMEFRAMEWORK->viewport_);
 
 	GameFramework::getSingletonPtr()->log_->logMessage("Leaving PhysicsState...");
 
@@ -288,7 +287,7 @@ void PhysicsState::createPhysics()
 	parker_->SetBodyPosition(parkerPosition);
 
 	// Set the active character to parker.
-	active_ = parker_;
+	activeCharacter_ = parker_;
 
 	holt_ = new CharacterHolt(myMouse_);
 	holt_->Initialize();
@@ -304,7 +303,7 @@ void PhysicsState::createPhysics()
 	gameCamera_->InitializeDef(&def);
 
 	// Hard coded, done poorly. This is here to circumvent creating a generic
-	// level state that could be a level and the main menu.
+	// level state that could be a level and the main menu level.
 	//
 	// Reading complicated messages in from XML was never implemented.
 	if(levelName_.compare("..\\LevelTwo.xml") == 0)
@@ -448,10 +447,10 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 
 	if(keyEventRef.key == OIS::KC_9)
 	{
-		if(active_ != parker_)
+		if(activeCharacter_ != parker_)
 		{
 			myMouse_->SetVisibility(false);
-			active_ = parker_;
+			activeCharacter_ = parker_;
 			holt_->SetActive(false);
 			parker_->SetActive(true);
 			CameraStateWatchDef def;
@@ -463,9 +462,9 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 
 	if(keyEventRef.key == OIS::KC_0)
 	{
-		if(active_ != holt_)
+		if(activeCharacter_ != holt_)
 		{
-			active_ = holt_;
+			activeCharacter_ = holt_;
 			parker_->SetActive(false);
 			holt_->SetActive(true);
 			CameraStateWatchDef def;
@@ -508,7 +507,7 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 	{
 		CameraStateWatchDef def;
 		def.initialPosition = camPosition;
-		def.targetObject = active_;
+		def.targetObject = activeCharacter_;
 		gameCamera_->InitializeDef(&def);
 	}
 
@@ -516,7 +515,7 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 	{
 		CameraStateWatchDef def;
 		def.initialPosition = Ogre::Vector3(0,8,50);
-		def.targetObject = active_;
+		def.targetObject = activeCharacter_;
 		gameCamera_->InitializeDef(&def);
 	}
 
@@ -536,7 +535,7 @@ bool PhysicsState::keyReleased(const OIS::KeyEvent &keyEventRef)
 
 	if(keyEventRef.key == OIS::KC_Y)
 	{
-		active_->ReturnToCheckPoint();
+		activeCharacter_->ReturnToCheckPoint();
 	}
 
 #if DEBUG_DRAW_ON

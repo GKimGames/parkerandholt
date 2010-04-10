@@ -14,6 +14,7 @@
 
 class GameCamera;
 
+
 class CameraStateGoToPointDef : public CameraStateDef
 {
 public:
@@ -23,12 +24,17 @@ public:
 		type = CAMERASTATE_GOTOPOINT;
 	}
 
+	/// Initial position of the camera
 	Ogre::Vector3 initialPosition;
 	
+	/// The Vector the camera wants to move to.
 	Ogre::Vector3 target;
 
+	/// How fast the camera gets there.
 	Ogre::Real factor;
 
+	/// The distance in which the camera needs to be within to be considered
+	/// have reached the target.
 	Ogre::Real toleranceDistance;
 
 	KGBMessageType messageType;
@@ -36,6 +42,7 @@ public:
 	GameObjectId messageTarget;
 	
 };
+
 
 class CameraStateGoToPoint : public CameraState
 {
@@ -74,19 +81,25 @@ public:
 	virtual void Exit();
 
 protected:
-
+	
+	/// The Vector the camera wants to move to.
 	Ogre::Vector3 target_;
 
+	/// How fast the camera gets there.
 	Ogre::Real factor_;
 
+	/// The distance in which the camera needs to be within to be considered
+	/// have reached the target.
 	Ogre::Real toleranceDistance_;
 
 	KGBMessageType messageType_;
 
 	GameObjectId messageTarget_;
 
+	/// The distance between the camera's position and the destination
 	Ogre::Vector3 diff;
 
+	/// Has the camera reached the destination?
 	bool done_;
 };
 

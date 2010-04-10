@@ -14,6 +14,12 @@
 #include "OgreXMLLoader.h"
 #include "Box2DXMLLoader.h"
 
+/// Creates a GameObjectOgreBox2D object from XML. This class looks at the 
+/// GameObjectFactory to find the b2Body to be associated with the GOOB.
+/// The XML config has an id that points to to the b2Body in the 
+/// GameObjectFactory.
+///
+/// All Box2D stuff is loaded previously by the GameObjectFactory.
 class GameObjectOgreBox2DCreator : public ObjectOgreCreator
 {
 

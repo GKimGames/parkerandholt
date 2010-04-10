@@ -29,7 +29,9 @@ class GameObject;
 class AppStateListener
 {
 public:
+
 	AppStateListener(void){};
+
 	virtual ~AppStateListener(void){};
 
 	/// Adds a new string / state pair to the Manager

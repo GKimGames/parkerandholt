@@ -33,6 +33,7 @@ public:
 	
 	/// Used to set the graphics position when there is no physical body, placeables only
 	bool SetGraphics(b2Vec2 position, float length, float angle, bool final);
+
 	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 
 	void SetInactive();

@@ -13,6 +13,8 @@
 #include "GameObjectCreator.h"
 #include "Door.h"
 
+/// Creates a door from XML.
+/// For simplicity of the XML this extends the base GameObjectCreator.
 class DoorCreator : public GameObjectCreator
 {
 

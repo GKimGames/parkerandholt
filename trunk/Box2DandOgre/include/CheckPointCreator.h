@@ -13,6 +13,8 @@
 #include "GameObjectCreator.h"
 #include "CheckPoint.h"
 
+/// Creates a check point from XML.
+/// For simplicity of the XML this extends the base GameObjectCreator.
 class CheckPointCreator : public GameObjectCreator
 {
 

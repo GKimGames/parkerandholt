@@ -16,6 +16,9 @@
 
 #include "MeshTools.h"
 
+/// This creates and GameObjectOgre from XML. It extends GameObjectCreator.
+/// It can load several different Ogre specific objects, such as lights,
+/// meshes, billboards and particle systems.
 class ObjectOgreCreator : public GameObjectCreator
 {
 
@@ -55,7 +58,8 @@ public:
 					TiXmlHandle ogreObjectElement(element->FirstChild( "OgreObject" ));
 					
 					TiXmlElement* meshElement = ogreObjectElement.FirstChild("Mesh").ToElement();
-
+					/// Get the mesh elements
+					/// Billboards, particle systems, and meshes are created here.
 					while(meshElement)
 					{
 						ParseMesh(meshElement, gameObjectOgre);

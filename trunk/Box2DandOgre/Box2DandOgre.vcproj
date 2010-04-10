@@ -218,10 +218,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\source\LevelLoader.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\source\main.cpp"
 				>
 			</File>
@@ -338,10 +334,6 @@
 				>
 				<File
 					RelativePath=".\source\AppStateManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\source\Level.cpp"
 					>
 				</File>
 				<File
@@ -498,10 +490,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\LevelLoader.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\MaterialInstance.h"
 				>
 			</File>
@@ -653,10 +641,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\Level.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\MenuState.hpp"
 					>
 				</File>
@@ -678,10 +662,6 @@
 				</File>
 				<File
 					RelativePath=".\include\FadingPlatform.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\GameConstants.h"
 					>
 				</File>
 				<File
@@ -746,10 +726,6 @@
 				</File>
 				<File
 					RelativePath=".\include\Triangle.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\UserProfile.h"
 					>
 				</File>
 				<Filter

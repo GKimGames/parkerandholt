@@ -69,27 +69,37 @@ public:
 				Object methods
 =============================================================================*/
 
-	// Constructor adds this object to the objectList.
-	// It also increases the static objectId and assigns this object an Id.
+	/// Constructor adds this object to the objectList.
+	/// It also increases the static objectId and assigns this object an Id.
 	GameObject(Ogre::String name = "GameObject" );
 
-	// Constructor adds this object to the objectList.
-	// It also increases the static objectId and assigns this object an Id.
+	/// Constructor adds this object to the objectList.
+	/// It also increases the static objectId and assigns this object an Id.
 	GameObject(GameObjectDef* objectDef);
 
-	// The destructor removes it from the objectList and objectNameList
+
 	virtual ~GameObject();
 
-	// All Objects must be able to update.
+	/// All Objects must be able to update.
+	/// All children of the class must call this Update function before their
+	/// own. This pattern should extend through all children.
 	virtual bool Update(double timeSinceLastFrame);
 
-	// Implement this to have this Object respond to messages.
-	// By default this returns false to indicate this Object
-	// did not handle the message that was sent to it. Return
-	// true if the object was able to handle the message.
+	/// Implement this to have this Object respond to messages.
+	/// By default this returns false to indicate this Object did not handle the
+	/// message that was sent to it. Return true if the object was able to 
+	/// handle the message. Each class that extends this class should call this
+	/// HandleMessage before their own in case this class can handle the 
+	/// message.
+	/// If you want this class to do something with a message and its children
+	/// to something with it as well just return false for that message.
 	virtual bool HandleMessage(const KGBMessage message);
 
-	// Initialize the GameObject.
+	/// Initialize the GameObject. This makes sure the object has a unique name
+	/// and adds it to the list of GameObject names. This is usually used to load
+	/// and create objects within the object after some variables are setup.
+	/// All children of the class must call this Initialize function before 
+	/// their own. This pattern should extend through all children.
 	virtual bool Initialize();
 
 /*=============================================================================

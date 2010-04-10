@@ -593,7 +593,11 @@ void CharacterParker::EndContact(ContactPoint* contact, b2Fixture* contactFixtur
 	stateMachine_->EndContact(contact,contactFixture, collidedFixture);
 }
 
-/// Returns character to the currently active checkpoint
+//=============================================================================
+//								ReturnToCheckPoint
+//
+/// Returns character to the currently active checkpoint by first panning the 
+/// camera to the checkpoint
 void CharacterParker::ReturnToCheckPoint()
 {
 	traumaMeter_->ResetTrauma();

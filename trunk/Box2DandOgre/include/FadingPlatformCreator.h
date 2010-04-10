@@ -13,6 +13,7 @@
 #include "GameObjectOgreBox2DCreator.h"
 #include "FadingPlatform.h"
 
+/// Creates a fading platform from XML.
 class FadingPlatformCreator : public GameObjectOgreBox2DCreator
 {
 

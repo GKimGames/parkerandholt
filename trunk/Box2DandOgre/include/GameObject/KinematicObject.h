@@ -4,6 +4,9 @@
 
 		  Author: Matt King
 
+
+		  NOT USED IN THE GAME RIGHT NOW.
+
 =============================================================================*/
 #ifndef KINEMATICOBJECT_H
 #define KINEMATICOBJECT_H
@@ -12,6 +15,7 @@
 
 typedef std::vector<b2Vec2> Path;
 
+/// This is a kinematic object that moves at a certain speed a long a path.
 class KinematicObject : public GameObjectOgreBox2D
 {
 public:

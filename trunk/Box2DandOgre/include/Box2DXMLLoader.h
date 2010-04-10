@@ -18,43 +18,6 @@ typedef std::map<Ogre::String, b2Body*> BodyMap;
 typedef std::map<Ogre::String, b2Fixture*> FixtureMap;
 typedef std::map<Ogre::String, b2Joint*> JointMap;
 
-// b2Body
-// String	Id
-// b2Vec2	position
-// float	angle
-// float	linearVelocityX
-// float	linearVelocityY
-// bool		allowSleep
-// bool		fixedRotation
-// bool		bullet
-// string	bodytype
-// bool		active
-
-
-// fixture and shape are stuck together, there is no explicit b2Shape, just fixture
-// b2Fixture
-// String	Id
-// b2Shape	shape
-// float	boxWidth
-// float	boxHeight
-// float	angle
-// float	friction
-// float	restitution
-// float	density
-// float	mass
-// string	category
-// string	group
-// bool		isSensor
-// b2Shape
-// string	type
-// float	radius
-// float	centerX
-// float	centerY
-// b2Vec2	position
-// int		pointCount
-// b2Vec2[]	points
-// 
-
 enum Box2DXMLResult
 {
 	BOX2DXML_OK,
@@ -68,6 +31,7 @@ const static char* Box2DXMLResultString[BOX2DXMLRESULT_COUNT] =
 	"Box2DXML_Element_Is_Zero"
 };
 
+/// Allows creation of Box2D objects from XML.
 class Box2DXMLLoader
 {
 

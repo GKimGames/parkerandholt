@@ -10,6 +10,9 @@
 #include "GameObjectOgre.h"
 #include "GameFramework.h"
 
+//=============================================================================
+//								Constructor
+//
 /// Constructor grabs the reference from the OgreFramework of the b2World.
 /// The object is not initialized until Initialize is called and will only
 /// be initialized if the body doesn't equal 0.
@@ -19,7 +22,7 @@ GameObjectOgreBox2D::GameObjectOgreBox2D(Ogre::String name, b2Body* body, Ogre::
 	// There is only ever one world at a time and all objects get the
 	// current world from the GameFramework singleton.
 	world_ = GAMEFRAMEWORK->GetWorld();
-	sceneManager_ = GAMEFRAMEWORK->sceneManager;
+
 	entity_ = entity;
 
 	if(entity_)
@@ -30,7 +33,6 @@ GameObjectOgreBox2D::GameObjectOgreBox2D(Ogre::String name, b2Body* body, Ogre::
 	body_ = body;
 
 	debugSceneNode_ = sceneNode_;
-	//debugSceneNode_ = sceneManager_->getRootSceneNode()->createChildSceneNode();
 	
 	debugDrawInitialized_ = false;
 	debugDrawOn_ = false;
@@ -38,7 +40,10 @@ GameObjectOgreBox2D::GameObjectOgreBox2D(Ogre::String name, b2Body* body, Ogre::
 	wasAwake_ = false;
 }
 
-
+//=============================================================================
+//								Destructor
+//
+/// Tells the b2World to destroy the b2Body associated with this object.
 GameObjectOgreBox2D::~GameObjectOgreBox2D()
 {
 	if(body_ != 0)
@@ -47,6 +52,13 @@ GameObjectOgreBox2D::~GameObjectOgreBox2D()
 	}
 }
 
+//=============================================================================
+//								Initialize
+//
+/// Initializes the object if the b2Body exists. When the object is initialized
+/// it can update the Ogre graphics with the b2Body parameters.
+/// All children of the class must call this Initialize function before 
+/// their own. This pattern should extend through all children.
 bool GameObjectOgreBox2D::Initialize()
 {
 	initialized_ = GameObjectOgre::Initialize();
@@ -63,6 +75,11 @@ bool GameObjectOgreBox2D::Initialize()
 	return initialized_;
 }
 
+//=============================================================================
+//								InitializeDebugDraw
+//
+/// This creates a manual object out of the b2Body's fixtures and shapes so
+/// that the DebugDraw doesn't have to every frame.
 bool GameObjectOgreBox2D::InitializeDebugDraw(Ogre::ColourValue color, Ogre::String materialName)
 {
 	
@@ -78,6 +95,7 @@ bool GameObjectOgreBox2D::InitializeDebugDraw(Ogre::ColourValue color, Ogre::Str
 		manName += objectName_;
 
 		manualObject_ = sceneManager_->createManualObject(manName);
+
 		RedrawDebug();
 
 		debugSceneNode_->attachObject(manualObject_);
@@ -86,11 +104,16 @@ bool GameObjectOgreBox2D::InitializeDebugDraw(Ogre::ColourValue color, Ogre::Str
 	return debugDrawInitialized_;
 }
 
+
+//=============================================================================
+//								Update
+//
+/// Updates the DebugDraw if it is enabled and calls it's parent's class
+/// update method.
 bool GameObjectOgreBox2D::Update(double timeSinceLastFrame)
 {
 	if(GameObjectOgre::Update(timeSinceLastFrame))
 	{
-
 		if(debugDrawOn_)
 		{
 			UpdateDebugDraw();
@@ -104,6 +127,10 @@ bool GameObjectOgreBox2D::Update(double timeSinceLastFrame)
 	}
 }
 
+//=============================================================================
+//								UpdateDebugDraw
+//
+/// Updates the DebugDraw scenenode and mesh.
 void GameObjectOgreBox2D::UpdateDebugDraw()
 {
 	
@@ -114,6 +141,8 @@ void GameObjectOgreBox2D::UpdateDebugDraw()
 	if(debugDrawInitialized_)
 	{
 
+		/// Change the material color of the debugMesh if the object
+		/// has changed whether it is awake or not.
 		if(body_->IsAwake() == true && wasAwake_ == false)
 		{
 			for(int i = 0; i < manualObject_->getNumSections(); ++i)
@@ -140,15 +169,19 @@ void GameObjectOgreBox2D::UpdateDebugDraw()
 	}
 	
 }
-/// Sets the scene node to be positioned the same as as the Box2D body
-/// this object has.
+
+
+//=============================================================================
+//								UpdateDebugDraw
+//
+/// Sets the scene node to be positioned the same as as the Box2D body this
+/// object has. This is called by GameObjectOgre's update function.
 bool GameObjectOgreBox2D::UpdateGraphics(double timeSinceLastFrame)
 {
 	// Since rotating a scenenode actually rotates it by an amount
 	// and not to a specific value we must store the previous angle
 	// that it was rotated by and rotate back by that and then rotate
 	// to our new angle.
-	
 	if(initialized_)
 	{
 
@@ -168,6 +201,10 @@ bool GameObjectOgreBox2D::UpdateGraphics(double timeSinceLastFrame)
 }
 
 
+//=============================================================================
+//								HandleMessage
+//
+/// Handles a message.
 bool GameObjectOgreBox2D::HandleMessage(const KGBMessage message)
 {	
 	if(GameObjectOgre::HandleMessage(message))
@@ -190,7 +227,11 @@ bool GameObjectOgreBox2D::HandleMessage(const KGBMessage message)
 	return false;
 }
 
-
+//=============================================================================
+//								RedrawDebug
+//
+/// Updates the manual object of this object if the fixtures in the b2body have
+/// changed.
 void GameObjectOgreBox2D::RedrawDebug()
 {
 	if(body_ != 0)

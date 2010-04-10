@@ -12,7 +12,7 @@
 #include "GameObjectOgreBox2D.h"
 
 
-/// HoltBox is a cube
+/// HoltBox is a cube. b2Body and some Ogre mesh.
 class HoltBox : public GameObjectOgreBox2D
 {
 public:

@@ -14,11 +14,15 @@
 #include "ParkerState.h"
 
 class CharacterParker;
+
+
+///State for Parker grabbing a ledge.
 class ParkerStateLedgeGrab : public ParkerState
 {
 
 public:
 
+	
 	ParkerStateLedgeGrab(CharacterParker* parker, FSMStateMachine<CharacterParker>* stateMachine);
 
 	~ParkerStateLedgeGrab(){}
@@ -52,11 +56,14 @@ protected:
 	b2Vec2				originalPosition_;
 	b2Vec2				ledgePosition_;
 	bool				climbing_;
-
-	void MoveLeft();
-	void MoveRight();
+	
+	/// Continuously called to climb up the ledge over a period of time.
 	void Climb();
+
+	/// Fall from the ledge.
 	void Drop();
+
+
 	void UpdateAnimation();
 
 };

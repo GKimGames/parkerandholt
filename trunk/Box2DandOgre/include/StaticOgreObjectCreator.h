@@ -16,13 +16,19 @@
 #include "MeshTools.h"
 #include <Box2D/Box2D.h>
 
+
+/// Creates a StaticOgreObject. These objects never move, this class is for
+/// convenience in the XML. It does return any object to the GameObjectFactory.
+/// It creates all the same things a GameObjectOgreCreator would create but 
+/// in very simple XML. 
+
+/// It can also create meshes with a Box2D representation.
 class StaticOgreObjectCreator : public GameObjectCreator
 {
 
 public:
 
 	StaticOgreObjectCreator(GameObjectFactory* gameObjectFactory):GameObjectCreator(gameObjectFactory){}
-
 
 	virtual GameObject* LoadFromXML(TiXmlElement* element)
 	{
@@ -224,6 +230,7 @@ public:
 		ps->getEmitter(0)->setDirection(TinyXMLHelper::GetAttributeVector3(element, "direction"));
 	}
 
+	/// Creates a platform with a possible Box2D edge representing it.
 	void CreatePlatform(TiXmlElement* element, GameObjectOgre* gameObjectOgre)
 	{
 		Ogre::String material = TinyXMLHelper::GetAttribute(element, "material","Matt/Road");
@@ -237,6 +244,7 @@ public:
 		Ogre::Real xSegments = TinyXMLHelper::GetAttributeReal(element, "xSegments", 1);
 		Ogre::Real ySegments = TinyXMLHelper::GetAttributeReal(element, "ySegments", 1);
 
+		// Point 1 should be the left most point.
 		if(point1.x > point2.x)
 		{
 			b2Vec2 holder = point2;
@@ -258,6 +266,7 @@ public:
 
 		float lengthOfPlane = sqrt((point2.x - point1.x) * (point2.x - point1.x) + (point2.y - point1.y) * (point2.y - point1.y));
 		
+		// Create a mesh for the plane. 
 		Ogre::MeshManager::getSingleton().createPlane(planeMeshName, 
 			Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
 			*plane,
@@ -270,6 +279,7 @@ public:
 			yTile,							// Tile y
 			Ogre::Vector3::UNIT_Z);
 
+		// Create the entity.
 		Ogre::Entity* planeEnt = GAMEFRAMEWORK->sceneManager->createEntity(planeEntityName , planeMeshName);
 		planeEnt->setMaterial(Ogre::MaterialManager::getSingleton().getByName(material));
 
@@ -289,6 +299,7 @@ public:
 		Ogre::Vector3 offset = TinyXMLHelper::GetAttributeVector3(element, "offset");
 		planeNode->translate(offset);
 
+		// This creates the Box2D portion for the platform if box2D=1
 		if(TinyXMLHelper::GetAttributeBool(element, "box2D", true))
 		{
 			b2World* world = GAMEFRAMEWORK->world_;

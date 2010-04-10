@@ -1,4 +1,11 @@
-// Implementation of Monotone Chain Convex Hull algorithm.
+/*=============================================================================
+
+		MeshTools.h
+
+		Author: Matt King
+
+=============================================================================*/
+
 #ifndef MESH_TOOLS_H
 #define MESH_TOOLS_H
 
@@ -6,6 +13,7 @@
 #include <vector>
 #include "Ogre.h"
 
+/// Gets information about a mesh and can create Box2D outline of a mesh.
 class MeshTools
 {
 
@@ -13,10 +21,12 @@ public:
 
 	
 
-	typedef Ogre::Vector3 Point;
-
-
+	/// Gets the outline of a mesh at z = 0 for a Box2D representation.
 	static std::vector<Ogre::Vector3> GetBox2DOutLine(Ogre::Entity* entity);
+
+
+	// Methods to create a convex hull.
+	typedef Ogre::Vector3 Point;
 
 	// 2D cross product.
 	// Return a positive value, if OAB makes a counter-clockwise turn,
