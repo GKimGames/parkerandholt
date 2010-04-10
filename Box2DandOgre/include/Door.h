@@ -13,7 +13,7 @@
 #include "AppStateManager.hpp"
 #include "AnimationBlender.h"
 
-
+/// The Door object moves the game between AppStates.
 class Door : public GameObjectOgreBox2D
 {
 
@@ -21,6 +21,7 @@ class Door : public GameObjectOgreBox2D
 
 public:
 	
+	/// Creates the Box2D and Ogre representation for the door.
 	Door(Ogre::String name, bool isEntrance, b2Vec2 position):
 	GameObjectOgreBox2D(name, 0, 0)
 	{
@@ -70,6 +71,7 @@ public:
 
 	virtual ~Door(){}
 
+	/// Updates the animation blender for the Door.
 	bool Update(double timeSinceLastFrame)
 	{
 		if(isOpening_ && animationBlender_->complete_ == false)
@@ -94,13 +96,13 @@ public:
 		return true;
 	}
 
+	/// Sets the AnimationBlender to open.
 	void OpenDoor()
 	{
-		animationBlender_->Blend("open", AnimationBlender::BlendSwitch, 0,false);
+		animationBlender_->Blend("open", AnimationBlender::BlendSwitch, 0, false);
 		isOpening_ = true;
 	}
 
-	//bool Initialize();
 
 private:
 

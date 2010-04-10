@@ -21,11 +21,16 @@ class TiXmlHandle;
 class TiXmlDocument;
 class TiXmlNode;
 
+
+
+/// This class makes it easy to get variables out XML Elements.
+/// Most methods have a default value that can be returned if the attribute we
+/// were looking for wasn't found.
 class TinyXMLHelper
 {
 public:
-	static Ogre::Vector3 ogreOffset;
-	static b2Vec2		 boxOffset;
+
+
 	static TiXmlHandle* GetRootFromFile(Ogre::String fileName, TiXmlDocument* configXML_);
 	static Ogre::String GetAttribute(TiXmlElement* element, const Ogre::String& name, const Ogre::String& defaultValue = "");
 	static KGBMessageType GetMessage(TiXmlElement* element, const Ogre::String& name, KGBMessageType defaultValue = NO_MESSAGE);
@@ -40,6 +45,9 @@ public:
 	static Ogre::ColourValue TinyXMLHelper::GetAttributeColor(TiXmlElement* element, const Ogre::String& name, Ogre::ColourValue defaultValue = Ogre::ColourValue::Black);
 	
 	static b2Vec2 GetAttributeb2Vec2(TiXmlElement* element, const Ogre::String& name, b2Vec2 defaultValue = b2Vec2(0,0));
+
+	static Ogre::Vector3 ogreOffset;
+	static b2Vec2		 boxOffset;
 };
 
 

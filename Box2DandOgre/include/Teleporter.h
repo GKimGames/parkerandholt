@@ -4,6 +4,9 @@
 
 		Author: Matt King
 
+
+		NOT USED IN THE GAME CURRENTLY.
+
 =============================================================================*/
 
 #ifndef TELEPORTER_H

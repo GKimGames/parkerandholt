@@ -4,6 +4,8 @@
 
 	Author: Matt King
 
+	NOT USED, REPLACED BY GAMEOBJECTSENSORCREATOR.
+
 =============================================================================*/
 
 #ifndef LEDGE_SENSOR_CREATOR

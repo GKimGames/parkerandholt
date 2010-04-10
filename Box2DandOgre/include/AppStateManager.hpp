@@ -21,6 +21,7 @@
 #include "MessageDispatcher.h"
 #include <map>
 
+/// Manages states and contains the main game loop.
 class AppStateManager : public AppStateListener
 {
 public:
@@ -31,6 +32,9 @@ public:
 	AppStateManager();
 
 	~AppStateManager();
+
+	/// This is the main loop of the game.
+	void		start(AppState* state);
 
 	/// Adds a new string / state pair to the Manager
 	void manageAppState(Ogre::String stateName, AppState* state);
@@ -57,9 +61,6 @@ public:
 
 	/// ShutDown the application.
 	void		shutdown();
-
-	/// This is the main loop of the game.
-	void		start(AppState* state);
 
 	/// This sets it so that the current state will be popped after the current
 	/// update loop has finished.

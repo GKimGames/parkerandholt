@@ -34,18 +34,16 @@
 
 #include "GameObjectFactory.h"
 
-
-
 #define GAMEFRAMEWORK GameFramework::getSingletonPtr()
 
-//class GameObjectFactory;
 
 class AppStateManager;
 
-/// GameFramework srarts up Ogre and loads resource to be used as well as
+/// GameFramework starts up Ogre and loads resource to be used as well as
 /// storing the current states b2World reference
 ///
-/// GameFramework is a singleton with 
+/// GameFramework is a singleton so objects can access the current b2World,
+/// SceneManager and more.
 class GameFramework : public Ogre::Singleton<GameFramework>, OIS::KeyListener, OIS::MouseListener
 {
 public:

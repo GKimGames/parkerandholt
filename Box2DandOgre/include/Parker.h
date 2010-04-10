@@ -28,6 +28,8 @@ class Door;
 /// Parkers class, extends Character. 
 class CharacterParker : public Character
 {
+	// For convenience and efficiency the FSM States are friend classes so
+	// they can change CharacterParker easily.
 	friend class ParkerStateOnGround;
 	friend class ParkerStateInAir;
 	friend class ParkerStateLedgeGrab;
@@ -38,6 +40,8 @@ public:
 
 	~CharacterParker(){}
 
+	/// Handles messages. Some messages are handled inside this class, others
+	/// are delegated to the Finite State Machine.
 	virtual bool HandleMessage(const KGBMessage message);
 
 	virtual bool Update(double timeSinceLastFrame);
@@ -50,16 +54,23 @@ public:
 	
 	virtual void PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse);
 	
+	/// Returns character to the currently active checkpoint by first panning the 
+	/// camera to the checkpoint
 	virtual void ReturnToCheckPoint();
 	
 	/// Initialize calls InitVariables, ReadXMLConfig, CreateGraphics,
 	/// CreatePhysics, and sets up the AnimationBlender.
 	virtual bool Initialize();
 	
+	/// Sets the character to active character, the character the player is
+	/// controlling
 	virtual void SetActive(bool active);
 	
+	/// Returns the PlayerInfo.
 	virtual PlayerInfo* GetPlayerInfo();
 
+	/// Returns if the fixture passed to it is the Characters foot sensor
+	/// fixture.
 	virtual bool IsFootSensor(b2Fixture* fixture);
 
 protected:
@@ -67,6 +78,7 @@ protected:
 	/// Initialize some class variables' default values.
 	void InitVariables();
 
+	/// Reads the Character's XML config and sets values.
 	bool ReadXMLConfig();
 
 	/// Create the Box2D representation of Parker.
@@ -75,6 +87,7 @@ protected:
 	/// Create the OGRE stuff for Parker.
 	void CreateGraphics();
 
+	/// Updates the Character's AnimationBlender.
 	void UpdateAnimation(double timeSinceLastFrame);
 
 	/// Applies "friction" to the character if they are on a surface.

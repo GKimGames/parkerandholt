@@ -13,6 +13,7 @@
 //=============================================================================
 //							GameObjectOgre::Constructor
 //
+/// Grabs the SceneManager and creates a SceneNode for this object.
 GameObjectOgre::GameObjectOgre(Ogre::String name):
 GameObject(name)
 {
@@ -26,6 +27,7 @@ GameObject(name)
 //=============================================================================
 //							GameObjectOgre::Destructor
 //
+/// Destroys the SceneNode.
 GameObjectOgre::~GameObjectOgre()
 {
 
@@ -35,12 +37,16 @@ GameObjectOgre::~GameObjectOgre()
 	}
 }
 
+
 //=============================================================================
 //							Initialize
 //
+/// All children of the class must call this Initialize function before their
+/// own. This pattern should extend through all children.
 bool GameObjectOgre::Initialize()
 {
 	initialized_ = GameObject::Initialize();
+
 	return initialized_;
 }
 
@@ -48,6 +54,8 @@ bool GameObjectOgre::Initialize()
 //							Initialize
 //
 /// Initialize the object with a mesh.
+/// All children of the class must call this Initialize function before their
+/// own. This pattern should extend through all children.
 bool GameObjectOgre::Initialize(Ogre::String meshName)
 {
 	objectName_ = meshName;
@@ -99,7 +107,11 @@ bool GameObjectOgre::UpdateGraphics(double timeSinceLastFrame)
 //=============================================================================
 //							HandleMessage
 //
-/// 
+/// Each class that extends this class should call this HandleMessage
+/// before their own in case this class can handle the message.
+/// If you want this class to do something with a message and its children
+/// to something with it as well just return false for that message.
+
 bool GameObjectOgre::HandleMessage(const KGBMessage message)
 {
 	if(GameObject::HandleMessage(message))
@@ -132,7 +144,10 @@ bool GameObjectOgre::HandleMessage(const KGBMessage message)
 	return false;
 }
 
-
+//=============================================================================
+//							SetTransparency
+//
+/// Set the transparency of the mesh in this object.
 void GameObjectOgre::SetTransparency(Ogre::Real alpha)
 	{
 		if(transparency_ == 0)
@@ -142,6 +157,10 @@ void GameObjectOgre::SetTransparency(Ogre::Real alpha)
 		transparency_->setTransparency(alpha);
 	}
 
+//=============================================================================
+//							SetBlendType
+//
+/// Set the blending type of the mesh matieral.
 void GameObjectOgre::SetBlendType(Ogre::SceneBlendType type)
 {
 	if(transparency_ == 0)

@@ -4,7 +4,6 @@
 
 	Author: Matt King
 
-	State for Parker on the ground.
 
 =============================================================================*/
 #ifndef PARKER_STATE_H
@@ -15,6 +14,7 @@
 
 class CharacterParker;
 
+/// Base class for CharacterParker's FSM States.
 class ParkerState : public FSMState<CharacterParker>
 {
 
@@ -45,6 +45,7 @@ public:
 	/// Called when two fixtures cease to touch.
 	virtual void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture){}
 
+	/// PostSolve callback, after the contact has been solved by Box2D we can inspect the collission.
 	virtual void PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse){};
 };
 

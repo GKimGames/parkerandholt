@@ -23,13 +23,20 @@ enum CameraStateType
 
 class GameCamera;
 
+/// Base class for a CameraStateDef. This allows for the camera state to setup
+/// using a data class. Each extended class can then read that data class
+/// in the way it needs to.
 class CameraStateDef
 {
 public:
+	/// The type is used so when a CameraState is passed into the Camera's
+	/// FSM it knows which State will want to load this def.
 	CameraStateType type;
 	Ogre::Vector3 initialPosition;
 };
 
+/// A Camera State Controls how the camera moves around and if its following
+/// some GameObject.
 class CameraState : public FSMState<GameCamera>
 {
 public:
@@ -39,6 +46,7 @@ public:
 	/// Destructor does nothing.
 	~CameraState(){}
 
+	/// Initialize some CameraStateDefinition.
 	virtual void InitializeDef(const CameraStateDef* cameraStateDef)=0;
 
 	/// This is called when the state is entered.

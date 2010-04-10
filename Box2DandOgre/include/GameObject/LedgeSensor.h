@@ -11,6 +11,8 @@
 
 #include "GameObjectSensor.h"
 
+/// LedgeSensor is used to tell the player that there is a ledge right there
+/// that they can climb.
 class LedgeSensor : public GameObjectSensor
 {
 public:

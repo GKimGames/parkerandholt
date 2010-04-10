@@ -25,7 +25,7 @@ struct ContactPoint
 	b2PointState state;
 };
 
-/// Structure to represent a contact point.
+/// Structure to represent PostSolve contact point.
 struct PostSolveData
 {
 	b2Contact* contact;
@@ -35,10 +35,11 @@ struct PostSolveData
 	{
 		delete impulse;
 	}
+
 };
 
 
-/// Structure to represent a contact point.
+/// Structure to represent PreSolve contact point.
 struct PreSolveData
 {
 	b2Contact* contact;
@@ -48,14 +49,17 @@ struct PreSolveData
 
 /// The default value of friction for all Box2D objects in the game.
 const static double DEFAULT_FRICTION = 0.4;
+
+/// Group of Static map objects, objects in the same group of a negative number
+/// will never collide.
 const static signed short STATIC_MAP_GROUP = -10;
 
-class GameObjectOgre;
 /// This extends GameObjectOgre and adds a Box2D component.
 class GameObjectOgreBox2D  : public GameObjectOgre
 {
 
 	friend class GameObjectOgreBox2DCreator;
+
 public:
 
 	/// Constructor grabs the reference from the OgreFramework of the b2World.
@@ -63,14 +67,30 @@ public:
 	/// be initialized if the body doesn't equal 0.
 	GameObjectOgreBox2D(Ogre::String name = "GameObjectOgreBox2D", b2Body* body = 0, Ogre::Entity* entity = 0);
 
+	/// Tells the b2World to destroy the b2Body associated with this object.
 	virtual ~GameObjectOgreBox2D();
 
+	/// Updates the DebugDraw if it is enabled and calls it's parent's class
+	/// update method.
 	virtual bool Update(double timeSinceLastFrame);
 
+	/// Each class that extends this class should call this HandleMessage before
+	/// their own in case this class can handle the message.
+	/// If you want this class to do something with a message and its children
+	/// to something with it as well just return false for that message.
 	virtual bool HandleMessage(const KGBMessage message);
+
+	/// Initializes the object if the b2Body exists. When the object is initialized
+	/// it can update the Ogre graphics with the b2Body parameters.
+	/// All children of the class must call this Initialize function before 
+	/// their own. This pattern should extend through all children.
 	virtual bool Initialize();
+
+	/// This creates a manual object out of the b2Body's fixtures and shapes so
+	/// that the DebugDraw doesn't have to every frame.
 	virtual bool InitializeDebugDraw(Ogre::ColourValue color = Ogre::ColourValue(1,1,1,1), Ogre::String materialName = "debugDraw");
 
+	/// Updates the DebugDraw scenenode and mesh.
 	virtual void UpdateDebugDraw();
 
 	/// Called when two fixtures begin to touch.
@@ -78,7 +98,6 @@ public:
 	/// Collided fixture is the fixture that hit this Object's body.
 	/// By default this does nothing.
 	virtual void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture){}
-
 
 	/// Called when two fixtures cease to touch.
 	/// Contact fixture is the fixture in this Object's body.
@@ -91,14 +110,13 @@ public:
 	/// You cannot create/destroy Box2D entities inside this callback.
 	virtual void PreSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2Manifold* manifold){}
 
-
 	/// Sets the scene node to be positioned the same as as the Box2D body
 	/// this object has.
 	virtual bool UpdateGraphics(double timeSinceLastFrame);
 
+	/// Updates the manual object of this object if the fixtures in the b2body have
+	/// changed.
 	virtual void RedrawDebug();
-
-	virtual void CreatePhysics(){}
 
 /*=========================================================================
 					Starting Getters and Setters.
@@ -111,6 +129,7 @@ public:
 		debugSceneNode_->setVisible(true);
 		debugDrawOn_ = true; 
 	}
+
 	void SetDebugDrawOff() 
 	{ 
 		debugSceneNode_->setVisible(false);

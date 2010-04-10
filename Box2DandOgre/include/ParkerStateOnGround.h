@@ -19,6 +19,8 @@ class ParkerStateOnGround : public ParkerState
 
 public:
 
+	// ParkerStateInAir needs to change some things about this class a d know if
+	// character was jumping when the state was left.
 	friend class ParkerStateInAir;
 
 	ParkerStateOnGround(CharacterParker* parker, ParkerStateMachine* stateMachine);
@@ -43,14 +45,15 @@ public:
 	/// This will execute when the state is exited.
 	virtual void Exit();
 	
-	int GetFeetContactCount();
-	
 
 protected:
 
 	void MoveLeft();
+
 	void MoveRight();
+
 	void Jump();
+
 	void UpdateAnimation();
 
 	Ogre::Vector3 direction_;	
