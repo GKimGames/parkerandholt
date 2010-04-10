@@ -1,0 +1,14 @@
+material Island/Floor02
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture Floor02.jpg
+                filtering trilinear
+            }
+        }
+    }
+}

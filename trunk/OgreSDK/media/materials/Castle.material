@@ -1,0 +1,704 @@
+material Castle/system
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture system.bmp
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/neu-1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture neu-1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/tower1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture tower1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/tower_top1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture tower_top1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/roof1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture color.bmp
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/entrance_top_1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture entrance_top_1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/gate_wall1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture gate_wall1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/gate_window1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture gate_window1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/gate_window2
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture gate_window2.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/gate_wall_edge1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture gate_wall_edge1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/entrance1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture entrance1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/gate1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture gate1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/gate_bridge1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture gate_bridge1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/bild5
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture color.bmp
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/street1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture street1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/gate_door1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture gate_door1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/gate_wall2
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture gate_wall2.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/gate_wall3
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture gate_wall3.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/gate2
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture gate2.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/bild3
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture color.bmp
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/balkony_wall1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture balkony_wall1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/gable3
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture gable3.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/black
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture color.bmp
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/material19
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture color.bmp
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/gate_clock1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture gate_clock1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/bild8
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture color.bmp
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/wall1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture wall1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/tower1_wall1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture tower1_wall1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/tower1_edge1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture tower1_edge1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/rail1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture rail1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/stairs1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture stairs1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/floor1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture floor1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/floor2
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture floor2.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/gate_wall4
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture gate_wall4.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/stairs2
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture stairs2.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/bild9
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture color.bmp
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/wall4
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture wall4.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/wall5
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture wall5.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/wall6
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture wall6.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/plain_wall1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture plain_wall1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/wall7
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture wall7.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/gable2
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture gable2.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/tower2
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture tower2.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/bild4
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture color.bmp
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/outer_wall
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture outer_wall.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/grass1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture grass1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material Castle/rock1
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture rock1.jpg
+                filtering trilinear
+            }
+        }
+    }
+}

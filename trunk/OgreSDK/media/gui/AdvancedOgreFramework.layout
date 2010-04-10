@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<GUILayout>
+
+<Window Type="DefaultGUISheet" Name="AOF_GUI">
+		<Property Name="UnifiedSize" Value="{{1, 1},{1, 1}}" />
+
+		<Window Type="TaharezLook/Button" Name="EnterButton">
+                <Property Name="UnifiedPosition" Value="{{0.35,0},{0.3,0}}" />
+                <Property Name="UnifiedSize" Value="{{0.3,0},{0.1,0}}" />
+                <Property Name="Text" Value="Start" />
+            </Window>
+
+		<Window Type="TaharezLook/Button" Name="ExitButton">
+                <Property Name="UnifiedPosition" Value="{{0.35,0},{0.5,0}}" />
+                <Property Name="UnifiedSize" Value="{{0.3,0},{0.1,0}}" />
+                <Property Name="Text" Value="Exit" />
+            </Window>
+
+
+</Window>
+
+</GUILayout>
+

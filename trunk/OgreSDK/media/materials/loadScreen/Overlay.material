@@ -1,0 +1,14 @@
+material Materials/LoadMaterial
+{
+	technique
+	{
+		pass
+		{
+
+			texture_unit
+			{
+				texture dkyellow.png
+			}
+		}
+	}
+}

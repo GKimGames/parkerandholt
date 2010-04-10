@@ -1,0 +1,14 @@
+material CliffFace2Floor04
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture Floor04.jpg
+                filtering trilinear
+            }
+        }
+    }
+}

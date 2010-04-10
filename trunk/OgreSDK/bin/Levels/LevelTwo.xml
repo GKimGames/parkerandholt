@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SampleLevel>
+  <LevelInfo name="MattsLevel" camPosition="0 6 18">
+	<Level />
+    <Parker position="2 2"/>
+    <Holt   position="2 2"/>
+    <!-- Level Info Should Go In Here -->
+  </LevelInfo>
+  <Box2D>
+    <!--
+   -->
+
+    <!-- top of pit left platform -->
+    <Body>
+      <BodyDef/>
+      <Fixture shape="edge" point1="0 20" point2="10 20"/>
+      <Fixture shape="edge" point1="14 20" point2="20 20"/>
+      <Fixture shape="edge" point1="33 20" point2="37 20"/>
+    </Body>
+
+    <Body id="secondRightSensor">
+      <BodyDef position="33 20"/>
+      <Fixture shape="circle" radius="0.3" sensor="1"/>
+    </Body>
+    
+    <Body id="firstRightSensor">
+      <BodyDef position="20 20"/>
+      <Fixture shape="circle" radius="0.3" sensor="1"/>
+    </Body>
+    
+    <!-- Pit -->
+    <!--top of pit ledge sensor and left wall-->
+    <Body id="topOfPitLeft">
+      <BodyDef position="10 20"/>
+      <Fixture shape="circle" radius="0.3" sensor="1"/>
+    </Body>
+    <Body>
+      <BodyDef/>
+      <Fixture shape="edge" point1="10 3" point2="10 20"/>
+    </Body>
+
+    <!--top of pit ledge sensor and right wall-->
+    <Body id="topOfPitRight">
+      <BodyDef position="14 20"/>
+      <Fixture shape="circle" radius="0.3" sensor="1"/>
+    </Body>
+    <Body>
+      <BodyDef/>
+      <Fixture shape="edge" point1="14 3" point2="14 20"/>
+    </Body>
+
+    <!--pit floor-->
+    <Body>
+      <BodyDef/>
+      <Fixture shape="edge" point1="0 0" point2="10 0"/>
+    </Body>
+    <!-- end Pit -->
+    
+    <Body id="steve">
+      <BodyDef bodyType="dynamicBody" position="137 -10"/>
+      <Fixture shape="box" boxWidth="3" boxHeight="0.5" density="15"/>
+    </Body>
+
+    <Body id="ground">
+      <BodyDef position="0 -50"/>
+      <Fixture shape="box" boxWidth="1" boxHeight="1" density="40"/>
+    </Body>
+    <Body id="LevarArm1">
+      <BodyDef bodyType="dynamicBody" position="65 20"/>
+      <Fixture shape="box" boxWidth="14.16" boxHeight="1.2" density="40"/>
+    </Body>
+    <Body id="LevarArm2">
+      <BodyDef bodyType="dynamicBody" position="50 20"/>
+      <Fixture shape="box" boxWidth="14.16" boxHeight="1.2" density="40"/>
+    </Body>
+    
+    
+    <Joint id="Revjoint" type="revolute">
+      <JointDef bodyA="ground" bodyB="LevarArm1"/>
+    </Joint>
+    <Joint id="Revjoint" type="revolute">
+      <JointDef bodyA="ground" bodyB="LevarArm2"/>
+    </Joint>
+    <!--
+    <Joint id="MrJoint" type="prismatic">
+      <JointDef bodyA="ground" bodyB="steve" localAxis1="0 1" enableLimit="1" lowerTranslation="-20" upperTranslation="1" worldAnchor="137 -10" enableMotor="1" motorSpeed="200" maxMotorForce="1500"/>
+    </Joint>
+    -->
+  </Box2D>
+  <GameObjects>
+
+    <GameObject type="OgreBox2D">
+      <Object name="A lever Arm"/>
+      <OgreObject position="0 0 0" >
+        <Mesh mesh="LeverArm.mesh" scale="0.4 0.2 0.2"/>
+      </OgreObject>
+      <Box2DObject bodyID="LevarArm1"/>
+    </GameObject>
+    <GameObject type="OgreBox2D">
+      <Object name="A lever Arm2"/>
+      <OgreObject position="0 0 0" >
+        <Mesh mesh="LeverArm.mesh" scale="0.4 0.2 0.2"/>
+      </OgreObject>
+      <Box2DObject bodyID="LevarArm2"/>
+    </GameObject>
+
+    <GameObject type="CheckPoint" position="4 0" />
+    <GameObject type="PickUp" position="12 5" breakingForce="31"/>
+    <GameObject type="Door" isEntrance="0" position="0 0" bodyID="topOfPitRight" />
+    <GameObject type="ObjectSensor" sensorType="sensortype ledge" bodyID="topOfPitLeft" />
+    <GameObject type="ObjectSensor" sensorType="sensortype ledge" bodyID="topOfPitRight" />
+    <GameObject type="ObjectSensor" sensorType="sensortype ledge" bodyID="firstRightSensor" />
+    <GameObject type="ObjectSensor" sensorType="sensortype ledge" bodyID="secondRightSensor" />
+    
+    <!--
+    <GameObject type="ObjectSensor">
+      <Object name="sleeves"/>
+      <OgreObject position="0 0 0" >
+        <Mesh mesh="cube.1m.mesh"/>
+      </OgreObject>
+      <Box2DObject bodyID="MySensor"/>
+      <ObjectSensor messageOnContact="1">
+        <Object objectID="MyObjectSensor" on=""/>
+        <Messages>
+          <Message id="Jumper" type="" delay="0">
+            <data>
+              <kittycat butts="butts"/>
+            </data>
+          </Message>
+        </Messages>
+      </ObjectSensor>
+    </GameObject>
+    <MovingPlatform type="MovingPlatform" name="Batman" point1="10 1" point2="0 1" start="5 1" end="0 5" speed="2"/>
+    -->
+    
+    <StaticOgreObjects>
+      <Light name="MyLighty" position="0 6 20" direction="0 -1 -1"/>
+      <Light name="MyLighty2" position="-20 6 0" direction="0 -1 0"/>
+      <Mesh type="platform" point1="0 0" point2="10 0" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="4"/> 
+      <Mesh type="platform" point1="0 20" point2="10 20" xTile="2" yTile="1" material="Examples/GrassFloor" zLength="4"/>
+      <Mesh type="platform" point1="10 3" point2="10 20" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="4" rotation="0 0 180"/>
+      <Mesh type="platform" point1="14 3" point2="14 20" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="4"/>
+      <Mesh type="platform" point1="14 20" point2="20 20" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="4"/>
+      <Mesh type="platform" point1="33 20" point2="37 20" xTile="2" yTile="1" material="BigIsland/Floor04" zLength="4"/>
+      
+      <Mesh mesh="tree.mesh" position="2 20 0" scale="1 1 1" rotation="0 48 0"/>
+      <Mesh type="platform" point1="5 3" point2="5 20" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="10" rotation="0 90 0" offset="0 0 2"/>
+      <Mesh type="platform" point1="17 3" point2="17 20" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="6" rotation="0 90 0" offset="0 0 2"/>
+      <Mesh mesh="SideWall.mesh" position="-5 0 0" scale="0.1 0.1 0.1" rotation="0 0 45" box2DitUp="1"/>
+
+
+      <BillboardSet position="20 45 -20" material="Clouds/bbCloud2">
+        <Billboard position="-50 40 -150" rotation="3.14159"/>
+        <Billboard position="120 10 -200" rotation="0.3"/>
+        <Billboard position="40 -20 -175"/>
+        <Billboard position="-150 -50 -150"/>
+      </BillboardSet>
+
+      <BillboardSet position="0 0 0" material="Clouds/bbCloud1">
+        <Billboard position="-50 40 -150" rotation="3.14159"/>
+        <Billboard position="120 10 -200" rotation="3.14159"/>
+        <Billboard position="40 -20 -175" rotation="1.5"/>
+        <Billboard position="-150 -50 -250" rotation="1.5"/>
+      </BillboardSet>
+     
+      <!--<Mesh mesh="SideWall.mesh" position="-5 0 0" scale="1 1 1" rotation="0 0 0" box2DitUp="1"/>-->
+    </StaticOgreObjects>
+  </GameObjects>
+
+</SampleLevel>

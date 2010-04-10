@@ -1,0 +1,14 @@
+material SideWall/Wall01
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture Wall01.jpg
+                filtering trilinear
+            }
+        }
+    }
+}

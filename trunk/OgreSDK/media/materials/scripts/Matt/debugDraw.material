@@ -1,0 +1,86 @@
+material debugDraw
+{
+    technique
+    {
+        pass
+        {
+            lighting off
+            scene_blend alpha_blend
+            depth_check off
+        }
+    }
+}
+
+material debugDraw/Sleeping
+{
+  technique
+  {
+    pass
+    {
+      lighting off
+      scene_blend alpha_blend
+      depth_check off
+      
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 0.5 0.5 0
+        alpha_op_ex source1 src_manual src_current 1.0
+      }
+    }
+  }
+}
+
+material debugDraw/Joint
+{
+  technique
+  {
+    pass
+    {
+      lighting off
+      scene_blend alpha_blend
+      depth_check off
+      
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 0.5 0.8 0.8
+        alpha_op_ex source1 src_manual src_current 1.0
+      }
+    }
+  }
+}
+
+material Template/Red50
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+      
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 0.5 0.5 0
+        alpha_op_ex source1 src_manual src_current 0.5
+      }
+    }
+  }
+}
+
+material Matt/Black
+{
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+      
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 0.0 0.0 0.0
+        alpha_op_ex source1 src_manual src_current 1.0
+      }
+    }
+  }
+}
