@@ -110,6 +110,8 @@ bool GameObjectOgreBox2D::InitializeDebugDraw(Ogre::ColourValue color, Ogre::Str
 //
 /// Updates the DebugDraw if it is enabled and calls it's parent's class
 /// update method.
+/// All children of the class must call this Update function before their own.
+/// This pattern should extend through all children.
 bool GameObjectOgreBox2D::Update(double timeSinceLastFrame)
 {
 	if(GameObjectOgre::Update(timeSinceLastFrame))
