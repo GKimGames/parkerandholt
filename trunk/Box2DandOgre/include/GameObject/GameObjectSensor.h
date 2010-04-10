@@ -48,13 +48,12 @@ static SensorType StringToSensorType(Ogre::String str)
 	return SENSORTYPE_COUNT;
 }
 
+/// This class sends out messages when its Box2D position is hit.
 class GameObjectSensor : public GameObjectOgreBox2D
 {
 public:
 
 	friend class GameObjectSensorCreator;
-
-	
 
 	/// Constructor takes a message to send to all GameObjects registered
 	/// to this sensor. Shapes for the sensor can be added using the 
@@ -94,6 +93,7 @@ public:
 	{
 		GameObject::HandleMessage(message);
 
+		// Debug stuff.
 		if(message.messageType == defaultMessageOff_.messageType)
 		{
 			if(message.sender == objectId_)
@@ -101,6 +101,7 @@ public:
 				body_->ApplyImpulse(b2Vec2(-10,50), body_->GetWorldCenter());
 			}
 		}
+
 		return false;
 	}
 
@@ -278,6 +279,7 @@ public:
 	{
 		return GameObjectOgreBox2D::Initialize();
 	}
+
 	void SetDefaultOnMessage(KGBMessageType onMessage){ defaultMessageOn_.messageType = onMessage; }
 	void SetDefaultOffMessage(KGBMessageType offMessage){ defaultMessageOff_.messageType = offMessage; }
 
@@ -319,8 +321,10 @@ protected:
 
 	bool isEnabled_;
 
+	/// Does this object Message the object that is touching it.
 	bool messageObjectOnContact_;
 
+	/// Does this object ignore fixtures that are sensors.
 	bool ignoreSensors_;
 
 };
