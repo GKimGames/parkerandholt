@@ -24,12 +24,9 @@ HoltStatePlacingPlatform::HoltStatePlacingPlatform(
 {
 	feetContactCount_ = 0;
 	platform_ = 0;
-	box_[0] = 0;
-	box_[1] = 0;
-	box_[2] = 0;
-	incrimenter_ = 0;
 	gravityVector_ = new GravityVector(driver_->sceneManager_, b2Vec2(0,0), b2Vec2(1,1));
 	leftMouseDown_ = false;
+	maxLength_ = 8.0;
 }
 
 //=============================================================================
@@ -46,8 +43,8 @@ void HoltStatePlacingPlatform::Enter()
 		driver_->animationBlender_->Blend("run", AnimationBlender::BlendWhileAnimating, 0.2, true);
 	}
 
-	driver_->mousePicking_->boxSize_ = 0.2f;
-	driver_->mousePicking_->UpdateMouseFromCamera();
+	// Sets the mouse visible and sets the current box size
+	driver_->mousePicking_->boxSize_ = 0.5f;
 	driver_->mousePicking_->SetVisibility(true);
 }
 
@@ -75,6 +72,12 @@ bool HoltStatePlacingPlatform::Update()
 	static Ogre::Vector3 direction;
 
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
+
+	// Takes the character out of placing state if they are moving a significant amount
+	if(driver_->GetBody()->GetLinearVelocity().LengthSquared() > 1)
+	{
+		stateMachine_->ChangeState(driver_->inAirState_);
+	}	
 	
 	if(driver_->feetSensorHit_ == false)
 	{
@@ -83,14 +86,7 @@ bool HoltStatePlacingPlatform::Update()
 	else
 	{
 
-		//if(moveRightDown_ || moveLeftDown_)
-		{
-			driver_->ApplyWalkingFriction(timeSinceLastFrame);
-		}
-
-		//moveRightDown_ = false;
-		//moveLeftDown_ = false;
-		
+		driver_->ApplyWalkingFriction(timeSinceLastFrame);
 
 		if(driver_->body_->GetLinearVelocity().x > 0.1)
 		{
@@ -113,13 +109,18 @@ bool HoltStatePlacingPlatform::Update()
 		}
 	}
 
+
+	// If the left mouse is held down the current position is updated
 	if(leftMouseDown_)
 	{
 		endPosition_.x = driver_->mousePicking_->GetPosition().x;
 		endPosition_.y = driver_->mousePicking_->GetPosition().y;
+
 		float tempLength = sqrt((startPosition_.x - endPosition_.x) * (startPosition_.x - endPosition_.x)
 							 + (startPosition_.y - endPosition_.y) * (startPosition_.y - endPosition_.y));
-		if(tempLength > 0.5)
+		
+		// Checks distance been click and release to see if it is within a valid length for a platform
+		if(tempLength > 0.5 && tempLength < 8.0)
 		{
 			if(platform_ == 0)
 			{
@@ -129,6 +130,24 @@ bool HoltStatePlacingPlatform::Update()
 								startPosition_.y - (startPosition_.y - endPosition_.y)/2);
 			float angle = atan2((endPosition_.y - startPosition_.y)/2,(endPosition_.x - startPosition_.x)/2);
 			platform_->SetGraphics(tempPosition, tempLength, angle, false);
+		}
+		// If the platform is too long it is limited by the maximum length and drawn at the angle between click and release
+		else if(tempLength >= 8.0)
+		{
+			if(platform_ == 0)
+			{
+				SpawnPlatform();
+			}
+
+			b2Vec2 tempPosition(startPosition_.x - ((startPosition_.x - endPosition_.x)/2),
+								startPosition_.y - ((startPosition_.y - endPosition_.y)/2));
+
+			float angle = atan2((endPosition_.y - startPosition_.y)/2,(endPosition_.x - startPosition_.x)/2);
+			
+			tempPosition.x = startPosition_.x - ((startPosition_.x - endPosition_.x)/tempLength) * maxLength_/2;
+			tempPosition.y = startPosition_.y - ((startPosition_.y - endPosition_.y)/tempLength) * maxLength_/2;
+			
+			platform_->SetGraphics(tempPosition, maxLength_, angle, false);
 		}
 	}
 
@@ -164,9 +183,11 @@ bool HoltStatePlacingPlatform::HandleMessage(const KGBMessage message)
 		{
 			endPosition_.x = driver_->mousePicking_->GetPosition().x;
 			endPosition_.y = driver_->mousePicking_->GetPosition().y;
-			//SpawnPlatform();
+			
 			float tempLength = sqrt((startPosition_.x - endPosition_.x) * (startPosition_.x - endPosition_.x)
 								 + (startPosition_.y - endPosition_.y) * (startPosition_.y - endPosition_.y));
+			
+			// Platform is only created if the distance between click and release is a valid length
 			if(platform_ == 0)
 			{
 				leftMouseDown_ = false;
@@ -174,7 +195,6 @@ bool HoltStatePlacingPlatform::HandleMessage(const KGBMessage message)
 			else if(tempLength < .5)
 			{
 				leftMouseDown_ = false;
-				//delete platform_;
 			}
 			else
 			{
@@ -185,10 +205,6 @@ bool HoltStatePlacingPlatform::HandleMessage(const KGBMessage message)
 				platform_->SetGraphics(platform_->GetBody()->GetPosition(), tempLength, platform_->GetBody()->GetAngle(), true);
 				platform_ = 0;
 			}
-			/*startPosition_.x = 0; startPosition_.y = 0;
-			endPosition_.x = 0; endPosition_.y = 0;*/
-			
-			
 
 			return true;
 		}
@@ -214,7 +230,6 @@ bool HoltStatePlacingPlatform::HandleMessage(const KGBMessage message)
 		}
 		case CHARACTER_MOVE_LEFT_MINUS:
 		{
-
 			driver_->moveLeft_ = false;
 			return true;
 		}
@@ -292,10 +307,7 @@ void HoltStatePlacingPlatform::BeginContact(ContactPoint* contact, b2Fixture* co
 				}
 
 			}
-		}
-
-		
-		
+		}	
 	}
 }
 
@@ -348,7 +360,6 @@ void HoltStatePlacingPlatform::MoveRight()
 //=============================================================================
 //								Jump
 ///
-/// Jump!
 void HoltStatePlacingPlatform::Jump()
 {
 	driver_->stateMachine_->ChangeState(driver_->onGroundState_);
@@ -401,17 +412,23 @@ void HoltStatePlacingPlatform::UpdateAnimation()
 	}
 }
 
-
+//=============================================================================
+//								SpawnBox
+//
+/// Creates a box at the location with the same size as the mouse cursor
 bool HoltStatePlacingPlatform::SpawnBox()
 {
 	XMLQuickVars var("..\\Myvars.xml");
-	box_[incrimenter_%3] = new HoltBox(driver_->sceneManager_, 
+	new HoltBox(driver_->sceneManager_, 
 		b2Vec2((float32)driver_->mousePicking_->GetPosition().x, (float32)driver_->mousePicking_->GetPosition().y),
 		driver_->mousePicking_->boxSize_/2, var.Double("HoltBox/boxDensity"));
-	incrimenter_++;
 	return true;
 }
 
+//=============================================================================
+//								SpawnPlatform
+//
+/// Creates a platform "shadow" based on distance between clicks, is a guide for placing platforms
 bool HoltStatePlacingPlatform::SpawnPlatform()
 {
 	float tempLength = sqrt((startPosition_.x - endPosition_.x) * (startPosition_.x - endPosition_.x)
@@ -443,6 +460,10 @@ bool HoltStatePlacingPlatform::SpawnGravityVector()
 
 	return false;
 }
+
+//=============================================================================
+//								GetGravityVector
+//
 GravityVector* HoltStatePlacingPlatform::GetGravityVector()
 {
 	return gravityVector_;

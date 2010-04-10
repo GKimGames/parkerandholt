@@ -1,3 +1,11 @@
+/*=============================================================================
+
+	HoltStatePlacingGravityVector.h
+
+	State for Holt placing GravityVector, no longer used
+
+=============================================================================*/
+
 #ifndef HOLT_STATE_PLACING_GRAVITY_VECTOR_H
 #define HOLT_STATE_PLACING_GRAVITY_VECTOR_H
 
@@ -37,7 +45,10 @@ public:
 	/// This will execute when the state is exited.
 	virtual void Exit();
 
+	/// Creates a HoltBox
 	bool SpawnBox();
+
+	/// Creates a Gravity Vector
 	bool SpawnGravityVector();
 	
 	

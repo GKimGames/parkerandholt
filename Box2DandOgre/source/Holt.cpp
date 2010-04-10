@@ -27,7 +27,8 @@ class Character;
 //=============================================================================
 //								Constructor
 //
-CharacterHolt::CharacterHolt(MousePicking* mousePicking) : CharacterParker()
+
+CharacterHolt::CharacterHolt(MousePicking* mousePicking) : Character()
 {
 	mousePicking_ = mousePicking;
 	holtId_ = objectId_;
@@ -101,7 +102,7 @@ void CharacterHolt::InitVariables()
 //=============================================================================
 //								CreatePhysics
 //
-/// Create the Box2D representation of Parker.
+/// Create the Box2D representation of Holt.
 void CharacterHolt::CreatePhysics()
 {
 	b2BodyDef bd;
@@ -136,9 +137,6 @@ void CharacterHolt::CreatePhysics()
 	fd.shape = &circleShape;
 	fd.density = (boundingBoxWidth_ * boundingBoxHeight_) * mass_;
 	feetCircle_ = body_->CreateFixture(&fd);
-
-	//body_->SetLinearDamping(linearDamping_);
-
 
 	// Create the sensor for the feet
 	b2PolygonShape feetSensor_Def;
@@ -206,10 +204,10 @@ void CharacterHolt::CreatePhysics()
 //=============================================================================
 //								CreateGraphics
 //
-/// Create the OGRE stuff for Parker.
+/// Create the OGRE stuff for Holt. Only one character mesh, so it is the same as Parker
 void CharacterHolt::CreateGraphics()
 {
-	// Set up the Graphics part of Parker
+	// Set up the Graphics part of Holt
 	entity_ = sceneManager_->createEntity(objectName_, meshName_);
 	animationState_ = entity_->getAnimationState("run");
 	animationState_->setLoop(true);
@@ -344,7 +342,7 @@ bool CharacterHolt::ReadXMLConfig()
 }
 
 //=============================================================================
-//								CharacterParker
+//								ApplyWalkingFriction
 //
 /// Applies "friction" to the character if they are on a surface.
 /// It applies a force in the opposite direction the character's velocity is
@@ -401,12 +399,11 @@ void CharacterHolt::UpdateAnimation(double timeSinceLastFrame)
 		maxVel = maximumWalkingVelocity_;
 	}
 
-	//if(!animationBlender_->complete)
-	//animationBlender_->addTime(timeSinceLastFrame / 80);
-
-	//animationState_->addTime(timeSinceLastFrame);
 }
 
+//=============================================================================
+//								HandleMessage
+//
 bool CharacterHolt::HandleMessage(const KGBMessage message)
 { 
 
@@ -414,35 +411,36 @@ bool CharacterHolt::HandleMessage(const KGBMessage message)
 	{
 		return true;
 	}
-	//if(active_)
+
+	if(message.messageType == KGBMessageType::PLAYER_DIED)
 	{
-		if(message.messageType == KGBMessageType::PLAYER_DIED)
-		{
-			body_->SetActive(true);
-			b2Vec2 temp(playerInfo_->GetCheckPoint());
-			SetBodyPosition(temp);
+		// When player has died it is transported to the last check point and made active, This does not mean he is the active character
+		body_->SetActive(true);
+		b2Vec2 temp(playerInfo_->GetCheckPoint());
+		SetBodyPosition(temp);
 
-			CameraStateWatchDef def;
-			def.initialPosition = Ogre::Vector3(0, 6, 18);
-			def.targetObject = this;
-			GAMEFRAMEWORK->gameCamera_->InitializeDef(&def);	
-
-		}
-
-		else
-		{
-			if(message.messageType == CREATE_BOX)
-			{
-				new HoltBox(sceneManager_, b2Vec2(-7, 10), 1, 20);
-			}
-		}
+		// Resets the camera to watch the character
+		CameraStateWatchDef def;
+		def.initialPosition = Ogre::Vector3(0, 6, 18);
+		def.targetObject = this;
+		GAMEFRAMEWORK->gameCamera_->InitializeDef(&def);	
+	}
+	else if(message.messageType == CREATE_BOX)
+	{
+		new HoltBox(sceneManager_, b2Vec2(-7, 10), 1, 20);
+	}
+	else if(message.messageType == KGBMessageType::ADD_ITEM)
+	{
+		playerInfo_->AddToInventory(1);
 	}
 
 	return stateMachine_->HandleMessage(message); 
 }
 
 
-
+//=============================================================================
+//								Update
+//
 bool CharacterHolt::Update(double timeSinceLastFrame)
 {
 	
@@ -548,13 +546,16 @@ bool CharacterHolt::Update(double timeSinceLastFrame)
 		contacts = contacts->next;
 	}
 
+	// Updates the TraumaMeter and if it exceeds .5 the character dies.
 	traumaMeter_->Update();
 	if(traumaMeter_->GetTrauma() > .5)
 	{
+		// If the character is the active character the camera is changed in return to check point
 		if(active_)
 		{
 			ReturnToCheckPoint();
 		}
+		// If not active the character is just placed at the last checkpoint
 		else
 		{
 			traumaMeter_->ResetTrauma();
@@ -563,6 +564,8 @@ bool CharacterHolt::Update(double timeSinceLastFrame)
 		}
 	}
 
+	// Increases trauma if the character is moving too quickly
+	// Creates a freefall death condition
 	if(body_->GetLinearVelocity().Length() > 40)
 	{
 		traumaMeter_->AddTrauma(0.01);
@@ -570,43 +573,19 @@ bool CharacterHolt::Update(double timeSinceLastFrame)
 	return stateMachine_->Update();
 }
 
-float32 CharacterHolt::ReportFixture(b2Fixture* fixture, const b2Vec2& point,
-									   const b2Vec2& normal, float32 fraction)
-{
-	
-	//static b2Color color(1,0,234.0/255.0);
 
-	//if(rayCastId == 0)
-	//{
-	//	GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec1, point, color);
-	//}
-	//else
-	//{
-	//	GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec2, point, color);
-	//}
-
-	//if(fixture != feetSensor_)
-	//{
-	//	this->SetBodyPosition(b2Vec2(body_->GetPosition().x, point.y + boundingBoxHeight_/2 + .1 ));
-
-	//	//body_->ApplyForce(b2Vec2(0,abs(body_->GetMass() * world_->GetGravity().y * 2)), body_->GetPosition());
-	//	body_->SetLinearVelocity(b2Vec2(body_->GetLinearVelocity().x,0));
-	//	b2Vec2 force((body_->GetLinearVelocity().x + 0.01) * body_->GetMass() * world_->GetGravity().x,
-	//				 (body_->GetLinearVelocity().y + 0.01) * body_->GetMass() * world_->GetGravity().y);
-	//	fixture->GetBody()->ApplyImpulse(force, point);
-	//}
-
-	return 0;
-
-}
-
+//=============================================================================
+//								BeginContact
+//
 /// Called when two fixtures begin to touch.
 void CharacterHolt::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
 
 	stateMachine_->BeginContact(contact,contactFixture, collidedFixture);
 }
-
+//=============================================================================
+//								EndContact
+//
 /// Called when two fixtures cease to touch.
 void CharacterHolt::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
@@ -614,7 +593,10 @@ void CharacterHolt::EndContact(ContactPoint* contact, b2Fixture* contactFixture,
 	stateMachine_->EndContact(contact,contactFixture, collidedFixture);
 }
 
-//returns character to the currently active checkpoint
+//=============================================================================
+//								ReturnToCheckPoint
+//
+//returns character to the currently active checkpoint by first panning the camera to the checkpoint
 void CharacterHolt::ReturnToCheckPoint()
 {
 	traumaMeter_->ResetTrauma();
@@ -630,12 +612,12 @@ void CharacterHolt::ReturnToCheckPoint()
 	def.initialPosition = GAMEFRAMEWORK->camera_->getPosition();
 	def.messageType = KGBMessageType::PLAYER_DIED;
 	GAMEFRAMEWORK->gameCamera_->InitializeDef(&def);
-
-	
-	placingPlatform_->GetGravityVector()->RemovePlayer();
 }
 
-
+//=============================================================================
+//								PostSolve
+//
+/// Checks for impacts against the character strong enough to injure him and adjusts trauma accordingly
 void CharacterHolt::PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse)
 {
 	if(contact->GetFixtureA()->GetBody()->GetUserData() != NULL)
@@ -674,7 +656,6 @@ void CharacterHolt::PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2F
 	}
 
 	stateMachine_->PostSolve(contact,contactFixture, collidedFixture, impulse);
-
 }
 
 //=============================================================================

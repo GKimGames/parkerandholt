@@ -6,14 +6,20 @@
 class PickUp : public GameObjectOgreBox2D
 {
 public:
-	PickUp(Ogre::SceneManager* sceneManager, b2Vec2 center, std::string meshName);
+	/// Creates a normal pickup
 	PickUp(Ogre::SceneManager* sceneManager, b2Vec2 center);
+
+	/// Creates a pickup that breaks at the entered force
 	PickUp(Ogre::SceneManager* sceneManager, b2Vec2 center, float breakingForce);
+	
 	virtual ~PickUp();
+
 	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 	void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
-	bool Update(double timeSinceLastFrame);
 	void PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse);
+
+	bool Update(double timeSinceLastFrame);
+	
 
 protected:
 	b2Vec2			position_;

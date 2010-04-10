@@ -51,6 +51,8 @@ public:
 	bool CreateBox2DBox();
 	bool Update(double timeSinceLastFrame);
 	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
+
+	/// Sets the box invisible and inactive
 	void SetInactive();
 
 	

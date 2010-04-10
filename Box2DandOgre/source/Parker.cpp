@@ -444,27 +444,6 @@ bool CharacterParker::Update(double timeSinceLastFrame)
 {
 	
 	static b2Color color(1,1,0);
-	//bodyVec1 = body_->GetWorldPoint(b2Vec2(-boundingBoxWidth_/2,	0));
-	//bodyVec2 = body_->GetWorldPoint(b2Vec2(boundingBoxWidth_/2,	0));
-	//feetVec1 = body_->GetWorldPoint(b2Vec2(-boundingBoxWidth_/2,	-boundingBoxHeight_/2 - .3));
-	//feetVec2 = body_->GetWorldPoint(b2Vec2(boundingBoxWidth_/2,	-boundingBoxHeight_/2  - .3));
-
-
-	/*bodyVec1 = body_->GetWorldPoint(b2Vec2(-boundingBoxWidth_/2 - .1,	-boundingBoxHeight_/2));
-	bodyVec2 = body_->GetWorldPoint(b2Vec2(boundingBoxWidth_/2 + .1,	-boundingBoxHeight_/2));
-	feetVec1 = body_->GetWorldPoint(b2Vec2(-boundingBoxWidth_/2 - .1,	-boundingBoxHeight_/2 - .1));
-	feetVec2 = body_->GetWorldPoint(b2Vec2(boundingBoxWidth_/2 + .1,	-boundingBoxHeight_/2  - .1));
-
-	world_->RayCast(this, bodyVec1, feetVec1);
-	rayCastId = 0;
-	world_->RayCast(this, bodyVec2, feetVec2);
-	rayCastId = 1;
-
-	if(GAMEFRAMEWORK->GetDebugDraw())
-	{
-		GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec1, feetVec1, color);
-		GAMEFRAMEWORK->GetDebugDraw()->DrawSegment(bodyVec2, feetVec2, color);
-	}*/
 
 	if(GameObjectOgreBox2D::Update(timeSinceLastFrame))
 	{
@@ -588,6 +567,7 @@ bool CharacterParker::Update(double timeSinceLastFrame)
 	return stateMachine_->Update();
 }
 
+
 /// Called when two fixtures begin to touch.
 void CharacterParker::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
@@ -616,7 +596,6 @@ void CharacterParker::ReturnToCheckPoint()
 	def.messageType = KGBMessageType::PLAYER_DIED;
 	def.messageTarget = this->GetId();
 	GAMEFRAMEWORK->gameCamera_->InitializeDef(&def);
-
 }
 
 

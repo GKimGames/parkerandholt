@@ -9,6 +9,10 @@
 #include "HoltBox.h"
 #include "MessageDispatcher.h"
 
+//=============================================================================
+//								Constructor
+//
+/// Default size
 HoltBox::HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center)
 {
 
@@ -39,6 +43,10 @@ HoltBox::HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center)
 	
 }
 
+//=============================================================================
+//								Constructo
+//
+/// Creates box with specified attributes, used for Holt's placeable
 HoltBox::HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center, double size, double density)
 {
 	position_ = center;
@@ -69,7 +77,10 @@ HoltBox::HoltBox(Ogre::SceneManager* sceneManager, b2Vec2 center, double size, d
 	CreateBox2DBox();
 }
 
-
+//=============================================================================
+//								CreateBox2DBox
+//
+/// Creates the physical box
 bool HoltBox::CreateBox2DBox()
 {
 	if(initialized_ == true)
@@ -110,6 +121,10 @@ bool HoltBox::CreateBox2DBox()
 	return false;	
 }
 
+//=============================================================================
+//								Update
+//
+// used mainly to determine if the position is intersecting another physical object
 bool HoltBox::Update(double timeSinceLastFrame)
 {
 	if(timeSinceLastFrame > .001)
@@ -117,8 +132,7 @@ bool HoltBox::Update(double timeSinceLastFrame)
 		placementTest_ = false;
 		if(badPlacement_)
 		{
-			entity_->setVisible(false);
-			body_->SetActive(false);
+			SetInactive();
 		}
 		if(!badPlacement_)
 		{
@@ -129,21 +143,30 @@ bool HoltBox::Update(double timeSinceLastFrame)
 	return true;
 }
 
+//=============================================================================
+//								BeginContact
+//
+// Checks to see if the placement test is active, if so checks for contacts
 void HoltBox::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
 	if(placementTest_)
 	{
 		if(contactFixture->GetBody() == body_ && !collidedFixture->IsSensor())
 		{
-			//body_->GetFixtureList()->SetSensor(true);
 			badPlacement_ = true;
 			placementTest_ = false;
 		}
 	}
 }
 
+//=============================================================================
+//								SetInactive
+//
+/// Sets the graphics and physics inactive and moves the box off screen
+// Used in place of deletion as deleting can break the GameObject list
 void HoltBox::SetInactive()
 {
 	entity_->setVisible(false);
 	body_->SetActive(false);
+	body_->SetTransform(b2Vec2(0, -100), 0);
 }

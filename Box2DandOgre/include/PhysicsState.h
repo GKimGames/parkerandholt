@@ -68,6 +68,7 @@ public:
 
 	PhysicsState(Ogre::String levelName);
 	
+
 	// Should be moved to the source file, too lazy.
 	/// Adds the AppState to the AppStateManager and sets the name of the level PhysicsState should load.
 	static void create(AppStateListener* parent, const Ogre::String name, Ogre::String levelName = "..\\LevelTwo.xml")	
@@ -158,7 +159,7 @@ public:
 	void setBufferedMode();
 	void setUnbufferedMode();
 
-	CharacterParker* active_;
+	Character* activeCharacter_;
 
 protected:
 
@@ -175,7 +176,6 @@ protected:
 
 	CharacterParker* parker_;
 	CharacterHolt* holt_;
-	
 
 	b2World* world;
 	double timeStep;
@@ -183,7 +183,6 @@ protected:
 	double levelTimeLeft_;
 
 	TraumaMeter* myMeter_;
-	float testing_;
 
 
 #ifdef DEBUG_DRAW_ON
@@ -219,7 +218,6 @@ private:
 	double time_;
 	int seconds_;
 	int minutes_;
-
 };
 
 

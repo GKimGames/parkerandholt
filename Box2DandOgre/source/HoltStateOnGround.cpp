@@ -80,13 +80,9 @@ bool HoltStateOnGround::Update()
 			Jump();
 		}
 	}
-
-	//static Ogre::Vector3 direction;
-	//Ogre::Vector3 direction;
 	
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 	
-	//if(driver_->feetSensorHitCount_ == 0)
 	if(driver_->feetSensorHit_ == false)
 	{
 		stateMachine_->ChangeState(driver_->inAirState_);
@@ -102,11 +98,8 @@ bool HoltStateOnGround::Update()
 			isJumping_ = false;
 		}
 
-		//if(moveRightDown_ || moveLeftDown_)
-		{
-			driver_->ApplyWalkingFriction(timeSinceLastFrame);
-		}
 
+		driver_->ApplyWalkingFriction(timeSinceLastFrame);
 		moveRightDown_ = false;
 		moveLeftDown_ = false;
 		
@@ -314,8 +307,7 @@ void HoltStateOnGround::MoveRight()
 
 //=============================================================================
 //								Jump
-///
-/// Jump!
+//
 void HoltStateOnGround::Jump()
 {
 
@@ -391,6 +383,9 @@ void HoltStateOnGround::UpdateAnimation()
 	}
 }
 
+//=============================================================================
+//								GetFeetContactCount
+//
 int HoltStateOnGround::GetFeetContactCount()
 {
 	return feetContactCount_;

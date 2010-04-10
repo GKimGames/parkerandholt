@@ -45,8 +45,6 @@ void PhysicsState::enter()
 	GameObject::objectList = gameObjectList_;
 	GameObject::objectNameList = gameObjectNameList_;
 
-	testing_ = .5;
-
 	gameObject_ = new GameObject("PhysicsState");
 
 	GameFramework::getSingletonPtr()->log_->logMessage("Entering PhysicsState...");
@@ -264,7 +262,12 @@ void PhysicsState::createPhysics()
 
 	// Load some level specific settings.
 	TiXmlDocument* configXML_ = 0;
-	TiXmlHandle* handle = TinyXMLHelper::GetRootFromFile(levelName_,configXML_);
+
+	TiXmlHandle* handle = TinyXMLHelper::GetRootFromFile("..\\LevelHolt.xml",configXML_);
+
+	//matt's
+	//TiXmlHandle* handle = TinyXMLHelper::GetRootFromFile(levelName_,configXML_);
+
 	
 	TiXmlElement* element = handle->FirstChildElement("LevelInfo").ToElement();
 	TiXmlElement* parkerElement = element->FirstChildElement();
@@ -290,7 +293,7 @@ void PhysicsState::createPhysics()
 	parker_->SetBodyPosition(parkerPosition);
 
 	// Set the active character to parker.
-	active_ = parker_;
+	activeCharacter_ = parker_;
 
 	holt_ = new CharacterHolt(myMouse_);
 	holt_->Initialize();
@@ -450,10 +453,10 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 
 	if(keyEventRef.key == OIS::KC_9)
 	{
-		if(active_ != parker_)
+		if(activeCharacter_ != parker_)
 		{
 			myMouse_->SetVisibility(false);
-			active_ = parker_;
+			activeCharacter_ = parker_;
 			holt_->SetActive(false);
 			parker_->SetActive(true);
 			CameraStateWatchDef def;
@@ -465,9 +468,9 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 
 	if(keyEventRef.key == OIS::KC_0)
 	{
-		if(active_ != holt_)
+		if(activeCharacter_ != holt_)
 		{
-			active_ = holt_;
+			activeCharacter_ = holt_;
 			parker_->SetActive(false);
 			holt_->SetActive(true);
 			CameraStateWatchDef def;
@@ -510,7 +513,7 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 	{
 		CameraStateWatchDef def;
 		def.initialPosition = camPosition;
-		def.targetObject = active_;
+		def.targetObject = activeCharacter_;
 		gameCamera_->InitializeDef(&def);
 	}
 
@@ -518,7 +521,7 @@ bool PhysicsState::keyPressed(const OIS::KeyEvent &keyEventRef)
 	{
 		CameraStateWatchDef def;
 		def.initialPosition = Ogre::Vector3(0,8,50);
-		def.targetObject = active_;
+		def.targetObject = activeCharacter_;
 		gameCamera_->InitializeDef(&def);
 	}
 
@@ -538,7 +541,7 @@ bool PhysicsState::keyReleased(const OIS::KeyEvent &keyEventRef)
 
 	if(keyEventRef.key == OIS::KC_Y)
 	{
-		active_->ReturnToCheckPoint();
+		activeCharacter_->ReturnToCheckPoint();
 	}
 
 #if DEBUG_DRAW_ON
@@ -569,7 +572,10 @@ bool PhysicsState::keyReleased(const OIS::KeyEvent &keyEventRef)
 bool PhysicsState::mouseMoved(const OIS::MouseEvent &evt)
 {
 	static double angle = 0;
-	Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, myMouse_->GetId(), UPDATE_MOUSE, &evt);
+
+	//Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, myMouse_->GetId(), UPDATE_MOUSE, &evt);
+	myMouse_->UpdateMouse(evt, holt_->GetBodyPosition());
+
 
 	return true;
 }
@@ -633,7 +639,7 @@ bool PhysicsState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID 
 /// it just updates the mouse because the camera has moved.
 void PhysicsState::moveCamera()
 {
-	myMouse_->UpdateMouseFromCamera();
+
 }
 
 
@@ -652,6 +658,13 @@ void PhysicsState::getInput()
 		debugDrawOn_ = false;
 	}
 
+		// Turn Debug Draw on
+		if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_X))
+		{
+			debugDrawOn_ = true;
+		}
+
+		
 	// Turn Debug Draw on
 	if(GameFramework::getSingletonPtr()->keyboard_->isKeyDown(OIS::KC_X))
 	{

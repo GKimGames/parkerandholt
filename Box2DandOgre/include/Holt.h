@@ -1,8 +1,6 @@
 /*=============================================================================
 
-		Parker.h
-
-		Author: Matt King
+		Holt.h
 
 =============================================================================*/
 
@@ -25,7 +23,7 @@
 class MousePicking;
 class Door;
 
-class CharacterHolt: public CharacterParker
+class CharacterHolt: public Character
 {
 	friend class HoltStateOnGround;
 	friend class HoltStateInAir;
@@ -43,9 +41,6 @@ public:
 
 	bool Update(double timeSinceLastFrame);
 
-	virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point,
-									const b2Vec2& normal, float32 fraction);
-
 	/// Called when two fixtures begin to touch.
 	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 
@@ -53,8 +48,14 @@ public:
 	void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 	
 	void PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse);
+
+	/// Returns the character to the last touched checkpoint
 	void ReturnToCheckPoint();
+
+	/// Sets if this character is the character being controled by the player
 	void SetActive(bool active);
+
+	// Returns this characters player information
 	PlayerInfo* GetPlayerInfo();
 
 	bool IsFootSensor(b2Fixture* fixture);
@@ -71,7 +72,7 @@ protected:
 
 	/// Applies "friction" to the character if they are on a surface.
 	void ApplyWalkingFriction(double timeSinceLastFrame);
-	//b2Body* elevator_;
+	b2Body* elevator_;
 
 	FSMStateMachine<CharacterHolt>*	stateMachine_;
 
@@ -80,45 +81,45 @@ protected:
 	HoltStatePlacingPlatform*		placingPlatform_;
 	HoltStatePlacingStatic*			placingStatic_;
 
-	//b2Fixture*			feetSensor_;
-	//bool				feetSensorHit_;
-	//b2Fixture*			feetCircle_;
+	b2Fixture*			feetSensor_;
+	bool				feetSensorHit_;
+	b2Fixture*			feetCircle_;
 
+	// These sensors are used to tell where things are in front of Parker
+	// Such as if something is only shin high, thigh high, or up to the torso.
+	// Used to check if something above the character is within a grabbable reach.
+	b2Fixture*			shinSensorRight_;
+	bool				shinRightHit_;
+	b2Fixture*			torsoSensorRight_;
+	bool				torsoRightHit_;
 
-	//// These sensors are used to tell where things are in front of Parker
-	//// Such as if something is only shin high, thigh high, or up to the torso.
-	//// Used to check if something above the character is within a grabbable reach.
-	//b2Fixture*			shinSensorRight_;
-	//bool				shinRightHit_;
-	//b2Fixture*			torsoSensorRight_;
-	//bool				torsoRightHit_;
+	b2Fixture*			shinSensorLeft_;
+	bool				shinLeftHit_;
+	b2Fixture*			torsoSensorLeft_;
+	bool				torsoLeftHit_;
 
-	//b2Fixture*			shinSensorLeft_;
-	//bool				shinLeftHit_;
-	//b2Fixture*			torsoSensorLeft_;
-	//bool				torsoLeftHit_;
+	MousePicking*		mousePicking_;
 
+	double boundingBoxHeight_;
+	double boundingBoxWidth_;
 
-	//MousePicking*		mousePicking_;
+	b2Vec2 wallJumpForce_;
 
-	//double boundingBoxHeight_;
-	//double boundingBoxWidth_;
+	double timeBetweenJump_;
+	
+	TraumaMeter*		traumaMeter_;
+	PlayerInfo*			playerInfo_;
 
-	//b2Vec2 wallJumpForce_;
+	GameObjectSensor*	ledge_;
+	b2Fixture*			sensorLedge_;
 
-	//double timeBetweenJump_;
-	//
-	//TraumaMeter*		traumaMeter_;
-	//PlayerInfo*			playerInfoh_;
+	GameCamera*			gameCamera_;
+	Ogre::Camera*		camera_;
 
-	//GameObjectSensor*	ledge_;
-	//b2Fixture*			sensorLedge_;
+	// Controls if the character is currently being controled by the players
+	bool				active_;
+	Door*				door_;
 
-	//GameCamera*			gameCamera_;
-	//Ogre::Camera*		camera_;
-
-	//bool				active_;
-	//Door*				door_;
 };
 
 #endif

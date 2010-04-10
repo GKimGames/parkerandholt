@@ -24,18 +24,18 @@ struct KGBMessage;
 class MousePicking : public GameObjectOgreBox2D
 {
 public: 
+
 	MousePicking(Ogre::SceneManager* sceneManager, Ogre::Camera* camera);
 	~MousePicking(){}
 
-	void MouseMoved(const OIS::MouseEvent &arg);
-	void MousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id); 
-	void MouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
-	void UpdateMouse(const KGBMessage message);
-	void UpdateMouseFromCamera();
+	void UpdateMouse(const OIS::MouseEvent &evt, b2Vec2 holtPosition);
 	bool HandleMessage(const KGBMessage message);
-	bool SpawnBox();
 	void SetVisibility(bool visible);
+
+	/// Returns the position of the mouse icon
 	const Ogre::Vector3 GetPosition();
+
+	/// Deletes placeable objects the mouse is in contact with
 	void DeletePlaceables();
 	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 	bool Update(double timeSinceLastFrame);
@@ -52,19 +52,17 @@ public:
 
 protected:
 	Ogre::SceneManager*			sceneManager_;
-	Ogre::RaySceneQuery*		m_pRSQ_;
-	Ogre::Camera*				m_pCamera_;
+	Ogre::RaySceneQuery*		RSQ_;
+	Ogre::Camera*				camera_;
 	Ogre::Plane*				pickingPlane_;
 	Ogre::Vector3				position_;
 	Ogre::Vector3				pointClicked_;
 	Ogre::Entity*				mouseIcon_;
 	Ogre::Real					rayPositionX_;
 	Ogre::Real					rayPositionY_;
-	HoltBox*					box_[3];
 	double						boxMinSize_;
 	double						boxSizeIncrement_;
 	double						boxMaxSize_;
-	int							incrementer_;
 	bool						deleteCheck_;
 
 };

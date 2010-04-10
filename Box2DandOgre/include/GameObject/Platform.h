@@ -21,35 +21,17 @@ public:
 
 	Platform();
 	Platform(Ogre::SceneManager* sceneManager, b2Vec2 p1, b2Vec2 p2);
-	Platform(Ogre::SceneManager* sceneManager, b2Vec2 p1, b2Vec2 p2, int temp);
+	Platform(Ogre::SceneManager* sceneManager, b2Vec2 p1, b2Vec2 p2, bool placeable);
 	virtual ~Platform();
 
-	bool Update(double timeSinceLastFrame)
-	{ 
-		if(timeSinceLastFrame > .001)
-		{
-			placementTest_ = false;
-			if(badPlacement_)
-			{
-				entity_->setVisible(false);
-				body_->SetActive(false);
-			}
-			if(!badPlacement_)
-			{
-				body_->GetFixtureList()->SetSensor(false);
-			}
-		}
-		UpdateGraphics(timeSinceLastFrame);
-		if (badPlacement_)
-		{
-			body_->SetActive(false);
-		}
-		return true;
-	};
+	bool Update(double timeSinceLastFrame);
+	
 
 	virtual bool Initialize();
 	virtual bool Initialize(Ogre::String str);
 	bool InitializePlaceable();
+	
+	/// Used to set the graphics position when there is no physical body, placeables only
 	bool SetGraphics(b2Vec2 position, float length, float angle, bool final);
 	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 
@@ -65,7 +47,7 @@ protected:
 	float	length_;
 	bool	placementTest_;
 	bool	badPlacement_;
-	
+	float	maxLength_;
 };
 
 
