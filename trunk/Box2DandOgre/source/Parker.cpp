@@ -77,7 +77,7 @@ bool CharacterParker::Initialize()
 //=============================================================================
 //								InitVariables
 //
-/// Initialize some variables.
+/// Initialize some class variables.
 void CharacterParker::InitVariables()
 {
 
@@ -112,7 +112,6 @@ void CharacterParker::CreatePhysics()
 	b2PolygonShape bodyShapeDef;
 
 	// The extents are the half-widths of the box.
-
 	b2Vec2 bodyVecs[4];
 	bodyShapeDef.SetAsBox(boundingBoxWidth_/2, boundingBoxHeight_/2.3, b2Vec2(0,.1),0);
 
