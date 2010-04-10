@@ -398,13 +398,14 @@ void CharacterParker::UpdateAnimation(double timeSinceLastFrame)
 	{
 		maxVel = maximumWalkingVelocity_;
 	}
-
-	//if(!animationBlender_->complete)
-	//animationBlender_->addTime(timeSinceLastFrame / 80);
-
-	//animationState_->addTime(timeSinceLastFrame);
 }
 
+
+//=============================================================================
+//								HandleMessage
+//
+/// Handles messages. Some messages are handled inside this class, others
+/// are delegated to the Finite State Machine.
 bool CharacterParker::HandleMessage(const KGBMessage message)
 { 
 
@@ -439,7 +440,11 @@ bool CharacterParker::HandleMessage(const KGBMessage message)
 }
 
 
-
+//=============================================================================
+//								Update
+//
+/// Calls update on its base class. Then it checks its sensors to see what 
+/// the character is touching. Then it calls update on its FSM.
 bool CharacterParker::Update(double timeSinceLastFrame)
 {
 	
@@ -462,6 +467,7 @@ bool CharacterParker::Update(double timeSinceLastFrame)
 	ledge_ = 0;
 	sensorLedge_ = 0;
 
+	// Go through all the contacts the b2Body has.
 	b2ContactEdge* contacts = body_->GetContactList();
 	while(contacts)
 	{
@@ -564,23 +570,30 @@ bool CharacterParker::Update(double timeSinceLastFrame)
 	{
 		traumaMeter_->AddTrauma(0.01);
 	}
+
+	// Update the FSM.
 	return stateMachine_->Update();
 }
 
-
+//=============================================================================
+//								BeginContact
+//
 /// Called when two fixtures begin to touch.
 void CharacterParker::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
 	stateMachine_->BeginContact(contact,contactFixture, collidedFixture);
 }
 
+//=============================================================================
+//								EndContact
+//
 /// Called when two fixtures cease to touch.
 void CharacterParker::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
 	stateMachine_->EndContact(contact,contactFixture, collidedFixture);
 }
 
-//returns character to the currently active checkpoint
+/// Returns character to the currently active checkpoint
 void CharacterParker::ReturnToCheckPoint()
 {
 	traumaMeter_->ResetTrauma();

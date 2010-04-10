@@ -16,8 +16,6 @@
 #include "ParkerStateOnGround.h"
 #include "ParkerStateInAir.h"
 
-// 470 to stop him from moving
-
 //=============================================================================
 //								Constructor
 //
@@ -216,7 +214,9 @@ void ParkerStateLedgeGrab::EndContact(ContactPoint* contact, b2Fixture* contactF
 //								Climb
 ///
 /// Getting a jump message while the character is grabbing a ledge will make
-/// him climb.
+/// him climb. The time in the animation sets the position of the character
+/// but he's being moved by setting his b2Body's position every frame.
+/// He is moved toward the center of the LedgeGrabSensor.
 void ParkerStateLedgeGrab::Climb()
 {
 
@@ -224,6 +224,8 @@ void ParkerStateLedgeGrab::Climb()
 
 	b2Vec2 dest = ledgePosition_ - originalPosition_;
 	driver_->SetBodyPosition(originalPosition_);
+
+	// Different points in the animation will have Parker moving in different directions at different speeds.
 	if(timeLeft < 0.8 && timeLeft > 0.1)
 	{
 		Ogre::Vector3 v(originalPosition_.x, originalPosition_.y + ((dest.y + 1.05) * timeLeft / 0.75),0);
@@ -254,6 +256,9 @@ void ParkerStateLedgeGrab::Climb()
 #include "XMLQuickVars.h"
 //=============================================================================
 //								PostSolve
+//
+/// We need to check if theres been a collission with Parker that has so much
+/// force behind it that he will stop climbing.
 void ParkerStateLedgeGrab::PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse)
 {
 	XMLQuickVars var("..\\Myvars.xml");

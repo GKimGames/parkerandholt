@@ -82,9 +82,6 @@ bool ParkerStateOnGround::Update()
 			Jump();
 		}
 	}
-
-	//static Ogre::Vector3 direction;
-	//Ogre::Vector3 direction;
 	
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 	
@@ -103,10 +100,8 @@ bool ParkerStateOnGround::Update()
 			isJumping_ = false;
 		}
 
-		//if(moveRightDown_ || moveLeftDown_)
-		{
-			driver_->ApplyWalkingFriction(timeSinceLastFrame);
-		}
+		//
+		driver_->ApplyWalkingFriction(timeSinceLastFrame);
 
 		moveRightDown_ = false;
 		moveLeftDown_ = false;
@@ -141,9 +136,10 @@ bool ParkerStateOnGround::Update()
 //=============================================================================
 //								HandleMessage
 //
+/// Handles the messages for when Parker is on the ground.
 bool ParkerStateOnGround::HandleMessage(const KGBMessage message)
 {
-  std::string* gameObject = 0;
+
   if(driver_->active_)
   {
 	switch(message.messageType)
@@ -195,6 +191,7 @@ bool ParkerStateOnGround::HandleMessage(const KGBMessage message)
 //=============================================================================
 //								Exit
 //
+/// Leave the state.
 void ParkerStateOnGround::Exit()
 {
 	driver_->elevator_ = 0;                                                             
@@ -263,7 +260,7 @@ void ParkerStateOnGround::EndContact(ContactPoint* contact, b2Fixture* contactFi
 //=============================================================================
 //								MoveLeft
 //
-///
+/// Applies force to the character so he moves left.
 void ParkerStateOnGround::MoveLeft()
 {
 
@@ -285,7 +282,7 @@ void ParkerStateOnGround::MoveLeft()
 //=============================================================================
 //								MoveRight
 //
-/// 
+/// Applies force to the character so he moves right.
 void ParkerStateOnGround::MoveRight()
 {
 	if(isJumping_ == false)
@@ -306,10 +303,12 @@ void ParkerStateOnGround::MoveRight()
 //=============================================================================
 //								Jump
 ///
-/// Jump!
+/// Jump, adds a force to Parker so he jumps up. Also sets his AnimationBlender
+/// to the jumping animation.
 void ParkerStateOnGround::Jump()
 {
 
+	// Only jump if enough time has passed in the j
 	if(jumpTimer_ > 0)
 	{
 		b2Vec2 force(b2Vec2(0, (driver_->jumpingAfterForce_)));
@@ -321,7 +320,6 @@ void ParkerStateOnGround::Jump()
 		driver_->body_->ApplyImpulse(b2Vec2(0,driver_->jumpingForce_/5), driver_->body_->GetPosition());
 
 		driver_->animationBlender_->Blend("jump", AnimationBlender::BlendWhileAnimating, 0.2, false, 0.6);
-		//driver_->animationBlender_->GetTarget()->setTimePosition(0.3);
 
 		isJumping_ = true;
 
@@ -335,14 +333,21 @@ void ParkerStateOnGround::Jump()
 //=============================================================================
 //								UpdateAnimation
 //
+/// Updates the animation based on the velocity of the character. It will set
+/// his animation too idle if he is barely moving and to running if he is
+/// moving fast enough.
 void ParkerStateOnGround::UpdateAnimation()
 {
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
 
+	/// Don't bother updating the animation if he is jumping.
 	if(isJumping_ == false)
 	{
+		
 		b2Vec2 lv = driver_->body_->GetLinearVelocity();
 	
+		// If parker is on something that is moving we really want his relative
+		// velocity to check if he is running or standing still.
 		if(driver_->elevator_ != 0)
 		{
 			lv -= driver_->elevator_->GetLinearVelocity();
@@ -380,9 +385,4 @@ void ParkerStateOnGround::UpdateAnimation()
 			}
 		}
 	}
-}
-
-int ParkerStateOnGround::GetFeetContactCount()
-{
-	return feetContactCount_;
 }
