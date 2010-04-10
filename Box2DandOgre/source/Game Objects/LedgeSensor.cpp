@@ -9,6 +9,10 @@
 #include "LedgeSensor.h"
 #include "GameFramework.h"
 
+//=============================================================================
+//							Constructor
+// 
+/// Create the body for the LedgeSensor.
 LedgeSensor::LedgeSensor() : GameObjectSensor(NO_MESSAGE)
 {
 	world_ = GameFramework::getSingletonPtr()->GetWorld();

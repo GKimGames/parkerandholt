@@ -10,6 +10,9 @@
 #include "Message.h"
 #include "Parker.h"
 
+//=============================================================================
+//							FadingPlatform
+//
 FadingPlatform::FadingPlatform(Ogre::String name,b2Body* body,Ogre::Entity* entity):
 GameObjectOgreBox2D(name, body, entity)
 {
@@ -26,16 +29,22 @@ GameObjectOgreBox2D(name, body, entity)
 	GameObject::Initialize();
 
 	particleSystem_ = sceneManager_->createParticleSystem(objectName_ + "psystem", "PaH/fadingPlatform");
-	//particleSystem_->setVisible(false);
+
 	particleSystem_->getEmitter(0)->setEnabled(false);
 	sceneNode_->attachObject(particleSystem_);
 }
 
+//=============================================================================
+//							Destructor
+//
 FadingPlatform::~FadingPlatform()
 {
 
 }
 
+//=============================================================================
+//							Initialize
+//
 bool FadingPlatform::Initialize()
 {
 	if(body_)
@@ -48,6 +57,11 @@ bool FadingPlatform::Initialize()
 	return GameObjectOgreBox2D::Initialize();
 }
 
+//=============================================================================
+//							Update
+//
+/// This checks if one of the characters feet sensor fixture is touching the
+/// the platform. If it is the platform starts to fade.
 bool FadingPlatform::Update(double timeSinceLastFrame)
 { 
 	if(GameObjectOgreBox2D::Update(timeSinceLastFrame))
@@ -116,7 +130,7 @@ bool FadingPlatform::Update(double timeSinceLastFrame)
 			{
 				body_->SetLinearVelocity(b2Vec2(0,0));
 				body_->SetActive(false);
-				//particleSystem_->setVisible(false);
+
 				particleSystem_->getEmitter(0)->setEnabled(false);
 
 				if(fadeTimer_ >= fadeReappearTime_)
@@ -142,6 +156,9 @@ bool FadingPlatform::Update(double timeSinceLastFrame)
 	return true;
 }
 
+//=============================================================================
+//							HandleMessage
+//
 bool FadingPlatform::HandleMessage(const KGBMessage message)
 {
 	if(GameObjectOgreBox2D::HandleMessage(message))

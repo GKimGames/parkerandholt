@@ -23,6 +23,8 @@ CameraState(camera, stateMachine)
 //=============================================================================
 //							Update
 //
+/// Sets the camera at the targets position plus the initialPosition. It
+/// sets the camera to look at the target as well.
 bool CameraStateWatch::Update()
 {
 

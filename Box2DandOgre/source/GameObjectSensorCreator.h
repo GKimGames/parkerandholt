@@ -13,6 +13,8 @@
 #include "GameObjectOgreBox2DCreator.h"
 #include "GameObjectSensor.h"
 
+
+/// Creates a GameObjectSensor from XML.
 class GameObjectSensorCreator : public GameObjectOgreBox2DCreator
 {
 
@@ -47,6 +49,7 @@ public:
 				Ogre::String sensorTypeString = TinyXMLHelper::GetAttribute(element, "sensorType", "");
 				gameObjectSensor->sensorType_ = StringToSensorType(sensorTypeString);
 
+				// For convenience this creates a ledge sensor in one line of XML.
 				if(gameObjectSensor->sensorType_ == SENSORTYPE_LEDGE)
 				{
 					Ogre::String bodyId;
@@ -72,6 +75,7 @@ public:
 
 						std::map<Ogre::String, KGBMessage> messageList;
 
+						// Get all the messages associated with this sensor.
 						if(messages != 0)
 						{
 							TiXmlElement* messageElement = messages->FirstChildElement("Message");
@@ -97,6 +101,7 @@ public:
 
 						TiXmlElement* objects = sensorElement->FirstChildElement("Object");
 
+						// Get the objects this will send messages to.
 						if(objects != 0)
 						{
 							Ogre::String objectID = TinyXMLHelper::GetAttribute(objects, "objectID", "");

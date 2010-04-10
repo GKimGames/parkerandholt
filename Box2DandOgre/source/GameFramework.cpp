@@ -14,6 +14,9 @@ using namespace Ogre;
 
 template<> GameFramework* Ogre::Singleton<GameFramework>::ms_Singleton = 0;
 
+//=============================================================================
+//							GameFramework
+//
 GameFramework::GameFramework()
 {
 	numScreenShots_		= 0;
@@ -33,7 +36,9 @@ GameFramework::GameFramework()
 }
 
 
-
+//=============================================================================
+//							GameFramework
+//
 GameFramework::~GameFramework()
 {
 	
@@ -47,7 +52,11 @@ GameFramework::~GameFramework()
 	delete root_;
 }
 
-
+//=============================================================================
+//							InitOgre
+//
+/// Initialize Ogre. Shows a load image and loads all the resources. It also
+/// sets up OIS listeners.
 bool GameFramework::InitOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener, OIS::MouseListener *pMouseListener)
 {
 	Ogre::LogManager* logMgr = new Ogre::LogManager();
@@ -65,10 +74,10 @@ bool GameFramework::InitOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 			// If returned true, user clicked OK so initialise
 			// Here we choose to let the system create a default rendering window by passing 'true'
 			renderWindow_ = root_->initialise(true, wndTitle);        
+			return false;
 		}
 		else
 		{
-			return false;
 		}
 
 	}
@@ -102,11 +111,11 @@ bool GameFramework::InitOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 
 	viewport_->setCamera(camera_);
 
-	
-
 	// Render a frame so our loadScreen is drawn.
 	root_->renderOneFrame();
 
+
+	// Setup the OIS input stuffs.
 	unsigned long hWnd = 0;
     OIS::ParamList paramList;
     renderWindow_->getCustomAttribute("WINDOW", &hWnd);
@@ -131,6 +140,7 @@ bool GameFramework::InitOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 	else
 		mouse_->setEventCallback(pMouseListener);
 
+	// Load the resources.
 	Ogre::String secName, typeName, archName;
 	Ogre::ConfigFile cf;
     cf.load("resources.cfg");
@@ -162,7 +172,9 @@ bool GameFramework::InitOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 	return true;
 }
 
-//  KeyPressed
+//=============================================================================
+//							KeyPressed
+//
 /// 
 bool GameFramework::KeyPressed(const OIS::KeyEvent &keyEventRef)
 {
@@ -188,41 +200,59 @@ bool GameFramework::KeyPressed(const OIS::KeyEvent &keyEventRef)
 	return true;
 }
 
-
+//=============================================================================
+//							KeyReleased
+//
+///
 bool GameFramework::KeyReleased(const OIS::KeyEvent &keyEventRef)
 {
 	return true;
 }
 
 
-
+//=============================================================================
+//							MouseMoved
+//
+///
 bool GameFramework::MouseMoved(const OIS::MouseEvent &evt)
 {
 	return true;
 }
 
 
-
+//=============================================================================
+//							MousePressed
+//
+///
 bool GameFramework::MousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
 	return true;
 }
 
 
-
+//=============================================================================
+//							MouseReleased
+//
+///
 bool GameFramework::MouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
 	return true;
 }
 
 
-
+//=============================================================================
+//							UpdateOgre
+//
+///
 void GameFramework::UpdateOgre(double timeSinceLastFrame)
 {
 	UpdateStats();
 }
 
-
+//=============================================================================
+//							UpdateOgre
+//
+/// Updates the stats, FPS etc.
 void GameFramework::UpdateStats() 
 { 
 	static String currFps = "Current FPS: "; 
