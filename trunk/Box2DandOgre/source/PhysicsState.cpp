@@ -566,7 +566,7 @@ bool PhysicsState::keyReleased(const OIS::KeyEvent &keyEventRef)
 bool PhysicsState::mouseMoved(const OIS::MouseEvent &evt)
 {
 	static double angle = 0;
-	Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, myMouse_->GetId(), UPDATE_MOUSE, &evt);
+	myMouse_->UpdateMouse(evt, holt_->GetBodyPosition());
 
 	return true;
 }
@@ -630,7 +630,7 @@ bool PhysicsState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID 
 /// it just updates the mouse because the camera has moved.
 void PhysicsState::moveCamera()
 {
-	myMouse_->UpdateMouseFromCamera();
+	//myMouse_->UpdateMouseFromCamera();
 }
 
 
