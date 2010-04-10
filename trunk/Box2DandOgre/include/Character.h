@@ -16,6 +16,7 @@
 #include <Ogre.h>
 #include <tinyxml.h>
 #include "GameObjectOgreBox2D.h"
+#include "PlayerInfo.h"
 
 #include "FSMStateMachine.h"
 
@@ -44,7 +45,15 @@ public:
 
 	virtual bool HandleMessage(const KGBMessage message)=0;
 
+
+	virtual void ReturnToCheckPoint()=0;
+
 	virtual bool Initialize()=0;
+
+	virtual PlayerInfo* GetPlayerInfo()=0;
+
+	virtual bool IsFootSensor(b2Fixture* fixture)=0;
+
 
 protected:
 		 

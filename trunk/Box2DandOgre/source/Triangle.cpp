@@ -2,12 +2,14 @@
 
 	Triangle.cpp
 
-	Author: Greg King
-
 =============================================================================*/
 
 #include "Triangle.h"
 
+//=============================================================================
+//								Constructor
+//
+/// Creates a permanent static box
 Triangle::Triangle(Ogre::SceneManager* sceneManager, b2Vec2 center, double size)
 {
 
@@ -36,9 +38,13 @@ Triangle::Triangle(Ogre::SceneManager* sceneManager, b2Vec2 center, double size)
 	temporary_ = false;
 
 	CreateTriangle();
-	
 }
 
+//=============================================================================
+//								Constructor
+//
+/// Creates a box that exists for the set TimeToLive (TTL)
+/// Box will not move, it is  a static object
 Triangle::Triangle(Ogre::SceneManager *sceneManager, b2Vec2 center, double size, float TTL)
 {
 	
@@ -67,23 +73,28 @@ Triangle::Triangle(Ogre::SceneManager *sceneManager, b2Vec2 center, double size,
 	particleSystem_ = sceneManager_->createParticleSystem(entityName + "psystem", "PaH/fadingBox");
 	particleSystem_->getEmitter(0)->setEnabled(false);
 	sceneNode_->attachObject(particleSystem_);
-	emitterSize_ = Ogre::Vector3(size * 1.3, size * 1.3, size * 1.3);
+	emitterSize_ = Ogre::Vector3(size * 1.5, size * 1.5, size * 1.5);
 
 	TTL_ = TTL;
 	temporary_ = true;
 	Ogre::ParticleEmitter* emitter = particleSystem_->getEmitter(0);
-		
+	
+	// Calculates the emmiter size adn emission rate based on the size of the box
 	emitter->setParameter("height", Ogre::StringConverter::toString(emitterSize_.y));
 	emitter->setParameter("width", Ogre::StringConverter::toString(emitterSize_.x));
 	emitter->setParameter("depth", Ogre::StringConverter::toString(emitterSize_.z));
-	//particleSystem_->getEmitter(0)->setEnabled(true);
+	emitter->setParameter("emission_rate", Ogre::StringConverter::toString((int)(size*size*12*200)));
+
 	timeAlive_ = 0;
 
 	CreateTriangle();
 	
 }
 
-
+//=============================================================================
+//								CreateTriangle
+//
+/// Creates the physics behind the object
 bool Triangle::CreateTriangle()
 {
 	if(initialized_ == true)
@@ -123,8 +134,12 @@ bool Triangle::CreateTriangle()
 	return false;	
 }
 
+//=============================================================================
+//								Update
+//
 bool Triangle::Update(double timeSinceLastFrame)
 {
+	// If time is greater then .001 the placement is not active
 	if(timeSinceLastFrame > .001)
 	{
 		placementTest_ = false;
@@ -137,26 +152,24 @@ bool Triangle::Update(double timeSinceLastFrame)
 			body_->GetFixtureList()->SetSensor(false);
 		}
 	}
+
+	// If the box is temporary this will incriment its time alive
 	if(temporary_)
 	{
 		timeAlive_ += timeSinceLastFrame;
 		Ogre::ParticleEmitter* emitter = particleSystem_->getEmitter(0);
-		//
-		//emitter->setParameter("height", Ogre::StringConverter::toString(emitterSize_.y));
-		//emitter->setParameter("width", Ogre::StringConverter::toString(emitterSize_.x));
-		//emitter->setParameter("depth", Ogre::StringConverter::toString(emitterSize_.z));
 
-		//particleSystem_->getEmitter(0)->setEnabled(true);
-
+		// Disables the box if it has existed longer than its TTL
 		if(timeAlive_ > TTL_)
 		{
-			entity_->setVisible(false);
-			body_->SetActive(false);
 			particleSystem_->getEmitter(0)->setEnabled(false);
-			//return false;
+			SetInactive();
 		}
+		// If the box is only alive for another 2 seconds the partical effect is activated
 		else if(TTL_ - timeAlive_ < 2.0)
 		{
+			this->SetBlendType(Ogre::SceneBlendType::SBT_REPLACE);
+			SetTransparency(.5);//(2/TTL_-timeAlive);
 			particleSystem_->getEmitter(0)->setEnabled(true);
 		}
 
@@ -165,13 +178,17 @@ bool Triangle::Update(double timeSinceLastFrame)
 	return true;
 }
 
+//=============================================================================
+//								BeginContact
+//
+/// Called with objects begin to touch
+// Used to check for bad placements
 void Triangle::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
 	if(placementTest_)
 	{
 		if(contactFixture->GetBody() == body_ && !collidedFixture->IsSensor())
 		{
-			//body_->GetFixtureList()->SetSensor(true);
 			badPlacement_ = true;
 			placementTest_ = false;
 		}
@@ -179,8 +196,13 @@ void Triangle::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2
 }
 
 
+//=============================================================================
+//								SetInactive
+//
+/// Disables graphics and physics and moves the box offscreen
 void Triangle::SetInactive()
 {
 	entity_->setVisible(false);
 	body_->SetActive(false);
+	body_->SetTransform(b2Vec2(0, -100), 0);
 }

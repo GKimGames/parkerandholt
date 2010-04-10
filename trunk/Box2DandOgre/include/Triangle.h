@@ -12,14 +12,17 @@
 #include "GameObjectOgreBox2D.h"
 
 
-/// HoltBox is a cube
+/// Triangle is a cube.
+// It was going to be a triangle point down but it looked awkward and caused issues with collisions
 class Triangle : public GameObjectOgreBox2D
 {
 public:
 
 	// Center is where the box is centered at. 
 	Triangle(Ogre::SceneManager* sceneManager, b2Vec2 center, double size);
+	/// Creates a box that will disappear after the entered TTL
 	Triangle(Ogre::SceneManager* sceneManager, b2Vec2 center, double size, float TTL);
+
 	virtual ~Triangle()
 	{
 
@@ -52,6 +55,7 @@ public:
 	bool Update(double timeSinceLastFrame);
 	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 
+	/// Use instead of deleting the box, deletion can cause issues with the gameObject list
 	void SetInactive();
 	
 

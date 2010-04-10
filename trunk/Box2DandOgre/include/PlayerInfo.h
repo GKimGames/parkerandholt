@@ -1,3 +1,11 @@
+/*=============================================================================
+
+		PlayerInfo.h
+
+		Stores information about the character
+
+=============================================================================*/
+
 #ifndef PLAYERINFO_H
 #define PLAYERINFO_H
 
@@ -12,12 +20,20 @@ public:
 
 	PlayerInfo();
 
+	/// Updates the last checkpoint touched.
 	void SetCheckPoint(b2Vec2 checkPoint);
 	b2Vec2 GetCheckPoint();
+
+	/// Adds the number of items indicated in the parameter.
 	void AddToInventory(int number);
+
+	/// Returns the number of items carried by the player.
 	int GetInventory();
+
 	bool HandleMessage(const KGBMessage message);
 	bool Update(double timeSinceLastFrame);
+
+	/// Increments the number of times the player has Died.
 	void PlayerDied();
 
 
@@ -31,6 +47,7 @@ public:
 	}
 
 protected:
+
 	b2Vec2			checkPoint_;
 	int				inventory_;
 	Ogre::String	itemDisplay_;

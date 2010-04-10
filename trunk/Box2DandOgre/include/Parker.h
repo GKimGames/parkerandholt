@@ -24,6 +24,7 @@
 class MousePicking;
 class Door;
 
+
 /// Parkers class, extends Character. 
 class CharacterParker : public Character
 {
@@ -121,6 +122,7 @@ protected:
 	GameCamera*			gameCamera_;
 	Ogre::Camera*		camera_;
 
+	// Controls if the character is currently being controled by the players
 	bool				active_;
 	Door*				door_;
 };

@@ -10,6 +10,9 @@
 
 using namespace Ogre;
 
+//=============================================================================
+//								Constructor
+//
 Platform::Platform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2)
 {
 	sceneManager_ = sceneManager;
@@ -22,7 +25,11 @@ Platform::Platform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2)
 	Initialize();
 }
 
-Platform::Platform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2, int temp)
+//=============================================================================
+//								Constructor
+//
+/// Constructor for a placeable platform
+Platform::Platform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2, bool placeable)
 {
 	sceneManager_ = sceneManager;
 
@@ -36,15 +43,18 @@ Platform::Platform(Ogre::SceneManager* sceneManager,b2Vec2 p1, b2Vec2 p2, int te
 	InitializePlaceable();
 }
 
+
 Platform::Platform()
 {
 	// do nothing
 }
 
+
+//=============================================================================
+//								Initialize
+//
 bool Platform::Initialize()
 {
-	//initialized_ = GameObjectOgreBox2D::Initialize();
-
 	if(initialized_)
 	{
 		gameObjectType_ = GOType_Platform;
@@ -87,9 +97,7 @@ bool Platform::Initialize()
 		MaterialPtr material = MaterialManager::getSingleton().create("Background", "General");
 		material->getTechnique(0)->getPass(0)->createTextureUnitState("road.png");
 		material->getTechnique(0)->getPass(0)->setLightingEnabled(true);
-		//material->getTechnique(0)->getPass(0)->setDepthCheckEnabled(false);
-		//material->getTechnique(0)->getPass(0)->setDepthWriteEnabled(false);
-		// Temporary
+
 
 		Ogre::Entity* planeEnt = sceneManager_->createEntity(planeEntityName , planeMeshName);
 		planeEnt->setMaterial(material);
@@ -123,6 +131,10 @@ bool Platform::Initialize()
 	return initialized_;
 }
 
+//=============================================================================
+//								EndContact
+//
+/// Initialize for a specific material
 bool Platform::Initialize(Ogre::String materialName)
 {
 	gameObjectType_ = GOType_Platform;
@@ -192,12 +204,18 @@ bool Platform::Initialize(Ogre::String materialName)
 	return true;
 }
 
+//=============================================================================
+//								Destructor
+//
 Platform::~Platform()
 {
 
 }
 
-
+//=============================================================================
+//								Initialize
+//
+/// Initialize a placeable, starts the object as a sensor
 bool Platform::InitializePlaceable()
 {
 	gameObjectType_ = GOType_PlaceablePlatform;
@@ -208,7 +226,7 @@ bool Platform::InitializePlaceable()
 		point2 = point1;
 		point1 = holder;
 	}
-
+	maxLength_ = 8.0;
 	
 	// Create body and fixture
 	b2BodyDef bd;
@@ -229,7 +247,6 @@ bool Platform::InitializePlaceable()
 	fd.density = 25;
 	fd.isSensor = true;
 	fd.friction = DEFAULT_FRICTION;
-	//fd.filter.groupIndex = STATIC_MAP_GROUP;
 
 	body_->CreateFixture(&fd);
 	body_->SetTransform(body_->GetPosition(), atan2(point2.y - point1.y, point2.x - point1.x));
@@ -250,45 +267,49 @@ bool Platform::InitializePlaceable()
 	initialized_ = true;
 	return true;
 }
+
+//=============================================================================
+//								SetGraphics
+//
+// Used to update the graphics based on mouse position
+// Only use on placeables. Also limits the length of a placeable
 bool Platform::SetGraphics(b2Vec2 position, float length, float angle, bool final)
 {
-		
-		body_->SetTransform(body_->GetPosition(), -previousAngle_);
-		body_->SetTransform(position, angle);
+	// Moves the body to move the graphics
+	body_->SetTransform(body_->GetPosition(), -previousAngle_);
+	body_->SetTransform(position, angle);
 
-		sceneNode_->setScale(length, 0.1f, 1.0);
+	sceneNode_->setScale(length, 0.1f, 1.0);
 
-		previousAngle_ = angle;
- 
+	previousAngle_ = angle;
+	maxLength_ = 8.0;
 
-
-		//b2PolygonShape bodyShapeDef;
-		//bodyShapeDef.SetAsBox(2.0f, 2.0f); //body_->GetPosition(), previousAngle_);
-		//b2FixtureDef fd;
-		//fd.shape = &bodyShapeDef;
-
-		//fd.density = 25;
-		//fd.friction = DEFAULT_FRICTION;
-		//body_->GetPosition().x -3;
-		////fd.filter.groupIndex = STATIC_MAP_GROUP;
-
-		//body_->CreateFixture(&fd);
-
-
+	// If this is the final position it deletes the currently fixture and creates a new one
+	// which is used as the placeable and set to be an active body, not a sensor
 	if(final)
 	{
 		body_->DestroyFixture(body_->GetFixtureList());
 		b2PolygonShape bodyShapeDef;
-		bodyShapeDef.SetAsBox(length/2, 0.05f); //body_->GetPosition(), previousAngle_);
+		if(length > maxLength_)
+		{
+			sceneNode_->setScale(maxLength_, 0.1f, 1.0);
+			bodyShapeDef.SetAsBox(maxLength_/2, 0.05f);
+		}
+		else
+		{
+			sceneNode_->setScale(length, 0.1f, 1.0);
+			bodyShapeDef.SetAsBox(length/2, 0.05f);
+		}
+		
 		b2FixtureDef fd;
 		fd.shape = &bodyShapeDef;
 		fd.isSensor = true;
 		fd.density = 25;
 		fd.friction = DEFAULT_FRICTION;
-		//fd.filter.groupIndex = STATIC_MAP_GROUP;
 
 		body_->CreateFixture(&fd);
 		
+		// Bool will start the placement test next update
 		placementTest_ = true;
 		world_->Step(0.001, 1, 1);
 	}
@@ -296,7 +317,10 @@ bool Platform::SetGraphics(b2Vec2 position, float length, float angle, bool fina
 	return true;
 }
 
-
+//=============================================================================
+//								BeginContact
+//
+/// Used to perform the placement test. If the test fails the position conflicts with another object
 void Platform::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
 	if(placementTest_)
@@ -310,8 +334,41 @@ void Platform::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2
 	}
 }
 
+//=============================================================================
+//								SetInactive
+//
+/// Sets the entity invisible and the body inactive and moved off screen
 void Platform::SetInactive()
 {
 	entity_->setVisible(false);
 	body_->SetActive(false);
+	body_->SetTransform(b2Vec2(0, -100), 0);
 }
+
+//=============================================================================
+//								Update
+//
+bool Platform::Update(double timeSinceLastFrame)
+{ 
+	// Placement check fram uses this timestep
+	if(timeSinceLastFrame > .001)
+	{
+		// Ends the test, no more small timesteps
+		placementTest_ = false;
+		
+		if(badPlacement_)
+		{
+			SetInactive();
+		}
+		if(!badPlacement_)
+		{
+			body_->GetFixtureList()->SetSensor(false);
+		}
+	}
+	UpdateGraphics(timeSinceLastFrame);
+	if (badPlacement_)
+	{
+		body_->SetActive(false);
+	}
+		return true;
+};

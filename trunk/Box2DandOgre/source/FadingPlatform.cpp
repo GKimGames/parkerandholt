@@ -80,7 +80,7 @@ bool FadingPlatform::Update(double timeSinceLastFrame)
 						if(collidedObject->GetGameObjectType() == GOType_Character_Holt ||
 							collidedObject->GetGameObjectType() == GOType_Character_Parker)
 						{
-							CharacterParker* cp = (CharacterParker*) collidedObject;
+							Character* cp = (Character*) collidedObject;
 							if(cp->IsFootSensor(touchedFixture))
 							{
 								isFading_ = true;

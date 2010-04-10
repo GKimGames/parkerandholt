@@ -23,7 +23,6 @@ HoltStatePlacingStatic::HoltStatePlacingStatic(
 	HoltState(holt,stateMachine)
 {
 	feetContactCount_ = 0;
-	incrimenter_ = 0;
 	leftMouseDown_ = false;
 }
 
@@ -42,7 +41,6 @@ void HoltStatePlacingStatic::Enter()
 	}
 
 	driver_->mousePicking_->boxSize_ = 0.5f;
-	driver_->mousePicking_->UpdateMouseFromCamera();
 	driver_->mousePicking_->SetVisibility(true);
 }
 
@@ -70,6 +68,11 @@ bool HoltStatePlacingStatic::Update()
 	static Ogre::Vector3 direction;
 
 	double timeSinceLastFrame = GAMEFRAMEWORK->GetTimeSinceLastFrame();
+
+	if(driver_->GetBody()->GetLinearVelocity().LengthSquared() > 1)
+	{
+		stateMachine_->ChangeState(driver_->inAirState_);
+	}	
 	
 	if(driver_->feetSensorHit_ == false)
 	{
@@ -128,12 +131,11 @@ bool HoltStatePlacingStatic::HandleMessage(const KGBMessage message)
 		}
 		case LEFT_MOUSE_MINUS:
 		{
-			SpawnBox();
+			SpawnTempBox();
 			return true;
 		}
 		case MIDDLE_MOUSE_MINUS:
 		{
-			driver_->mousePicking_->DeletePlaceables();
 			return true;
 		}
 		case CHARACTER_MOVE_LEFT_PLUS:
@@ -178,7 +180,7 @@ bool HoltStatePlacingStatic::HandleMessage(const KGBMessage message)
 
 		case RIGHT_MOUSE_MINUS:
 		{
-			SpawnTempBox();
+			driver_->mousePicking_->DeletePlaceables();
 			return true;
 		}
 	}
@@ -329,15 +331,10 @@ void HoltStatePlacingStatic::UpdateAnimation()
 	}
 }
 
-
-bool HoltStatePlacingStatic::SpawnBox()
-{
-	new Triangle(driver_->sceneManager_, 
-		b2Vec2((float32)driver_->mousePicking_->GetPosition().x, (float32)driver_->mousePicking_->GetPosition().y),
-		driver_->mousePicking_->boxSize_/2);
-	return true;
-}
-
+//=============================================================================
+//								Enter
+//
+/// Creates a short lived box at the mouse position based on the size as the mouse cursor
 bool HoltStatePlacingStatic::SpawnTempBox()
 {
 	float timeToLive = 4;

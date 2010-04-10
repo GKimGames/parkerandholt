@@ -19,6 +19,10 @@
 #include "Message.h"
 #include "MessageDispatcher.h"
 
+//=============================================================================
+//								Constructor
+//
+/// Creates teh graphic for the mouse and establishes its camera and sceneManager
 MousePicking::MousePicking(Ogre::SceneManager* sceneManager, Ogre::Camera* camera)
 {
 	boxSize_ = 1;
@@ -26,11 +30,11 @@ MousePicking::MousePicking(Ogre::SceneManager* sceneManager, Ogre::Camera* camer
 	boxMaxSize_ = 2.0;
 	boxSizeIncrement_ = 0.25;
 	sceneManager_ = sceneManager;
-	m_pCamera_ = camera;
+	camera_ = camera;
 	pickingPlane_ = new Ogre::Plane(Ogre::Vector3::UNIT_Z, 0);
 	gameObjectType_ = GOType_Mouse;
 
-	m_pRSQ_ = sceneManager_->createRayQuery(Ogre::Ray());
+	RSQ_ = sceneManager_->createRayQuery(Ogre::Ray());
 
 	entity_ = sceneManager_->createEntity("mouse", "TransparentBox.mesh");
 
@@ -39,10 +43,7 @@ MousePicking::MousePicking(Ogre::SceneManager* sceneManager, Ogre::Camera* camer
 	entity_->getParentSceneNode()->setScale(1,1,1);
 
 	deleteCheck_ = false;
-	box_[0] = 0;
-	box_[1] = 0;
-	box_[2] = 0;
-	incrementer_ = 0;
+
 	entity_->setVisible(false);
 
 
@@ -70,27 +71,50 @@ MousePicking::MousePicking(Ogre::SceneManager* sceneManager, Ogre::Camera* camer
 	
 }
 
-
-void MousePicking::MouseMoved(const OIS::MouseEvent &arg)
+//=============================================================================
+//								UpdateMouse
+//
+/// Updates the mouse position based ont he mouseEvent and Holt's position
+void MousePicking::UpdateMouse(const OIS::MouseEvent &arg, b2Vec2 holtPosition)
 {
-	sceneNode_->setVisible(true);
+	// Is the maximum distance the mouse can be from Holt, creates a radius
+	float maxDistance = 10;
 
+	// Positions for the raycast to be performed to a plane at z = 0
 	rayPositionX_ = arg.state.X.abs/float(arg.state.width);
 	rayPositionY_ = arg.state.Y.abs/float(arg.state.height);
 
-	Ogre::Ray mouseRay = m_pCamera_->getCameraToViewportRay(  rayPositionX_, rayPositionY_ );
-
-	m_pRSQ_ = sceneManager_->createRayQuery(Ogre::Ray());
-	m_pRSQ_->setRay(mouseRay);
+	Ogre::Ray mouseRay = camera_->getCameraToViewportRay(  rayPositionX_, rayPositionY_ );
+	RSQ_ = sceneManager_->createRayQuery(Ogre::Ray());
+	RSQ_->setRay(mouseRay);
 	
+	// Store the results of the raycast
 	std::pair<bool, Ogre::Real> hit = mouseRay.intersects(*pickingPlane_);
 	
+	// If the cast hits the plane store its position
 	if(hit.first)
 	{
 		position_ = Ogre::Vector3(mouseRay.getPoint(hit.second).x, mouseRay.getPoint(hit.second).y, 0);
 		entity_->getParentSceneNode()->setPosition(position_);
 	}
 
+	// Calculate the distance between Holt and the mouse
+	float tempDistance = sqrt((position_.x - holtPosition.x) * (position_.x - holtPosition.x)
+							 + (position_.y - holtPosition.y) * (position_.y - holtPosition.y));
+
+	// If the distance is too great set the mouse to be at the maximum distance possible in the direction the mouse is
+	if(tempDistance > maxDistance)
+	{
+		Ogre::Vector3 tempPosition;
+		tempPosition.x = holtPosition.x + ((position_.x - holtPosition.x)/tempDistance) * maxDistance;
+		tempPosition.y = holtPosition.y + ((position_.y - holtPosition.y)/tempDistance) * maxDistance;
+		tempPosition.z = 0;
+
+		position_ = tempPosition;
+	}
+
+	// Mouse movment in the Z direction is mouseWheel scrolling
+	// used to incriment the box size
 	if(arg.state.Z.rel > 0)
 	{
 		if(boxSize_ > boxMinSize_)
@@ -98,7 +122,6 @@ void MousePicking::MouseMoved(const OIS::MouseEvent &arg)
 			boxSize_ -= boxSizeIncrement_;
 		}
 	}
-
 	if(arg.state.Z.rel < 0)
 	{
 		if(boxSize_ < boxMaxSize_)
@@ -107,103 +130,40 @@ void MousePicking::MouseMoved(const OIS::MouseEvent &arg)
 		}
 	}
 
+	// Update the size of the mouse cursor
 	entity_->getParentSceneNode()->setScale( boxSize_, boxSize_, boxSize_);
 }
 
-
-void MousePicking::UpdateMouseFromCamera()
-{
-
-	Ogre::Ray mouseRay = m_pCamera_->getCameraToViewportRay(  rayPositionX_, rayPositionY_ );
-	m_pRSQ_ = sceneManager_->createRayQuery(Ogre::Ray());
-	m_pRSQ_->setRay(mouseRay);
-	std::pair<bool, Ogre::Real> hit = mouseRay.intersects(*pickingPlane_);
-	if(hit.first)
-	{
-		position_ = Ogre::Vector3(mouseRay.getPoint(hit.second).x, mouseRay.getPoint(hit.second).y, 0);
-		entity_->getParentSceneNode()->setPosition(position_);
-	}
-}
-
-void MousePicking::UpdateMouse(const KGBMessage message)
-{
-	const OIS::MouseEvent* tempMouse_ = boost::any_cast<const OIS::MouseEvent*>(message.messageData);
-
-	//OIS::MouseEvent* tempMouse_ = any_cast<OIS::MouseEvent>(message.messageData);
-
-	rayPositionX_ = tempMouse_->state.X.abs/float (tempMouse_->state.width);
-	rayPositionY_ = tempMouse_->state.Y.abs/float (tempMouse_->state.height);
-	//UpdateMouse();
-
-	Ogre::Ray mouseRay = m_pCamera_->getCameraToViewportRay(rayPositionX_, rayPositionY_);
-	m_pRSQ_ = sceneManager_->createRayQuery(Ogre::Ray());
-	m_pRSQ_->setRay(mouseRay);
-	std::pair<bool, Ogre::Real> hit = mouseRay.intersects(*pickingPlane_);
-	if(hit.first)
-	{
-		position_ = Ogre::Vector3(mouseRay.getPoint(hit.second).x, mouseRay.getPoint(hit.second).y, 0);
-		entity_->getParentSceneNode()->setPosition(position_);
-	}
-
-	if(tempMouse_->state.Z.rel > 0)
-	{
-		if(boxSize_ > boxMinSize_)
-		{
-			boxSize_ -= boxSizeIncrement_;
-		}
-	}
-
-	if(tempMouse_->state.Z.rel < 0)
-	{
-		if(boxSize_ < boxMaxSize_)
-		{
-			boxSize_ += boxSizeIncrement_;
-		}
-	}
-
-	entity_->getParentSceneNode()->setScale( boxSize_, boxSize_, boxSize_);
-
-}
-
-
+//=============================================================================
+//								GetPosition
+//
+/// Returns the current mouse position
 const Ogre::Vector3 MousePicking::GetPosition()
 {
 	return position_;
 }
 
-
+//=============================================================================
+//								HandleMessage
+//
 bool MousePicking::HandleMessage(const KGBMessage message)
 {
-	switch(message.messageType)
-	{
-		case UPDATE_MOUSE:
-			{
-				UpdateMouse(message);
-				return true;
-			}
-	}
-
 	return false;
 }
 
-bool MousePicking::SpawnBox()
-{
-
-	if(box_[incrementer_ % 3] != 0)
-	{
-		delete box_[incrementer_ % 3];
-	}
-	box_[incrementer_%3] = new HoltBox(sceneManager_, b2Vec2(position_.x, position_.y), boxSize_/2);
-	incrementer_++;
-	return true;
-}
-
+//=============================================================================
+//								SetVisibility
+//
+/// Controls if the cursor is visible
 void MousePicking::SetVisibility(bool visible)
 {
 	sceneNode_->setVisible(visible);
-
 }
 
+//=============================================================================
+//								DeletePlaceables
+//
+/// enables delete check and the body and steps the world a very small amount to get new collisions
 void MousePicking::DeletePlaceables()
 {
 	deleteCheck_ = true;
@@ -212,8 +172,13 @@ void MousePicking::DeletePlaceables()
 }
 
 
+//=============================================================================
+//								BeginContact
+//
+/// Called when bodies begin to touch
 void MousePicking::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
+	// If delete check is on checks for contacts with the mouse cursor, sets them inactive if there is a contact with a placeable type
 	if(deleteCheck_)
 	{
 		if(contactFixture->GetBody() == body_ && collidedFixture->GetBody()->GetUserData() != 0)
@@ -239,15 +204,18 @@ void MousePicking::BeginContact(ContactPoint* contact, b2Fixture* contactFixture
 	}
 }
 
+//=============================================================================
+//								Update
+//
 bool MousePicking::Update(double timeSinceLastFrame)
 {
+	// This small timestep is only used for delete checks, disables the check if its found
 	if(timeSinceLastFrame > .001)
 	{
 		deleteCheck_ = false;
 		body_->SetActive(false);
 	}
 
-	
 	SetBodyPosition(b2Vec2(position_.x, position_.y));
 	UpdateGraphics(timeSinceLastFrame);
 	

@@ -1,11 +1,18 @@
+/*=============================================================================
+
+		CheckPoint.cpp
+
+==============================================================================*/
 #include "CheckPoint.h"
 #include "Parker.h"
 #include "MessageDispatcher.h"
 
 
+//=============================================================================
+//								Constructor
+//
 CheckPoint::CheckPoint(Ogre::SceneManager *sceneManager, b2Vec2 center, float width, float height)
 {
-	triggered_ = false;
 	gameObjectType_ = GOType_CheckPoint;
 	sceneManager_ = sceneManager;
 	center.y += height /2.0;
@@ -13,6 +20,7 @@ CheckPoint::CheckPoint(Ogre::SceneManager *sceneManager, b2Vec2 center, float wi
 	width_ = width;
 	height_ = height;
 
+	// setup body for checkpoint
 	b2BodyDef bd;
 	bd.position.Set(center.x, center.y);
 	body_= world_->CreateBody(&bd);
@@ -36,6 +44,7 @@ CheckPoint::CheckPoint(Ogre::SceneManager *sceneManager, b2Vec2 center, float wi
 
 	body_->SetUserData(this);
 
+	//setup the graphic for a checkpoint
 	Ogre::String name = "CheckPoint";
 	name += Ogre::StringConverter::toString(objectId_);
 	entity_ = sceneManager_->createEntity(name, "CheckPoint.mesh");
@@ -59,19 +68,16 @@ CheckPoint::~CheckPoint()
 //=============================================================================
 //								BeginContact
 //
+/// Updates the player info with this checkpoint location if a player touches it
 void CheckPoint::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
-	if(!triggered_)
+	if(collidedFixture->IsSensor() == true)
 	{
-		if(collidedFixture->IsSensor() == true)
+		GameObjectOgreBox2D* go = (GameObjectOgreBox2D*)collidedFixture->GetBody()->GetUserData();
+		if(go->GetGameObjectType() == GOType_Character_Parker || go->GetGameObjectType() == GOType_Character_Holt)
 		{
-			GameObjectOgreBox2D* go = (GameObjectOgreBox2D*)collidedFixture->GetBody()->GetUserData();
-			if(go->GetGameObjectType() == GOType_Character_Parker || go->GetGameObjectType() == GOType_Character_Holt)
-			{
-				CharacterParker* temp = (CharacterParker*)go;
-				Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, temp->GetPlayerInfo()->GetId(), UPDATE_CHECKPOINT, position_);
-				//triggered_ = true;
-			}
+			Character* temp = (Character*)go;
+			Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, temp->GetPlayerInfo()->GetId(), UPDATE_CHECKPOINT, position_);
 		}
 	}
 }

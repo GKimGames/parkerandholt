@@ -1,3 +1,10 @@
+/*=============================================================================
+
+	HoltStatePlacingPlatform.h
+
+	State for Holt when placing platforms, boxes and gravity vector
+
+=============================================================================*/
 #ifndef HOLT_STATE_PLACING_PLATFORM_H
 #define HOLT_STATE_PLACING_PLATFORM_H
 
@@ -40,12 +47,17 @@ public:
 
 	GravityVector* GetGravityVector();
 
+	/// Creates a holt box
 	bool SpawnBox();
+
+	/// Creates a platform
 	bool SpawnPlatform();
+
+	/// Updates the gravity vector, one is precreated to avoid time spent creating a new partical system
 	bool SpawnGravityVector();
+
 	bool leftMouseDown_;
-	
-	
+
 
 protected:
 
@@ -59,12 +71,17 @@ protected:
 
 	int				feetContactCount_;
 	b2Body*			elevator_;
+
+	// Start and end positions of when the mouse is clicked and released
 	b2Vec2			startPosition_;
 	b2Vec2			endPosition_;
-	HoltBox*		box_[3];
+
+	// Pointer for platform when mouse is being dragged
 	Platform*		platform_;
-	int				incrimenter_;
 	GravityVector*	gravityVector_;
+	// Maximum lenght a platform can be
+	float			maxLength_;
+
 	EntityMaterialInstance*	trans_;
 };
 

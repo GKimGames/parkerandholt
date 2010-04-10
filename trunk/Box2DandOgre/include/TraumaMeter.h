@@ -11,15 +11,22 @@ class TraumaMeter
 
 public:
 
+	// Two constructors as two different overlays are needed
 	TraumaMeter();
-	TraumaMeter(int test);
+	TraumaMeter(bool secondOverlay);
 	~TraumaMeter();
+
 	void DrawTrauma(float trauma);
 	void HideOverlay();
+
+	// Trauma level accessors
 	void AddTrauma(float trauma);
-	void Update();
 	float GetTrauma();
 	void ResetTrauma();
+	
+	void Update();
+
+	/// Overlay will not draw when inactive
 	void SetActive(bool active);
 
 protected:
@@ -31,4 +38,3 @@ protected:
 	bool					active_;
 
 };
-//#endif

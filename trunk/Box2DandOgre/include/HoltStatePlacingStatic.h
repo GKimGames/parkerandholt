@@ -1,3 +1,10 @@
+/*=============================================================================
+
+	HoltStatePlacingStatic.h
+
+	State for Holt when placing semi permanent boxes and deleting placeable objects
+
+=============================================================================*/
 #ifndef HOLT_STATE_PLACING_STATIC_H
 #define HOLT_STATE_PLACING_STATIC_H
 
@@ -37,7 +44,7 @@ public:
 	/// This will execute when the state is exited.
 	virtual void Exit();
 
-	bool SpawnBox();
+	/// Creates a temporary box at the mouse location
 	bool SpawnTempBox();
 
 	bool leftMouseDown_;
@@ -56,9 +63,7 @@ protected:
 
 	int				feetContactCount_;
 	b2Body*			elevator_;
-	b2Vec2			startPosition_;
-	b2Vec2			endPosition_;
-	int				incrimenter_;
+
 	EntityMaterialInstance*	trans_;
 };
 

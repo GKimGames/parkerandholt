@@ -1,9 +1,19 @@
+/*=============================================================================
+
+	PickUp.cpp
+
+	Author: Greg King
+
+=============================================================================*/
+
 #include "PickUp.h"
 #include "Parker.h"
 #include <boost/any.hpp>
 #include "MessageDispatcher.h"
 
-
+//=============================================================================
+//								Constructor
+//
 PickUp::PickUp(Ogre::SceneManager *sceneManager, b2Vec2 center)
 {
 	sceneManager_ = sceneManager;
@@ -45,12 +55,10 @@ PickUp::PickUp(Ogre::SceneManager *sceneManager, b2Vec2 center)
 	Initialize();
 }
 
-PickUp::PickUp(Ogre::SceneManager *sceneManager, b2Vec2 center, std::string meshName)
-{
-	sceneManager_ = sceneManager;
-	position_ = center;
-}
-
+//=============================================================================
+//								Constructor
+//
+// Creates picup with set breaking force, responds to hits from physical objects to break
 PickUp::PickUp(Ogre::SceneManager* sceneManager, b2Vec2 center, float breakingForce)
 {
 	sceneManager_ = sceneManager;
@@ -69,7 +77,6 @@ PickUp::PickUp(Ogre::SceneManager* sceneManager, b2Vec2 center, float breakingFo
 	fd.shape = &bodyShapeDef;
 
 	fd.density = 5;
-	//fd.isSensor = true;
 	fd.friction = DEFAULT_FRICTION;
 	
 	itemSensor_ = body_->CreateFixture(&fd);
@@ -94,11 +101,17 @@ PickUp::PickUp(Ogre::SceneManager* sceneManager, b2Vec2 center, float breakingFo
 	Initialize();
 }
 
+//=============================================================================
+//								Destructor
+//
 PickUp::~PickUp()
 {	
 	sceneManager_->destroyEntity(entity_);
 }
 
+//=============================================================================
+//								Update
+//
 bool PickUp::Update(double timeSinceLastFrame)
 {
 	UpdateGraphics(timeSinceLastFrame);
@@ -106,7 +119,6 @@ bool PickUp::Update(double timeSinceLastFrame)
 	if(pickedUp_)
 	{
 		sceneNode_->setVisible(false);
-		//return false;
 	}
 
 	return true;
@@ -118,7 +130,7 @@ bool PickUp::Update(double timeSinceLastFrame)
 //
 void PickUp::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
-	if(!pickedUp_)// && !breakable_)
+	if(!pickedUp_)
 	{
 		if(collidedFixture->IsSensor() == true)
 		{
@@ -143,6 +155,10 @@ void PickUp::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixt
 
 }
 
+//=============================================================================
+//								PostSolve
+//
+/// Checks if the body is hit hard enough to break it and if so messages Holt to add to inventory
 void PickUp::PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse)
 {
 	if(breakable_)

@@ -2,8 +2,6 @@
 
 	HoltStateOnGround.h
 
-	Author: Matt King
-
 	State for Holt on the ground.
 
 =============================================================================*/

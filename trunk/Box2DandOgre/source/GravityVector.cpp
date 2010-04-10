@@ -43,7 +43,7 @@ GravityVector::GravityVector(Ogre::SceneManager *sceneManager, b2Vec2 center, b2
 	forceApplied_.y = maxForce_ * tempMagnitude.y;
 
 
-	//sceneNode_ = sceneManager_->getRootSceneNode()->createChild();
+	//create partical effects for the GravityVector
 	Ogre::String name;
 	name = "FireWorks";
 	name += Ogre::StringConverter::toString(objectId_);
@@ -90,46 +90,86 @@ GravityVector::~GravityVector()
 //=============================================================================
 //								BeginContact
 //
+// Previously used to check if something was in the vector, is innaccurate
 void GravityVector::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
-	if(contactFixture == gravitySensor_ && collidedFixture->GetBody()->GetUserData() != 0)
-	{
-		bodyList_.push_back(collidedFixture->GetBody());
-	}
-	if(collidedFixture == gravitySensor_)
-	{
-		bodyList_.push_back(collidedFixture->GetBody());
-	}
+	//if(contactFixture == gravitySensor_ && collidedFixture->GetBody()->GetUserData() != 0)
+	//{
+	//	bodyList_.push_back(collidedFixture->GetBody());
+	//}
+	//if(collidedFixture == gravitySensor_)
+	//{
+	//	bodyList_.push_back(collidedFixture->GetBody());
+	//}
 }
 
 
 //=============================================================================
 //								EndContact
 //
+// Previously used to check if something was leaving the vector, is innaccurate
 void GravityVector::EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture)
 {
-	if(active_)
-	{
-		if(contactFixture == gravitySensor_)
-		{
-			for(int i = 0; i < bodyList_.size(); i++)
-			{
-				if(bodyList_[i] == collidedFixture->GetBody())
-				{
-					bodyList_.erase(bodyList_.begin()+i);
-					break;
-				}
-			}
-		}
-	}
+	//if(active_)
+	//{
+	//	if(contactFixture == gravitySensor_)
+	//	{
+	//		for(int i = 0; i < bodyList_.size(); i++)
+	//		{
+	//			if(bodyList_[i] == collidedFixture->GetBody())
+	//			{
+	//				bodyList_.erase(bodyList_.begin()+i);
+	//				break;
+	//			}
+	//		}
+	//	}
+	//}
 }
 
 
 //=============================================================================
 //								Update
 //
+// If active the vector checks all contacts with itself to see if they are actually touching
+//if so it raycasts to their center to get a position to push on, if the cast fails it pushes based on its own center
 bool GravityVector::Update(double timeSinceLastFrame)
 {
+	bodyList_.clear();
+
+	if(active_)
+	{	
+		b2ContactEdge* contacts = body_->GetContactList();
+		while(contacts)
+		{
+			b2Fixture* A = contacts->contact->GetFixtureA();
+			b2Fixture* B = contacts->contact->GetFixtureB();
+
+			GameObject* goA = (GameObject*) A->GetBody()->GetUserData();
+			GameObject* goB = (GameObject*) B->GetBody()->GetUserData();
+
+			GameObject* collidedObject;
+			b2Fixture*	collidedFixture;
+			b2Fixture*	myFixture;
+
+			if(goA == this)
+			{
+				collidedObject =	goB;
+				collidedFixture =	B;
+				myFixture =			A;
+			}
+			else
+			{
+				collidedObject =	goA;
+				collidedFixture =	A;
+				myFixture =			B;
+			}
+			
+			bodyList_.push_back(collidedFixture->GetBody());
+
+			contacts = contacts->next;
+		}
+	}
+
 	if(active_)
 	{	
 		for(int i = 0; i < bodyList_.size(); i++)
@@ -141,11 +181,6 @@ bool GravityVector::Update(double timeSinceLastFrame)
 		
 		UpdateGraphics(timeSinceLastFrame);
 	}
-	else
-	{
-		//bodyList_.clear();
-	}
-
 
 	return true;
 }
@@ -154,6 +189,7 @@ bool GravityVector::Update(double timeSinceLastFrame)
 //=============================================================================
 //								Stop
 //
+/// Stops the vector, sets it invisible and clears its list of bodies to push on
 bool GravityVector::Stop()
 { 
 	active_ = false;
@@ -172,6 +208,7 @@ bool GravityVector::Stop()
 //=============================================================================
 //								Start
 //
+/// Sets the vector visible, calculates the force direction and reactivates the partical effect
 bool GravityVector::Start(b2Vec2 newPosition, b2Vec2 newDirection)
 {
 	position_ = newPosition;
@@ -213,14 +250,14 @@ void GravityVector::SetPosition(b2Vec2 position)
 //=============================================================================
 //								RemovePlayer
 //
-bool GravityVector::RemovePlayer()
+bool GravityVector::RemovePlayer(GameObjectId characterId)
 {
 	for(int i = 0; i < bodyList_.size(); i++)
 	{
 		if(bodyList_[i]->GetUserData() != NULL)
 		{
 			GameObject* object = (GameObject*) bodyList_[i]->GetUserData();
-			if(object->GetId() == object->GetParkerId())
+			if(object->GetId() == characterId)
 			{
 				bodyList_.erase(bodyList_.begin()+i);
 				return true;
@@ -251,6 +288,9 @@ float32 GravityVector::ReportFixture(b2Fixture *fixture, const b2Vec2 &point, co
 
 }
 
+//=============================================================================
+//								SetParticalsVisible
+//
 void GravityVector::SetParticalsVisible(bool visible)
 {
 	Ogre::String name;
