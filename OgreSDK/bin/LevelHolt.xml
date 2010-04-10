@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SampleLevel>
+  <LevelInfo>
+    <Parker position=""/>
+    <Holt   position=""/>
+    <!-- Level Info Should Go In Here -->
+  </LevelInfo>
+  <Box2D>  
+
+    <Body id="ground">
+      <BodyDef position="0 -50"/>
+      <Fixture shape="box" boxWidth="1" boxHeight="1" density="40"/>
+    </Body>
+ 
+    <Body id="LevarArm1">
+      <BodyDef bodyType="dynamicBody" position="-62.5 .5"/>
+      <Fixture shape="box" boxWidth="5.5" boxHeight="1" density="40"/>
+    </Body>
+	
+	<Body id="LevarArm2">
+      <BodyDef bodyType="dynamicBody" position="-91.6 8"/>
+      <Fixture shape="box" boxWidth="3" boxHeight=".2" density="40"/>
+    </Body>
+	
+	<!--
+	<Body id="PulleyPlatform1">
+      <BodyDef bodyType="dynamicBody" position="-1 4"/>
+      <Fixture shape="box" boxWidth=".5" boxHeight=".5" density="40"/>
+    </Body>
+	
+	<Body id="PulleyPlatform2">
+      <BodyDef bodyType="dynamicBody" position="1 4"/>
+      <Fixture shape="box" boxWidth=".5" boxHeight=".5" density="40"/>
+    </Body>
+	
+	<Joint id="PulleyJoint1" type="pulley">
+	  <JointDef bodyA="PulleyPlatform1" bodyB="PulleyPlatform2" collideConnected="0" lengthA="1" lengthB="2"/>
+    </Joint>
+	-->
+	<!--<JointDef bodyA="PulleyPlatform1" bodyB="PulleyPlatform2" groundAnchorA="-1 7" groundAnchorB="0 7" ratio="2" maxLengthA="4" maxLengthB="4" lengthA="2" lengthB="2" localAnchorA="0 2" localAnchorB="0 2"/>-->
+	
+	<Joint id="Revjoint1" type="revolute">
+      <JointDef bodyA="ground" bodyB="LevarArm1" enableLimit="0" enableMotor="1" localAnchorA="0 0"  lowerAngle="0" maxMotorTorque="8000" motorSpeed="-10" upperAngle="0" />
+    </Joint>
+	
+	<Joint id="Revjoint2" type="revolute">
+      <JointDef bodyA="ground" bodyB="LevarArm2" enableLimit="1" enableMotor="0" localAnchorA="0 0"  lowerAngle=".01" upperAngle="1.5" worldAnchor="-93 8"/>
+    </Joint>
+
+
+  </Box2D>
+  <GameObjects>
+  
+    <GameObject type="OgreBox2D">
+      <Object name="A lever Arm"/>
+      <OgreObject position="0 0 0" >
+        <Mesh mesh="LeverArm.mesh" scale="0.16 0.166 0.166"/>
+      </OgreObject>
+      <Box2DObject bodyID="LevarArm1"/>
+    </GameObject>
+	
+	<GameObject type="OgreBox2D">
+      <Object name="lever Arm2"/>
+      <OgreObject position="0 0 0" >
+        <Mesh mesh="LeverArm.mesh" scale="0.0873 0.033 0.033"/>
+      </OgreObject>
+      <Box2DObject bodyID="LevarArm2"/>
+    </GameObject>
+
+
+    <GameObject type="CheckPoint" position="-3 0" />
+	<GameObject type="CheckPoint" position="-37 7" />
+	<GameObject type="CheckPoint" position="-83 4" />
+	<GameObject type="PickUp" position="-7.5 7" />
+	<GameObject type="PickUp" position="-101 3"/>
+	<GameObject type="PickUp" position="-65.5 -1.5"/>
+	<GameObject type="PickUp" position="-62.5 1"/>
+	<GameObject type="PickUp" position="-48 -2"/>
+	<GameObject type="PickUp" position="-46 -2"/>
+	<GameObject type="PickUp" position="-44 -2"/>
+	<GameObject type="PickUp" position="-100 9"/>
+	<GameObject type="PickUp" position="-104 9"/>
+	<GameObject type="PickUp" position="-108 9"/>
+	<GameObject type="PickUp" position="-3 7" breakingForce="50"/>
+	<GameObject type="PickUp" position="-37.5 4.5" breakingForce="50"/>
+	<GameObject type="PickUp" position="-16 2" breakingForce="50"/>
+	<GameObject type="PickUp" position="-18 2" breakingForce="50"/>
+	<GameObject type="PickUp" position="-115 14" breakingForce="50"/>
+	
+    
+    
+    <StaticOgreObjects>
+      <Light name="MyLighty" position="0 6 20" direction="0 -1 -1"/>
+      <Light name="MyLighty2" position="-20 6 0" direction="0 -1 0"/>
+	  
+	  <!-- first island -->
+      <Mesh name="billbillgarrytoo" type="platform" point1="-10 0" point2="5 0" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="4"/> 
+	  <Mesh type="platform" point1="-2.5 -6" point2="-2.5 0" xTile="2" yTile="2" material="BigIsland/Floor04" zLength="15" rotation="0 90 0" offset="0 0 2" box2D="0"/>
+	  <Mesh type="platform" point1="-10 -6" point2="-10 0" xTile="2" yTile="2" material="BigIsland/Floor04" zLength="4" rotation="0 0 0" offset="0 0 0" box2D="0"/>
+
+	  <Mesh type="platform" point1="-10 0" point2="-10 4" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="4"/> 
+	  <Mesh type="platform" point1="-10 -6" point2="-10 4" xTile="2" yTile="2" material="BigIsland/Floor04" zLength="4" rotation="0 180 0" offset="0 0 0" box2D="0"/>
+	  <Mesh type="platform" point1="-15 4" point2="-10 4" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="4"/> 
+	  <Mesh type="platform" point1="-12.5 -6" point2="-12.5 4" xTile="1" yTile="1" material="BigIsland/Floor04" zLength="5" rotation="0 90 0" offset="0 0 2" box2D="0"/>
+	  <Mesh type="platform" point1="-15 -6" point2="-15 4" xTile="2" yTile="2" material="BigIsland/Floor04" zLength="4" rotation="0 0 0" offset="0 0 0" box2D="0"/>
+	  <!-- end first island -->
+
+	  <!-- second island -->
+	  <Mesh type="platform" point1="-40 4" point2="-23 4" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="4"/> 
+	  <Mesh type="platform" point1="-31.5 0" point2="-31.5 4" xTile="2" yTile="2" material="BigIsland/Floor04" zLength="17" rotation="0 90 0" offset="0 0 2" box2D="0"/>
+	  <Mesh type="platform" point1="-23 0" point2="-23 4" xTile="2" yTile="2" material="BigIsland/Floor04" zLength="4" rotation="0 180 0" offset="0 0 0" box2D="0"/>
+	  <Mesh type="platform" point1="-40 0" point2="-40 4" xTile="2" yTile="2" material="BigIsland/Floor04" zLength="4" rotation="0 0 0" offset="0 0 0" box2D="0"/>
+	  <Mesh type="platform" point1="-40 5" point2="-35 5" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="2" rotation="180 0 0"/> 
+	  <Mesh type="platform" point1="-40 7" point2="-35 7" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="2" rotation="0 0 0"/> 
+	  <Mesh type="platform" point1="-37.5 5" point2="-37.5 7" xTile="1" yTile="1" material="BigIsland/Floor04" zLength="5" rotation="0 90 0" offset="0 0 1" box2D="0"/>
+	  <Mesh type="platform" point1="-35 5" point2="-35 7" xTile="2" yTile="2" material="BigIsland/Floor04" zLength="2" rotation="0 180 0" offset="0 0 0" box2D="0"/>
+	  <Mesh type="platform" point1="-40 5" point2="-40 7" xTile="2" yTile="2" material="BigIsland/Floor04" zLength="2" rotation="0 0 0" offset="0 0 0" box2D="0"/>
+	  <Mesh type="platform" point1="-40 5" point2="-40 7" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="2"/>
+	  <Mesh type="platform" point1="-35 5" point2="-35 7" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="2"/>
+	  <!-- end second island -->
+	  
+	  
+	  <!-- third island -->
+	  <Mesh type="platform" point1="-70 -3" point2="-50 -3" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="4"/> 
+	    <!-- front -->
+      <Mesh type="platform" point1="-60 -10" point2="-60 -3" xTile="2" yTile="2" material="BigIsland/Floor04" zLength="20" rotation="0 90 0" offset="0 0 2" box2D="0"/>
+	    <!-- right/left cap -->
+	  <Mesh type="platform" point1="-50 -3" point2="-50 -10" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="4"/>
+	  <Mesh type="platform" point1="-70 -3" point2="-70 -10" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="4" rotation="0 180 0"/>
+	  <Mesh mesh="MainMenuIsland.mesh" position="-70 1 0" scale="1.5 1.5 1.5" rotation="0 0 0" offset="0 0 -1.5" box2DitUp="1"/>
+	  <!-- end third island -->
+	  
+	  
+	  <!-- fourth island -->
+	  <Mesh type="platform" point1="-80 4" point2="-100 4" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="4"/> 
+	  <Mesh type="platform" point1="-90 0" point2="-90 4" xTile="2" yTile="2" material="BigIsland/Floor04" zLength="20" rotation="0 90 0" offset="0 0 2" box2D="0"/>
+	  <Mesh type="platform" point1="-80 0" point2="-80 4" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="4" rotation="0 180 0"/>
+	  <Mesh type="platform" point1="-100 0" point2="-100 4" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="4"/>
+	  
+	  <Mesh type="platform" point1="-83 8" point2="-90 8" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="4"/> 
+	  <Mesh type="platform" point1="-86.5 8" point2="-86.5 20" xTile="2" yTile="2" material="BigIsland/Floor04" zLength="7" rotation="0 90 0" offset="0 0 2" box2D="0"/>
+	  <Mesh type="platform" point1="-110 8" point2="-93.2 8" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="4"/> 
+	  <Mesh type="platform" point1="-83 8" point2="-83 20" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="4" rotation="0 180 0"/>
+	  <Mesh type="platform" point1="-90 8" point2="-90 20" xTile="4" yTile="1" material="BigIsland/Floor04" zLength="4"/>
+	  <!-- end fourth island -->
+	  
+	  
+	  
+
+      <BillboardSet position="20 45 -20" material="Clouds/bbCloud2">
+        <Billboard position="-50 40 -150" rotation="3.14159"/>
+        <Billboard position="120 10 -200" rotation="0.3"/>
+        <Billboard position="40 -20 -175"/>
+        <Billboard position="-150 -50 -150"/>
+      </BillboardSet>
+
+      <BillboardSet position="0 0 0" material="Clouds/bbCloud1">
+        <Billboard position="-50 40 -150" rotation="3.14159"/>
+        <Billboard position="120 10 -200" rotation="3.14159"/>
+        <Billboard position="40 -20 -175" rotation="1.5"/>
+        <Billboard position="-150 -50 -250" rotation="1.5"/>
+      </BillboardSet>
+     
+    </StaticOgreObjects>
+  </GameObjects>
+
+</SampleLevel>

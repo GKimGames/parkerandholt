@@ -1,0 +1,65 @@
+ ---------------------------------------------------------------------------------------------------------------------------------- 
+                                          loging report for : 04/09/2010   21:43:27
+ ---------------------------------------------------------------------------------------------------------------------------------- 
+
+21:43:27  |  General  |  Info  |  * Initialise: Gui  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_gui.cpp  |  54
+21:43:27  |  General  |  Info  |  * MyGUI version 2.2.3  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_gui.cpp  |  58
+21:43:27  |  General  |  Info  |  Viewport : 800 600  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_gui.cpp  |  68
+21:43:27  |  General  |  Info  |  * Initialise: ResourceManager  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_resourcemanager.cpp  |  41
+21:43:27  |  General  |  Info  |  ResourceManager successfully initialized  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_resourcemanager.cpp  |  53
+21:43:27  |  General  |  Info  |  * Initialise: LayerManager  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_layermanager.cpp  |  41
+21:43:27  |  General  |  Info  |  LayerManager successfully initialized  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_layermanager.cpp  |  73
+21:43:27  |  General  |  Info  |  * Initialise: WidgetManager  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  62
+21:43:27  |  General  |  Info  |  * Register widget factory 'Widget'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'Button'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'Window'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'List'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'HScroll'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'VScroll'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'Edit'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'ComboBox'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'StaticText'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'Tab'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'TabItem'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'TabItem'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'Sheet'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'Progress'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'ItemBox'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'MultiList'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'StaticImage'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'Message'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'RenderBox'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'MenuCtrl'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'MenuItem'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'PopupMenu'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'MenuBar'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'ScrollView'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'DDContainer'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  * Register widget factory 'Canvas'  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  118
+21:43:27  |  General  |  Info  |  WidgetManager successfully initialized  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_widgetmanager.cpp  |  93
+21:43:27  |  General  |  Info  |  * Initialise: InputManager  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_inputmanager.cpp  |  51
+21:43:27  |  General  |  Info  |  InputManager successfully initialized  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_inputmanager.cpp  |  74
+21:43:27  |  General  |  Info  |  * Initialise: SubWidgetManager  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_subwidgetmanager.cpp  |  33
+21:43:27  |  General  |  Info  |  SubWidgetManager successfully initialized  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_subwidgetmanager.cpp  |  49
+21:43:27  |  General  |  Info  |  * Initialise: SkinManager  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_skinmanager.cpp  |  40
+21:43:27  |  General  |  Info  |  SkinManager successfully initialized  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_skinmanager.cpp  |  46
+21:43:27  |  General  |  Info  |  * Initialise: FontManager  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_fontmanager.cpp  |  44
+21:43:27  |  General  |  Info  |  FontManager successfully initialized  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_fontmanager.cpp  |  48
+21:43:27  |  General  |  Info  |  * Initialise: ControllerManager  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_controllermanager.cpp  |  36
+21:43:27  |  General  |  Info  |  ControllerManager successfully initialized  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_controllermanager.cpp  |  40
+21:43:27  |  General  |  Info  |  * Initialise: PointerManager  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_pointermanager.cpp  |  41
+21:43:27  |  General  |  Info  |  PointerManager successfully initialized  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_pointermanager.cpp  |  50
+21:43:27  |  General  |  Info  |  * Initialise: ClipboardManager  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_clipboardmanager.cpp  |  35
+21:43:27  |  General  |  Info  |  ClipboardManager successfully initialized  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_clipboardmanager.cpp  |  44
+21:43:27  |  General  |  Info  |  * Initialise: LayoutManager  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_layoutmanager.cpp  |  41
+21:43:27  |  General  |  Info  |  LayoutManager successfully initialized  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_layoutmanager.cpp  |  47
+21:43:27  |  General  |  Info  |  * Initialise: DynLibManager  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_dynlibmanager.cpp  |  34
+21:43:27  |  General  |  Info  |  DynLibManager successfully initialized  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_dynlibmanager.cpp  |  36
+21:43:27  |  General  |  Info  |  * Initialise: PluginManager  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_pluginmanager.cpp  |  36
+21:43:27  |  General  |  Info  |  PluginManager successfully initialized  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_pluginmanager.cpp  |  40
+21:43:27  |  General  |  Info  |  * Initialise: LanguageManager  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_languagemanager.cpp  |  37
+21:43:27  |  General  |  Info  |  LanguageManager successfully initialized  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_languagemanager.cpp  |  44
+21:43:27  |  General  |  Error  |  ResourceManager : 'core.xml', 'Failed to open XML file' ,  file='core.xml' ,  line=0 ,  col=0  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_resourcemanager.cpp  |  204
+21:43:27  |  General  |  Info  |  Gui successfully initialized  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_gui.cpp  |  112
+21:43:27  |  General  |  Warning  |  Skin 'Button' not found, set Default  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_skinmanager.cpp  |  73
+21:43:27  |  General  |  Critical  |  Layer 'Main' is not found  |  z:\parker and holt\mygui2.2.3_source\myguiengine\src\mygui_layermanager.cpp  |  199

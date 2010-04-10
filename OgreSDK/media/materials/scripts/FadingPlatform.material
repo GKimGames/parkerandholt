@@ -1,0 +1,14 @@
+material FadingPlatformFloor10
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture Floor10.jpg
+                filtering trilinear
+            }
+        }
+    }
+}

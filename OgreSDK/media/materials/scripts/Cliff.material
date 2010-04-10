@@ -1,0 +1,29 @@
+material Cliffmaterial16
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture Floor09.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
+
+material CliffFloor04
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture Floor04.jpg
+                filtering trilinear
+            }
+        }
+    }
+}

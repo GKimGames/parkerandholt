@@ -1,0 +1,106 @@
+fragment_program Ogre/Compositor/B&W_FP cg
+{
+	source GrayScale.cg
+	entry_point GrayScale_ps
+	profiles ps_2_0 arbfp1
+}
+
+material Ogre/Compositor/BlackAndWhite
+{
+	technique
+	{
+
+		pass
+		{
+			depth_check off
+
+			vertex_program_ref Ogre/Compositor/StdQuad_Cg_vp
+			{
+			}
+
+			fragment_program_ref Ogre/Compositor/B&W_FP
+			{
+			}
+
+			texture_unit
+			{
+				texture RT
+                tex_coord_set 0
+				tex_address_mode clamp
+				filtering linear linear linear
+			}
+		}
+	}
+}
+
+material Matt/Skyline
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			depth_write off
+			depth_check off
+			texture_unit
+			{
+				texture bwreflections.jpg
+			}
+		}
+	}
+}
+
+
+material Examples/WhiteSky
+{
+	technique
+	{
+	
+		pass
+		{
+			ambient 0.25 0.25 0.25
+			diffuse 1.0 1.0 1.0
+			lighting off
+			depth_write off
+			depth_check off
+
+			texture_unit
+			{
+				texture whitecube.png
+			}
+		}
+	}
+}
+
+material Examples/WhiteSkyBox
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			depth_write off
+
+			texture_unit
+			{
+				cubic_texture whitecube.png whitecube.png whitecube.png whitecube.png whitecube.png whitecube.png separateUV
+				tex_address_mode clamp
+			}
+		}
+	}
+}
+
+material Matt/Road
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture road.png
+                filtering trilinear
+            }
+        }
+    }
+}

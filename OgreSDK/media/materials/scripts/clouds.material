@@ -1,0 +1,128 @@
+material Clouds/Cloud1
+{
+    technique
+    {
+        pass
+        {
+			scene_blend alpha_blend
+			lighting off
+			depth_check on
+			depth_write off
+			texture_unit
+			{
+				texture pahCloud1.png
+			}
+        }
+    }
+}
+
+material Clouds/Cloud2
+{
+    technique
+    {
+        pass
+        {
+			scene_blend alpha_blend
+			lighting off
+			depth_check on
+			depth_write off
+			texture_unit
+			{
+				texture pahCloud2.png
+			}
+        }
+    }
+}
+
+material Clouds/Cloud3
+{
+    technique
+    {
+        pass
+        {
+			scene_blend alpha_blend
+			lighting off
+			depth_check on
+			depth_write off
+			texture_unit
+			{
+				texture pahCloud3.png
+			}
+        }
+    }
+}
+
+
+
+
+material Clouds/bbCloud1
+{
+    technique
+    {
+        pass
+        {
+			scene_blend alpha_blend
+			lighting off
+			depth_check on
+			depth_write off
+			texture_unit
+			{
+				texture bbCloud1.png
+			}
+        }
+    }
+}
+
+material Clouds/bbCloud2
+{
+    technique
+    {
+        pass
+        {
+			scene_blend alpha_blend
+			lighting off
+			depth_check on
+			depth_write off
+			texture_unit
+			{
+				texture bbCloud2.png
+			}
+        }
+    }
+}
+
+material Clouds/bbCloud3
+{
+    technique
+    {
+        pass
+        {
+			scene_blend alpha_blend
+			lighting off
+			depth_check on
+			depth_write off
+			texture_unit
+			{
+				texture bbCloud3.png
+			}
+        }
+    }
+}
+
+material Clouds/bbCloud4
+{
+    technique
+    {
+        pass
+        {
+			scene_blend alpha_blend
+			lighting off
+			depth_check on
+			depth_write off
+			texture_unit
+			{
+				texture bbCloud4.png
+			}
+        }
+    }
+}

@@ -1,0 +1,109 @@
+// Example emitted emitters
+particle_system Examples/Fireworks
+{
+    material Examples/Flare
+    point_rendering            false
+    particle_width             10
+    particle_height            10
+    cull_each                  false
+    quota                      1000
+    emit_emitter_quota         10
+    billboard_type             point
+    
+    // Emitter that emits multiple Point emitters with name 'explosion'
+    emitter Box
+    {
+        name                    mainEmitter
+        emit_emitter            explosion
+        angle                   30
+        emission_rate           1000
+        time_to_live            3
+        direction               0 1 0
+        velocity                200
+    }
+
+    // This Point emitter is emitted by the Box emitter and emits billboard particles itself
+    emitter Point
+    {
+        name                    explosion
+        angle                   180
+        emission_rate           1000
+        time_to_live            2
+        direction               0 1 0
+        velocity                7
+        duration                0.1
+        repeat_delay_min        2
+        repeat_delay_max        3
+    }
+
+    // Make em float downwards
+    affector LinearForce
+    {
+        force_vector            0 -1 0
+        force_application       add
+    }
+
+    // Give em some nice colours
+    affector ColourInterpolator
+    {
+        time0                   0
+        colour0                 1 1 0
+        time1                   0.5
+        colour1                 1 0 0
+        time2                   0.9
+        colour2                 0 0 1
+    }
+}
+
+// Exudes aureola particles which around the model float upwards
+particle_system Examples/MattAureola
+{
+	quota	9777
+	material	PE/lensflare
+	particle_width	1.3
+	particle_height	4
+	cull_each	false
+	renderer	billboard
+	billboard_type	oriented_common
+	common_direction	-0.210852 0.0925627 0.330424
+
+	emitter Ellipsoid
+	{
+		angle	25
+		colour	1 1 1 1
+		colour_range_start	1 1 1 1
+		colour_range_end	1 1 1 1
+		direction	0 1 0
+		emission_rate	111.1
+		position	0 -1 0
+		velocity	10.17
+		velocity_min	10.17
+		velocity_max	15
+		time_to_live	0.1
+		time_to_live_min	0.1
+		time_to_live_max	0.1
+		duration	0
+		duration_min	0
+		duration_max	0
+		repeat_delay	0
+		repeat_delay_min	0
+		repeat_delay_max	0
+		width	5
+		height	5
+		depth	5
+	}
+
+	affector LinearForce
+	{
+		force_vector	0 -12 0
+		force_application	add
+	}
+
+	affector ColourFader
+	{
+		red	1
+		green	1
+		blue	1
+		alpha	0.4545
+	}
+}

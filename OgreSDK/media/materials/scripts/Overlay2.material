@@ -1,0 +1,15 @@
+material Materials/OverlayMaterial2
+{
+	technique
+	{
+		pass
+		{
+			scene_blend alpha_blend
+
+			texture_unit
+			{
+				texture trauma2.png
+			}
+		}
+	}
+}

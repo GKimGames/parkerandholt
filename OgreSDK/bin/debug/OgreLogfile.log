@@ -1,0 +1,419 @@
+18:30:12: Creating resource group General
+18:30:12: Creating resource group Internal
+18:30:12: Creating resource group Autodetect
+18:30:12: SceneManagerFactory for type 'DefaultSceneManager' registered.
+18:30:12: Registering ResourceManager for type Material
+18:30:12: Registering ResourceManager for type Mesh
+18:30:12: Registering ResourceManager for type Skeleton
+18:30:12: MovableObjectFactory for type 'ParticleSystem' registered.
+18:30:12: OverlayElementFactory for type Panel registered.
+18:30:12: OverlayElementFactory for type BorderPanel registered.
+18:30:12: OverlayElementFactory for type TextArea registered.
+18:30:12: Registering ResourceManager for type Font
+18:30:12: ArchiveFactory for archive type FileSystem registered.
+18:30:12: ArchiveFactory for archive type Zip registered.
+18:30:12: FreeImage version: 3.10.0
+18:30:12: This program uses FreeImage, a free, open source image library supporting all common bitmap formats. See http://freeimage.sourceforge.net for details
+18:30:12: Supported formats: bmp,ico,jpg,jif,jpeg,jpe,jng,koa,iff,lbm,mng,pbm,pbm,pcd,pcx,pgm,pgm,png,ppm,ppm,ras,tga,targa,tif,tiff,wap,wbmp,wbm,psd,cut,xbm,xpm,gif,hdr,g3,sgi,exr,j2k,j2c,jp2
+18:30:12: DDS codec registering
+18:30:12: Registering ResourceManager for type HighLevelGpuProgram
+18:30:12: Registering ResourceManager for type Compositor
+18:30:12: MovableObjectFactory for type 'Entity' registered.
+18:30:12: MovableObjectFactory for type 'Light' registered.
+18:30:12: MovableObjectFactory for type 'BillboardSet' registered.
+18:30:12: MovableObjectFactory for type 'ManualObject' registered.
+18:30:12: MovableObjectFactory for type 'BillboardChain' registered.
+18:30:12: MovableObjectFactory for type 'RibbonTrail' registered.
+18:30:12: Loading library .\RenderSystem_Direct3D9_d
+18:30:12: Installing plugin: D3D9 RenderSystem
+18:30:12: D3D9 : Direct3D9 Rendering Subsystem created.
+18:30:12: D3D9: Driver Detection Starts
+18:30:12: D3D9: Driver Detection Ends
+18:30:12: Plugin successfully installed
+18:30:12: Loading library .\RenderSystem_GL_d
+18:30:12: Installing plugin: GL RenderSystem
+18:30:12: OpenGL Rendering Subsystem created.
+18:30:13: Plugin successfully installed
+18:30:13: Loading library .\Plugin_ParticleFX_d
+18:30:13: Installing plugin: ParticleFX
+18:30:13: Particle Emitter Type 'Point' registered
+18:30:13: Particle Emitter Type 'Box' registered
+18:30:13: Particle Emitter Type 'Ellipsoid' registered
+18:30:13: Particle Emitter Type 'Cylinder' registered
+18:30:13: Particle Emitter Type 'Ring' registered
+18:30:13: Particle Emitter Type 'HollowEllipsoid' registered
+18:30:13: Particle Affector Type 'LinearForce' registered
+18:30:13: Particle Affector Type 'ColourFader' registered
+18:30:13: Particle Affector Type 'ColourFader2' registered
+18:30:13: Particle Affector Type 'ColourImage' registered
+18:30:13: Particle Affector Type 'ColourInterpolator' registered
+18:30:13: Particle Affector Type 'Scaler' registered
+18:30:13: Particle Affector Type 'Rotator' registered
+18:30:13: Particle Affector Type 'DirectionRandomiser' registered
+18:30:13: Particle Affector Type 'DeflectorPlane' registered
+18:30:13: Plugin successfully installed
+18:30:13: Loading library .\Plugin_BSPSceneManager_d
+18:30:13: Installing plugin: BSP Scene Manager
+18:30:13: Plugin successfully installed
+18:30:13: Loading library .\Plugin_CgProgramManager_d
+18:30:13: Installing plugin: Cg Program Manager
+18:30:13: Plugin successfully installed
+18:30:13: Loading library .\Plugin_PCZSceneManager_d.dll
+18:30:13: Installing plugin: Portal Connected Zone Scene Manager
+18:30:13: PCZone Factory Type 'ZoneType_Default' registered
+18:30:13: Plugin successfully installed
+18:30:13: Loading library .\Plugin_OctreeZone_d.dll
+18:30:13: Installing plugin: Octree Zone Factory
+18:30:13: Plugin successfully installed
+18:30:13: Loading library .\Plugin_OctreeSceneManager_d
+18:30:13: Installing plugin: Octree & Terrain Scene Manager
+18:30:13: Plugin successfully installed
+18:30:13: *-*-* OGRE Initialising
+18:30:13: *-*-* Version 1.6.4 (Shoggoth)
+18:30:13: D3D9 : RenderSystem Option: Allow NVPerfHUD = No
+18:30:13: D3D9 : RenderSystem Option: Anti aliasing = None
+18:30:13: D3D9 : RenderSystem Option: Floating-point mode = Fastest
+18:30:13: D3D9 : RenderSystem Option: Full Screen = No
+18:30:13: D3D9 : RenderSystem Option: Rendering Device = NVIDIA GeForce 8800 GTS
+18:30:13: D3D9 : RenderSystem Option: VSync = No
+18:30:13: D3D9 : RenderSystem Option: Video Mode = 800 x 600 @ 32-bit colour
+18:30:13: D3D9 : RenderSystem Option: sRGB Gamma Conversion = No
+18:30:15: CPU Identifier & Features
+18:30:15: -------------------------
+18:30:15:  *   CPU ID: AuthenticAMD: AMD Athlon(tm) 64 X2 Dual Core Processor 6000+
+18:30:15:  *      SSE: yes
+18:30:15:  *     SSE2: yes
+18:30:15:  *     SSE3: yes
+18:30:15:  *      MMX: yes
+18:30:15:  *   MMXEXT: yes
+18:30:15:  *    3DNOW: yes
+18:30:15:  * 3DNOWEXT: yes
+18:30:15:  *     CMOV: yes
+18:30:15:  *      TSC: yes
+18:30:15:  *      FPU: yes
+18:30:15:  *      PRO: yes
+18:30:15:  *       HT: no
+18:30:15: -------------------------
+18:30:15: D3D9 : Subsystem Initialising
+18:30:15: D3D9RenderSystem::_createRenderWindow "Parker And Holt", 800x600 windowed  miscParams: FSAA=0 FSAAQuality=0 colourDepth=32 gamma=false useNVPerfHUD=false vsync=false 
+18:30:15: D3D9 : Created D3D9 Rendering Window 'Parker And Holt' : 800x600, 32bpp
+18:30:15: D3D9 : WARNING - disabling VSync in windowed mode can cause timing issues at lower frame rates, turn VSync on if you observe this problem.
+18:30:15: Registering ResourceManager for type Texture
+18:30:15: Registering ResourceManager for type GpuProgram
+18:30:15: D3D9: Vertex texture format supported - PF_FLOAT16_RGB
+18:30:15: D3D9: Vertex texture format supported - PF_FLOAT16_RGBA
+18:30:15: D3D9: Vertex texture format supported - PF_FLOAT32_RGB
+18:30:15: D3D9: Vertex texture format supported - PF_FLOAT32_RGBA
+18:30:15: D3D9: Vertex texture format supported - PF_FLOAT16_R
+18:30:15: D3D9: Vertex texture format supported - PF_FLOAT32_R
+18:30:15: D3D9: Vertex texture format supported - PF_FLOAT16_GR
+18:30:15: D3D9: Vertex texture format supported - PF_FLOAT32_GR
+18:30:15: RenderSystem capabilities
+18:30:15: -------------------------
+18:30:15: RenderSystem Name: Direct3D9 Rendering Subsystem
+18:30:15: GPU Vendor: nvidia
+18:30:15: Device Name: NVIDIA GeForce 8800 GTS
+18:30:15: Driver Version: 8.17.11.9562
+18:30:15:  * Fixed function pipeline: yes
+18:30:15:  * Hardware generation of mipmaps: yes
+18:30:15:  * Texture blending: yes
+18:30:15:  * Anisotropic texture filtering: yes
+18:30:15:  * Dot product texture operation: yes
+18:30:15:  * Cube mapping: yes
+18:30:15:  * Hardware stencil buffer: yes
+18:30:15:    - Stencil depth: 8
+18:30:15:    - Two sided stencil support: yes
+18:30:15:    - Wrap stencil values: yes
+18:30:15:  * Hardware vertex / index buffers: yes
+18:30:15:  * Vertex programs: yes
+18:30:15:  * Fragment programs: yes
+18:30:15:  * Geometry programs: no
+18:30:15:  * Supported Shader Profiles: hlsl ps_1_1 ps_1_2 ps_1_3 ps_1_4 ps_2_0 ps_2_a ps_2_b ps_2_x ps_3_0 vs_1_1 vs_2_0 vs_2_a vs_2_x vs_3_0
+18:30:15:  * Texture Compression: yes
+18:30:15:    - DXT: yes
+18:30:15:    - VTC: no
+18:30:15:  * Scissor Rectangle: yes
+18:30:15:  * Hardware Occlusion Query: yes
+18:30:15:  * User clip planes: yes
+18:30:15:  * VET_UBYTE4 vertex element type: yes
+18:30:15:  * Infinite far plane projection: yes
+18:30:15:  * Hardware render-to-texture: yes
+18:30:15:  * Floating point textures: yes
+18:30:15:  * Non-power-of-two textures: yes
+18:30:15:  * Volume textures: yes
+18:30:15:  * Multiple Render Targets: 4
+18:30:15:    - With different bit depths: yes
+18:30:15:  * Point Sprites: yes
+18:30:15:  * Extended point parameters: yes
+18:30:15:  * Max Point Size: 8192
+18:30:15:  * Vertex texture fetch: yes
+18:30:15:    - Max vertex textures: 4
+18:30:15:    - Vertex textures shared: no
+18:30:15:  * Render to Vertex Buffer : no
+18:30:15:  * DirectX per stage constants: yes
+18:30:15: ***************************************
+18:30:15: *** D3D9 : Subsystem Initialised OK ***
+18:30:15: ***************************************
+18:30:15: ResourceBackgroundQueue - threading disabled
+18:30:15: Particle Renderer Type 'billboard' registered
+18:30:15: SceneManagerFactory for type 'BspSceneManager' registered.
+18:30:15: Registering ResourceManager for type BspLevel
+18:30:15: SceneManagerFactory for type 'PCZSceneManager' registered.
+18:30:15: MovableObjectFactory for type 'PCZLight' registered.
+18:30:15: PCZone Factory Type 'ZoneType_Octree' registered
+18:30:15: PCZone Factory Type 'ZoneType_Terrain' registered
+18:30:15: SceneManagerFactory for type 'OctreeSceneManager' registered.
+18:30:15: SceneManagerFactory for type 'TerrainSceneManager' registered.
+18:30:15: Creating resource group Bootstrap
+18:30:15: Added resource location '../../media/packs/OgreCore.zip' of type 'Zip' to resource group 'Bootstrap'
+18:30:15: Added resource location '../../media' of type 'FileSystem' to resource group 'General'
+18:30:15: Added resource location '../../media/fonts' of type 'FileSystem' to resource group 'General'
+18:30:15: Added resource location '../../media/materials/programs' of type 'FileSystem' to resource group 'General'
+18:30:15: Added resource location '../../media/materials/scripts' of type 'FileSystem' to resource group 'General'
+18:30:15: Added resource location '../../media/materials/textures' of type 'FileSystem' to resource group 'General'
+18:30:15: Added resource location '../../media/models' of type 'FileSystem' to resource group 'General'
+18:30:15: Added resource location '../../media/overlays' of type 'FileSystem' to resource group 'General'
+18:30:15: Added resource location '../../media/particle' of type 'FileSystem' to resource group 'General'
+18:30:15: Added resource location '../../media/gui' of type 'FileSystem' to resource group 'General'
+18:30:15: Added resource location '../../media/DeferredShadingMedia' of type 'FileSystem' to resource group 'General'
+18:30:15: Added resource location '../../media/PCZAppMedia' of type 'FileSystem' to resource group 'General'
+18:30:15: Added resource location '../../media/BloodyCake' of type 'FileSystem' to resource group 'General'
+18:30:15: Added resource location '../../media/packs/cubemap.zip' of type 'Zip' to resource group 'General'
+18:30:15: Added resource location '../../media/packs/cubemapsJS.zip' of type 'Zip' to resource group 'General'
+18:30:15: Added resource location '../../media/packs/dragon.zip' of type 'Zip' to resource group 'General'
+18:30:15: Added resource location '../../media/packs/fresneldemo.zip' of type 'Zip' to resource group 'General'
+18:30:15: Added resource location '../../media/packs/ogretestmap.zip' of type 'Zip' to resource group 'General'
+18:30:15: Added resource location '../../media/packs/skybox.zip' of type 'Zip' to resource group 'General'
+18:30:15: Parsing scripts for resource group Autodetect
+18:30:15: Finished parsing scripts for resource group Autodetect
+18:30:15: Parsing scripts for resource group Bootstrap
+18:30:15: Parsing script OgreCore.material
+18:30:15: Parsing script OgreProfiler.material
+18:30:15: Parsing script Ogre.fontdef
+18:30:15: Parsing script OgreDebugPanel.overlay
+18:30:15: Texture: New_Ogre_Border_Center.png: Loading 1 faces(PF_A8R8G8B8,256x128x1) with  hardware generated mipmaps from Image. Internal format is PF_A8R8G8B8,256x128x1.
+18:30:15: Texture: New_Ogre_Border.png: Loading 1 faces(PF_A8R8G8B8,256x256x1) with  hardware generated mipmaps from Image. Internal format is PF_A8R8G8B8,256x256x1.
+18:30:15: Texture: New_Ogre_Border_Break.png: Loading 1 faces(PF_A8R8G8B8,32x32x1) with  hardware generated mipmaps from Image. Internal format is PF_A8R8G8B8,32x32x1.
+18:30:15: Font BlueHighwayusing texture size 512x512
+18:30:15: Info: Freetype returned null for character 127 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 128 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 129 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 130 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 131 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 132 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 133 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 134 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 135 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 136 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 137 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 138 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 139 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 140 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 141 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 142 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 143 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 144 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 145 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 146 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 147 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 148 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 149 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 150 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 151 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 152 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 153 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 154 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 155 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 156 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 157 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 158 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 159 in font BlueHighway
+18:30:15: Info: Freetype returned null for character 160 in font BlueHighway
+18:30:15: Texture: BlueHighwayTexture: Loading 1 faces(PF_BYTE_LA,512x512x1) with 0 generated mipmaps from Image. Internal format is PF_BYTE_LA,512x512x1.
+18:30:15: Texture: ogretext.png: Loading 1 faces(PF_A8R8G8B8,256x128x1) with  hardware generated mipmaps from Image. Internal format is PF_A8R8G8B8,256x128x1.
+18:30:15: Parsing script OgreLoadingPanel.overlay
+18:30:15: Finished parsing scripts for resource group Bootstrap
+18:30:15: Parsing scripts for resource group General
+18:30:16: Parsing script Examples.program
+18:30:16: Parsing script StdQuad_vp.program
+18:30:16: Parsing script deferred.glsl.program
+18:30:16: Parsing script deferred.hlsl.program
+18:30:16: Parsing script deferred.program
+18:30:16: Parsing script deferred_post_ambient.program
+18:30:16: Parsing script deferred_post_debug.glsl.program
+18:30:16: Parsing script deferred_post_debug.hlsl.program
+18:30:16: Parsing script deferred_post_debug.program
+18:30:16: Parsing script deferred_post_minilight.glsl.program
+18:30:16: Parsing script deferred_post_minilight.hlsl.program
+18:30:16: OGRE EXCEPTION(2:InvalidParametersException): Parameter called lightFalloff does not exist.  in GpuProgramParameters::_findNamedConstantDefinition at f:\codingextra\ogre\shoggoth_vc9\ogre\ogremain\src\ogregpuprogram.cpp (line 1097)
+18:30:16: Compiler error: invalid parameters in deferred_post_minilight.hlsl.program(27): setting of constant failed
+18:30:16: Parsing script deferred_post_minilight.program
+18:30:16: Parsing script deferred_post_multipass.glsl.program
+18:30:16: Parsing script deferred_post_multipass.hlsl.program
+18:30:16: Parsing script deferred_post_onepass.glsl.program
+18:30:16: Parsing script deferred_post_onepass.hlsl.program
+18:30:16: Parsing script deferred_post_vs.program
+18:30:16: Parsing script Ogre.material
+18:30:16: Parsing script Scene.material
+18:30:16: Parsing script meh.material
+18:30:16: Parsing script ASCII.material
+18:30:16: Parsing script ASMSwizzle.material
+18:30:16: Compiler error: object unsupported by render system in ASMSwizzle.material(1)
+18:30:16: Parsing script BlackAndWhite.material
+18:30:16: Parsing script Bloom.material
+18:30:17: Parsing script Bloom2.material
+18:30:17: Parsing script CGSwizzle.material
+18:30:17: Parsing script DepthShadowmap.material
+18:30:17: Parsing script Dither.material
+18:30:17: Parsing script DOF.material
+18:30:17: Parsing script Embossed.material
+18:30:17: Parsing script Example-DynTex.material
+18:30:17: Parsing script Example-Water.material
+18:30:17: Parsing script Example.material
+18:30:18: OGRE EXCEPTION(2:InvalidParametersException): Parameter called camObjPos does not exist.  in GpuProgramParameters::_findNamedConstantDefinition at f:\codingextra\ogre\shoggoth_vc9\ogre\ogremain\src\ogregpuprogram.cpp (line 1097)
+18:30:18: Compiler error: invalid parameters in Example.material(762): setting of constant failed
+18:30:18: Parsing script Examples-Advanced.material
+18:30:18: Parsing script facial.material
+18:30:18: Parsing script Glass.material
+18:30:18: Parsing script GLSLSwizzle.material
+18:30:18: Parsing script Halftone.material
+18:30:18: Parsing script hdr.material
+18:30:19: Parsing script HeatVision.material
+18:30:19: Parsing script Hurt.material
+18:30:19: Parsing script instancing.material
+18:30:19: Parsing script Invert.material
+18:30:19: Parsing script IsoSurf.material
+18:30:19: Parsing script Laplace.material
+18:30:19: Parsing script MotionBlur.material
+18:30:19: Parsing script MRTtest.material
+18:30:19: Parsing script NightVision.material
+18:30:19: Parsing script Ocean.material
+18:30:20: Parsing script OffsetMapping.material
+18:30:20: Parsing script Ogre.material
+18:30:20: Parsing script OldMovie.material
+18:30:20: Parsing script OldTV.material
+18:30:20: Parsing script ParticleGS.material
+18:30:20: OGRE EXCEPTION(7:InternalErrorException): Unable to compile Cg program Ogre/ParticleGS/GenerateVS: CG ERROR : The compile returned an error.
+(0) : error C6015: Output 'POSITION' not completely written
+ in CgProgram::loadFromSource at f:\codingextra\ogre\shoggoth_vc9\ogre\plugins\cgprogrammanager\src\ogrecgprogrammanagerdll.cpp (line 66)
+18:30:20: High-level program Ogre/ParticleGS/GenerateVS encountered an error during loading and is thus not supported.
+OGRE EXCEPTION(7:InternalErrorException): Unable to compile Cg program Ogre/ParticleGS/GenerateVS: CG ERROR : The compile returned an error.
+(0) : error C6015: Output 'POSITION' not completely written
+ in CgProgram::loadFromSource at f:\codingextra\ogre\shoggoth_vc9\ogre\plugins\cgprogrammanager\src\ogrecgprogrammanagerdll.cpp (line 66)
+18:30:20: OGRE EXCEPTION(7:InternalErrorException): Unable to compile Cg program Ogre/ParticleGS/DisplayVS: CG ERROR : The compile returned an error.
+(249) : warning C7050: "output.color" might be used before being initialized
+(0) : error C6015: Output 'POSITION' not completely written
+ in CgProgram::loadFromSource at f:\codingextra\ogre\shoggoth_vc9\ogre\plugins\cgprogrammanager\src\ogrecgprogrammanagerdll.cpp (line 66)
+18:30:20: High-level program Ogre/ParticleGS/DisplayVS encountered an error during loading and is thus not supported.
+OGRE EXCEPTION(7:InternalErrorException): Unable to compile Cg program Ogre/ParticleGS/DisplayVS: CG ERROR : The compile returned an error.
+(249) : warning C7050: "output.color" might be used before being initialized
+(0) : error C6015: Output 'POSITION' not completely written
+ in CgProgram::loadFromSource at f:\codingextra\ogre\shoggoth_vc9\ogre\plugins\cgprogrammanager\src\ogrecgprogrammanagerdll.cpp (line 66)
+18:30:20: OGRE EXCEPTION(7:InternalErrorException): Unable to compile Cg program Ogre/ParticleGS/DisplayPS: CG ERROR : The compile returned an error.
+(323) : fatal error C9999: unexpected cast operation
+ in CgProgram::loadFromSource at f:\codingextra\ogre\shoggoth_vc9\ogre\plugins\cgprogrammanager\src\ogrecgprogrammanagerdll.cpp (line 66)
+18:30:20: High-level program Ogre/ParticleGS/DisplayPS encountered an error during loading and is thus not supported.
+OGRE EXCEPTION(7:InternalErrorException): Unable to compile Cg program Ogre/ParticleGS/DisplayPS: CG ERROR : The compile returned an error.
+(323) : fatal error C9999: unexpected cast operation
+ in CgProgram::loadFromSource at f:\codingextra\ogre\shoggoth_vc9\ogre\plugins\cgprogrammanager\src\ogrecgprogrammanagerdll.cpp (line 66)
+18:30:20: Parsing script Posterize.material
+18:30:20: Parsing script pssm.material
+18:30:20: Parsing script RadialBlur.material
+18:30:20: Parsing script RZR-002.material
+18:30:20: Parsing script SharpenEdges.material
+18:30:20: Parsing script smoke.material
+18:30:20: Parsing script Tiling.material
+18:30:20: Parsing script VarianceShadowmap.material
+18:30:20: Parsing script debugDraw.material
+18:30:20: Parsing script mc.material
+18:30:20: Parsing script deferred.material
+18:30:20: Parsing script deferreddemo.material
+18:30:20: Parsing script deferred_post_ambient.material
+18:30:20: Parsing script deferred_post_debug.material
+18:30:20: Parsing script deferred_post_minilight.material
+18:30:20: Parsing script deferred_post_multipass.material
+18:30:20: Parsing script deferred_post_onepass.material
+18:30:20: Parsing script ROOM.material
+18:30:20: Parsing script 00ambient.material
+18:30:20: Parsing script 00diffuse.material
+18:30:20: Parsing script 00shadow_caster.material
+18:30:20: Parsing script bgui.material
+18:30:21: Compiler error: unknown error in bgui.material(218): token "#" is not recognized
+18:30:21: Compiler error: unknown error in bgui.material(285): token "#" is not recognized
+18:30:21: Compiler error: unknown error in bgui.material(641): token "#" is not recognized
+18:30:21: Compiler error: unknown error in bgui.material(774): token "#" is not recognized
+18:30:21: Parsing script cc.material
+18:30:21: Parsing script RomanBath.material
+18:30:21: Parsing script emitted_emitter.particle
+18:30:21: Parsing script Example-Water.particle
+18:30:21: Parsing script Example.particle
+18:30:21: Parsing script smoke.particle
+18:30:21: Parsing script Examples.compositor
+18:30:21: Parsing script deferred.compositor
+18:30:21: Parsing script sample.fontdef
+18:30:21: Parsing script MgOpen.fontdef
+18:30:21: Parsing script Compositor.overlay
+18:30:21: Parsing script DP3.overlay
+18:30:21: Parsing script Example-CubeMapping.overlay
+18:30:21: Parsing script Example-DynTex.overlay
+18:30:21: Parsing script Example-Water.overlay
+18:30:21: Parsing script Shadows.overlay
+18:30:21: Finished parsing scripts for resource group General
+18:30:21: Parsing scripts for resource group Internal
+18:30:21: Finished parsing scripts for resource group Internal
+18:30:21: Texture: TaharezLook.tga: Loading 1 faces(PF_A8R8G8B8,256x256x1) with 0 generated mipmaps from Image. Internal format is PF_A8R8G8B8,256x256x1.
+18:30:22: Texture: _cegui_ogre_0: Loading 1 faces(PF_A8R8G8B8,256x256x1) with 0 generated mipmaps from Image. Internal format is PF_A8R8G8B8,256x256x1.
+18:30:22: Parker and Holt initialized
+18:30:22: Entering MenuState...
+18:30:25: Pausing MenuState...
+18:30:25: Entering PhysicsState...
+18:30:25: Texture: grass_1024.jpg: Loading 1 faces(PF_R8G8B8,1024x1024x1) with  hardware generated mipmaps from Image. Internal format is PF_X8R8G8B8,1024x1024x1.
+18:30:25: Mesh: Loading ninja.mesh.
+18:30:25: Skeleton: Loading ninja.skeleton
+18:30:25: Texture: nskingr.jpg: Loading 1 faces(PF_R8G8B8,512x512x1) with  hardware generated mipmaps from Image. Internal format is PF_X8R8G8B8,512x512x1.
+18:30:25: Mesh: Loading cube.1m.mesh.
+18:30:25: Texture: cube.png: Loading 1 faces(PF_R8G8B8,512x512x1) with  hardware generated mipmaps from Image. Internal format is PF_X8R8G8B8,512x512x1.
+18:31:56: Leaving PhysicsState...
+18:31:56: Resuming MenuState...
+18:31:56: Leaving MenuState...
+18:31:56: Main loop quit
+18:31:56: Shutdown OGRE...
+18:31:56: PCZone Factory Type 'ZoneType_Octree' unregistered
+18:31:56: PCZone Factory Type 'ZoneType_Terrain' unregistered
+18:31:56: Unregistering ResourceManager for type BspLevel
+18:31:57: *-*-* OGRE Shutdown
+18:31:57: Unregistering ResourceManager for type Compositor
+18:31:57: Unregistering ResourceManager for type Font
+18:31:57: Unregistering ResourceManager for type Skeleton
+18:31:57: Unregistering ResourceManager for type Mesh
+18:31:57: Unregistering ResourceManager for type HighLevelGpuProgram
+18:31:57: Uninstalling plugin: Octree & Terrain Scene Manager
+18:31:57: Plugin successfully uninstalled
+18:31:57: Unloading library .\Plugin_OctreeSceneManager_d
+18:31:57: Uninstalling plugin: Octree Zone Factory
+18:31:57: Plugin successfully uninstalled
+18:31:57: Unloading library .\Plugin_OctreeZone_d.dll
+18:31:57: Uninstalling plugin: Portal Connected Zone Scene Manager
+18:31:57: Plugin successfully uninstalled
+18:31:57: Unloading library .\Plugin_PCZSceneManager_d.dll
+18:31:57: Uninstalling plugin: Cg Program Manager
+18:31:57: Plugin successfully uninstalled
+18:31:57: Unloading library .\Plugin_CgProgramManager_d
+18:31:57: Uninstalling plugin: BSP Scene Manager
+18:31:57: Plugin successfully uninstalled
+18:31:57: Unloading library .\Plugin_BSPSceneManager_d
+18:31:57: Uninstalling plugin: ParticleFX
+18:31:57: Plugin successfully uninstalled
+18:31:57: Unloading library .\Plugin_ParticleFX_d
+18:31:57: Uninstalling plugin: GL RenderSystem
+18:31:57: *** Stopping Win32GL Subsystem ***
+18:31:57: Plugin successfully uninstalled
+18:31:57: Unloading library .\RenderSystem_GL_d
+18:31:57: Uninstalling plugin: D3D9 RenderSystem
+18:31:57: D3D9 : Shutting down cleanly.
+18:31:57: Unregistering ResourceManager for type Texture
+18:31:57: Unregistering ResourceManager for type GpuProgram
+18:31:57: D3D9 : Direct3D9 Rendering Subsystem destroyed.
+18:31:57: Plugin successfully uninstalled
+18:31:57: Unloading library .\RenderSystem_Direct3D9_d
+18:31:57: Unregistering ResourceManager for type Material

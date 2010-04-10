@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SampleLevel>
+  <LevelInfo>
+    <!-- Level Info Should Go In Here -->
+  </LevelInfo>
+  <GameObjects>
+    <GameObject type="ObjectOgre">
+      <Object/>
+      <OgreObject position="0 0 0" scale="0.1 0.1 0.1">
+        <Mesh name="Welcome" type="platform" point1="-7 0" point2="7 0"  material="MainMenu/Splash" zLength="14" rotation="90 180 0"/>
+      </OgreObject>
+    </GameObject>
+  </GameObjects>
+</SampleLevel>

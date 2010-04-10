@@ -1,0 +1,42 @@
+Quake3 level statistics
+-----------------------
+Entities     : 214
+Faces        : 49
+Leaf Faces   : 106
+Leaves       : 62
+Lightmaps    : 1
+Elements     : 324
+Models       : 1
+Nodes        : 60
+Planes       : 96
+Shaders      : 6
+Vertices     : 206
+Vis Clusters : 26
+
+-= Shaders =-
+Shader 0: textures/steve/cobbles01
+Shader 1: textures/steve/terr_rock6
+Shader 2: textures/steve/terr_dirt-grass
+Shader 3: textures/steve/planks01
+Shader 4: textures/steve/ogrelogo
+Shader 5: textures/steve/rustysteel
+
+-= Entities =-
+{
+"classname" "worldspawn"
+}
+{
+"classname" "info_player_deathmatch"
+"origin" "80 64 88"
+}
+{
+"classname" "light"
+"light" "300"
+"origin" "152 -56 104"
+}
+{
+"origin" "-144 104 120"
+"light" "300"
+"classname" "light"
+}
+

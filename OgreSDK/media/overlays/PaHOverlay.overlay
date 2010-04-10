@@ -1,0 +1,84 @@
+// Ogre overlay scripts
+PaH/Timer
+{
+	zorder 500
+	// Stats block
+	container BorderPanel(PaH/TimerPanel)
+	{
+		metrics_mode pixels
+		vert_align top
+		horz_align center
+		top 0
+		
+
+		    
+		element TextArea(PaH/Time)
+		{
+			metrics_mode pixels
+			alignment center
+			top 1
+			width 210
+			height 30
+			font_name BlueHighway
+			char_height  25
+			caption 00:00
+			colour_top 1 1 1
+			colour_bottom 1 1 1
+		}		
+	}
+}
+
+
+PaH/Pickups
+{
+	zorder 500
+	// Stats block
+	container BorderPanel(PaH/PickupPanel)
+	{
+
+		metrics_mode pixels
+		vert_align top
+		horz_align right
+		top 0
+		left -30
+		width 30
+		height 50
+		material Core/StatsBlockCenter
+
+		
+		    
+		element TextArea(PaH/ParkerPickup)
+		{
+			metrics_mode pixels
+			alignment right
+			top 1
+			left 26
+			width 210
+			height 30
+			font_name BlueHighway
+			char_height  25
+			caption 0
+			colour_top 1 1 1
+			colour_bottom 1 1 1
+		}
+
+		element TextArea(PaH/HoltPickup)
+		{
+			metrics_mode pixels
+			alignment right
+			top 25
+			left 26
+			width 210
+			height 30
+			font_name BlueHighway
+			char_height  25
+			caption 0
+			colour_top 1 1 1
+			colour_bottom 1 1 1
+		}	
+	}
+}
+
+
+
+

@@ -1,0 +1,14 @@
+material MyWall/Wall02
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture Wall02.jpg
+                filtering trilinear
+            }
+        }
+    }
+}

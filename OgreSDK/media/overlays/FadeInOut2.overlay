@@ -1,0 +1,13 @@
+Overlays/FadeInOut2
+{
+	zorder 649
+
+	container Panel(FadeInOutPanel2)
+	{
+		left 0
+		top 0
+		width 1
+		height 1
+		material Materials/OverlayMaterial2
+	}
+}

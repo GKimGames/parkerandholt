@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SampleLevel>
+  <LevelInfo>
+    <Parker position="0 2"/>
+    <Holt   position="1 2"/>
+    <!-- Level Info Should Go In Here -->
+  </LevelInfo>
+  <Box2D>
+  </Box2D>
+  <GameObjects>
+
+    <GameObject type="Door" isEntrance="1" stateName="PhysicsState" position="0 0"/>
+	<GameObject type="Door" isEntrance="0" stateName="PhysicsState" position="7 0"/>
+    
+    <StaticOgreObjects>
+      <Light name="MyLighty" position="0 6 20" direction="0 -1 -1"/>
+
+      <BillboardSet position="20 45 -20" material="Clouds/bbCloud2">
+        <Billboard position="-50 40 -150" rotation="3.14159"/>
+        <Billboard position="120 10 -200" rotation="0.3"/>
+        <Billboard position="40 -20 -175"/>
+        <Billboard position="-150 -50 -150"/>
+      </BillboardSet>
+
+      <BillboardSet position="0 0 0" material="Clouds/bbCloud1">
+        <Billboard position="-50 40 -150" rotation="3.14159"/>
+        <Billboard position="120 10 -200" rotation="3.14159"/>
+        <Billboard position="40 -20 -175" rotation="1.5"/>
+        <Billboard position="-150 -50 -250" rotation="1.5"/>
+      </BillboardSet>
+     
+      <Mesh mesh="MainMenuIsland.mesh" position="0 0 0" scale="1 1 1" rotation="0 0 0" box2DitUp="1"/>
+	  <Mesh mesh="MainMenuIsland.mesh" position="7 0 0" scale="1 1 1" rotation="0 0 0" box2DitUp="1"/>
+	  <Mesh mesh="MainMenuIsland.mesh" position="20 30 -100" scale="2 1 1" rotation="0 0 0" />
+	  <Mesh mesh="MainMenuIsland.mesh" position="10 0 -50" scale="2 2.5 2" rotation="0 0 0" />
+	  <Mesh mesh="MainMenuIsland.mesh" position="-10 5 -100" scale="3 4 5" rotation="0 45 0" />
+    </StaticOgreObjects>
+  </GameObjects>
+
+</SampleLevel>

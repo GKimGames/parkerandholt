@@ -1,0 +1,14 @@
+material MyBox/Wood01
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture Wood01.jpg
+                filtering trilinear
+            }
+        }
+    }
+}
