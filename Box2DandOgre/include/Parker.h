@@ -63,9 +63,15 @@ public:
 
 protected:
 
+	/// Initialize some class variables' default values.
 	void InitVariables();
+
 	bool ReadXMLConfig();
+
+	/// Create the Box2D representation of Parker.
 	void CreatePhysics();
+
+	/// Create the OGRE stuff for Parker.
 	void CreateGraphics();
 
 	void UpdateAnimation(double timeSinceLastFrame);
