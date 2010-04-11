@@ -56,6 +56,9 @@ void ParkerStateOnGround::Enter()
 		feetContactCount_ = 0;
 	}
 
+	driver_->animationBlender_->Blend("clip7", AnimationBlender::BlendSwitch, 0.2,false);
+	driver_->animationBlender_->GetSource()->setTimePosition(0.8);
+
 }
 
 
@@ -308,7 +311,7 @@ void ParkerStateOnGround::MoveRight()
 void ParkerStateOnGround::Jump()
 {
 
-	// Only jump if enough time has passed in the j
+	// Only jump if enough time has passed in the jumpTimer_
 	if(jumpTimer_ > 0)
 	{
 		b2Vec2 force(b2Vec2(0, (driver_->jumpingAfterForce_)));
@@ -319,7 +322,7 @@ void ParkerStateOnGround::Jump()
 
 		driver_->body_->ApplyImpulse(b2Vec2(0,driver_->jumpingForce_/5), driver_->body_->GetPosition());
 
-		driver_->animationBlender_->Blend("jump", AnimationBlender::BlendWhileAnimating, 0.2, false, 0.6);
+		driver_->animationBlender_->Blend("jump", AnimationBlender::BlendSwitch, 0.4, false);
 
 		isJumping_ = true;
 

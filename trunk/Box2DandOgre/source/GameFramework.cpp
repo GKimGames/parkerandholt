@@ -74,13 +74,15 @@ bool GameFramework::InitOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 			// If returned true, user clicked OK so initialise
 			// Here we choose to let the system create a default rendering window by passing 'true'
 			renderWindow_ = root_->initialise(true, wndTitle);        
-			return false;
+			
 		}
 		else
 		{
+			return false;
 		}
 
 	}
+
 	viewport_ = renderWindow_->addViewport(0);
 
 	// Creating a load image

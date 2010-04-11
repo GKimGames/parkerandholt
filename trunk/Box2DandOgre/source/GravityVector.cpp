@@ -131,7 +131,7 @@ void GravityVector::EndContact(ContactPoint* contact, b2Fixture* contactFixture,
 //								Update
 //
 // If active the vector checks all contacts with itself to see if they are actually touching
-//if so it raycasts to their center to get a position to push on, if the cast fails it pushes based on its own center
+// if so it raycasts to their center to get a position to push on, if the cast fails it pushes based on its own center
 bool GravityVector::Update(double timeSinceLastFrame)
 {
 	bodyList_.clear();
@@ -141,37 +141,39 @@ bool GravityVector::Update(double timeSinceLastFrame)
 		b2ContactEdge* contacts = body_->GetContactList();
 		while(contacts)
 		{
-			b2Fixture* A = contacts->contact->GetFixtureA();
-			b2Fixture* B = contacts->contact->GetFixtureB();
-
-			GameObject* goA = (GameObject*) A->GetBody()->GetUserData();
-			GameObject* goB = (GameObject*) B->GetBody()->GetUserData();
-
-			GameObject* collidedObject;
-			b2Fixture*	collidedFixture;
-			b2Fixture*	myFixture;
-
-			if(goA == this)
+			if(contacts->contact->IsTouching())
 			{
-				collidedObject =	goB;
-				collidedFixture =	B;
-				myFixture =			A;
-			}
-			else
-			{
-				collidedObject =	goA;
-				collidedFixture =	A;
-				myFixture =			B;
+				b2Fixture* A = contacts->contact->GetFixtureA();
+				b2Fixture* B = contacts->contact->GetFixtureB();
+
+				GameObject* goA = (GameObject*) A->GetBody()->GetUserData();
+				GameObject* goB = (GameObject*) B->GetBody()->GetUserData();
+
+				GameObject* collidedObject;
+				b2Fixture*	collidedFixture;
+				b2Fixture*	myFixture;
+
+				if(goA == this)
+				{
+					collidedObject =	goB;
+					collidedFixture =	B;
+					myFixture =			A;
+				}
+				else
+				{
+					collidedObject =	goA;
+					collidedFixture =	A;
+					myFixture =			B;
+				}
+				
+				bodyList_.push_back(collidedFixture->GetBody());
+
 			}
 			
-			bodyList_.push_back(collidedFixture->GetBody());
-
+			
 			contacts = contacts->next;
 		}
-	}
-
-	if(active_)
-	{	
+	
 		for(int i = 0; i < bodyList_.size(); i++)
 		{
 			listNumber_ = i;
@@ -273,7 +275,7 @@ bool GravityVector::RemovePlayer(GameObjectId characterId)
 //
 float32 GravityVector::ReportFixture(b2Fixture *fixture, const b2Vec2 &point, const b2Vec2 &normal, float32 fraction)
 {
-	//returns fisrt contact point with the object being pushed, if no point is found it takes a mid point
+	// Returns first contact point with the object being pushed, if no point is found it takes a mid point.
 	if(fixture->GetBody() == bodyList_[listNumber_])
 	{
 		forcePoint_ = point;

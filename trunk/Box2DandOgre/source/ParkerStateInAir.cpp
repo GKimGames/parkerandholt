@@ -45,7 +45,7 @@ void ParkerStateInAir::Enter()
 	}
 	else if(driver_->onGroundState_->isJumping_)
 	{
-		driver_->animationBlender_->Blend("jump_idle", AnimationBlender::BlendThenAnimate, 1.0, true);
+		driver_->animationBlender_->Blend("jump_idle", AnimationBlender::BlendThenAnimate, 0.4, true);
 	}
 	else
 	{
@@ -310,7 +310,7 @@ void ParkerStateInAir::Jump()
 		{
 			if(driver_->moveLeft_)
 			{
-				driver_->animationBlender_->Blend("clip7", AnimationBlender::BlendSwitch, 0.1, false);
+				driver_->animationBlender_->Blend("clip7", AnimationBlender::BlendSwitch, 0.2, false);
 				driver_->animationBlender_->Blend("jump_idle", AnimationBlender::BlendWhileAnimating, 0.7, false);
 
 
@@ -323,7 +323,7 @@ void ParkerStateInAir::Jump()
 		{
 			if(driver_->moveRight_)
 			{
-				driver_->animationBlender_->Blend("clip7", AnimationBlender::BlendSwitch, 0.1, false);
+				driver_->animationBlender_->Blend("clip7", AnimationBlender::BlendSwitch, 0.2, false);
 				driver_->animationBlender_->Blend("jump_idle", AnimationBlender::BlendWhileAnimating, 0.7, false);
 				
 

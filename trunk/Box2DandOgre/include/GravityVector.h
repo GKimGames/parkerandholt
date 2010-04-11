@@ -23,6 +23,7 @@ public:
 	
 	/// Stops the vector from pushing on objects and sets it to be invisible.
 	bool Stop();
+
 	/// Starts the vector pushing on objects and makes it visible.
 	bool Start(b2Vec2 newPosition, b2Vec2 newDirection);
 
