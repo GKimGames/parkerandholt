@@ -32,13 +32,6 @@ CharacterParker::CharacterParker() : Character()
 
 	stateMachine_ = new FSMStateMachine<CharacterParker>(this);
 
-	onGroundState_ = new ParkerStateOnGround(this, stateMachine_);
-	inAirState_ = new ParkerStateInAir(this, stateMachine_);
-	ledgeGrabState_ = new ParkerStateLedgeGrab(this, stateMachine_);
-
-	stateMachine_->SetCurrentState(onGroundState_);
-	stateMachine_->ChangeState(onGroundState_);
-
 	elevator_ = NULL;
 
 	traumaMeter_ = new TraumaMeter();
@@ -68,6 +61,13 @@ bool CharacterParker::Initialize()
 
 	animationBlender_ = new AnimationBlender(entity_);
 	animationBlender_->Initialize("idle");
+
+	onGroundState_ = new ParkerStateOnGround(this, stateMachine_);
+	inAirState_ = new ParkerStateInAir(this, stateMachine_);
+	ledgeGrabState_ = new ParkerStateLedgeGrab(this, stateMachine_);
+
+	stateMachine_->SetCurrentState(onGroundState_);
+	stateMachine_->ChangeState(onGroundState_);
 
 	initialized_ = true;
 
