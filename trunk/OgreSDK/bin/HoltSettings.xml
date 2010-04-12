@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Character>
   <MeshInfo>
-    <Mesh name="parkor.mesh" translate="0 -.91 0" rotateY="-90"/>
+    <Mesh name="parkor.mesh" translate="0 -.81 0" rotateY="-90"/>
   </MeshInfo>
   <ShapeInfo>
     <Size width="0.3" height="1.884" scaleX="0.11" scaleY="0.10" scaleZ="0.11"/>

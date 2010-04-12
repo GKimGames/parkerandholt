@@ -560,6 +560,7 @@ bool CharacterParker::Update(double timeSinceLastFrame)
 		}
 		else
 		{
+			playerInfo_->PlayerDied();
 			traumaMeter_->ResetTrauma();
 			body_->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
 			SetBodyPosition(playerInfo_->GetCheckPoint());
@@ -601,6 +602,7 @@ void CharacterParker::EndContact(ContactPoint* contact, b2Fixture* contactFixtur
 void CharacterParker::ReturnToCheckPoint()
 {
 	traumaMeter_->ResetTrauma();
+	playerInfo_->PlayerDied();
 
 	body_->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
 	body_->SetActive(false);
@@ -615,7 +617,9 @@ void CharacterParker::ReturnToCheckPoint()
 	GAMEFRAMEWORK->gameCamera_->InitializeDef(&def);
 }
 
-
+//=============================================================================
+//				PostSolve
+//
 void CharacterParker::PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse)
 {
 	if(contact->GetFixtureA()->GetBody()->GetUserData() != NULL)
@@ -670,12 +674,18 @@ bool CharacterParker::IsFootSensor(b2Fixture* fixture)
 	return false;
 }
 
+//=============================================================================
+//				SetActive
+//
 void CharacterParker::SetActive(bool active)
 {
 	traumaMeter_->SetActive(active);
 	active_ = active;
 }
 
+//=============================================================================
+//				GetPlayerInfo
+//
 PlayerInfo* CharacterParker::GetPlayerInfo()
 {
 	return playerInfo_;

@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 {
 	try
     {
-		// Try to start the game
+		// Try to start the game 
 		KGBOgreApplication ogreApp;
 		
 		ogreApp.Start();

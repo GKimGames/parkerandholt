@@ -11,7 +11,7 @@
 
 #include "GameObject.h"
 #include <Box2D/Box2D.h>
-
+#include "PickUp.h"
 
 
 class PlayerInfo : public GameObject
@@ -52,6 +52,8 @@ protected:
 	int				inventory_;
 	Ogre::String	itemDisplay_;
 	int				deaths_;
+
+	std::vector<PickUp*>	pickUpResetList_;
 };
 
 #endif
