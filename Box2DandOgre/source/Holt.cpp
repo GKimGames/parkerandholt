@@ -27,7 +27,6 @@ class Character;
 //=============================================================================
 //								Constructor
 //
-
 CharacterHolt::CharacterHolt(MousePicking* mousePicking) : Character()
 {
 	mousePicking_ = mousePicking;
@@ -240,12 +239,7 @@ void CharacterHolt::CreateGraphics()
 	bodyNode_->translate(translate_);
 	bodyNode_->rotate(Ogre::Vector3::UNIT_Y,Ogre::Degree(rotateY));
 
-
-	if(GetId() == holtId_)
-	{
-		entity_->setMaterial(Ogre::MaterialManager::getSingletonPtr()->getByName("CheckPoint/CheckPoint"));
-	}
-
+	entity_->setMaterial(Ogre::MaterialManager::getSingletonPtr()->getByName("Holt/Holt"));
 }
 
 //=============================================================================
@@ -431,7 +425,7 @@ bool CharacterHolt::HandleMessage(const KGBMessage message)
 	}
 	else if(message.messageType == KGBMessageType::ADD_ITEM)
 	{
-		playerInfo_->AddToInventory(1);
+		playerInfo_->HandleMessage(message);
 	}
 
 	return stateMachine_->HandleMessage(message); 
@@ -558,6 +552,7 @@ bool CharacterHolt::Update(double timeSinceLastFrame)
 		// If not active the character is just placed at the last checkpoint
 		else
 		{
+			playerInfo_->PlayerDied();
 			traumaMeter_->ResetTrauma();
 			body_->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
 			SetBodyPosition(playerInfo_->GetCheckPoint());
@@ -596,10 +591,11 @@ void CharacterHolt::EndContact(ContactPoint* contact, b2Fixture* contactFixture,
 //=============================================================================
 //								ReturnToCheckPoint
 //
-//returns character to the currently active checkpoint by first panning the camera to the checkpoint
+/// Returns character to the currently active checkpoint by first panning the camera to the checkpoint
 void CharacterHolt::ReturnToCheckPoint()
 {
 	traumaMeter_->ResetTrauma();
+	playerInfo_->PlayerDied();
 
 	body_->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
 	body_->SetActive(false);

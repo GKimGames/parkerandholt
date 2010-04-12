@@ -366,13 +366,13 @@
 	
 	
 	<!-- HOLT -->
-	<GameObject type="CheckPoint" position="199 10" />
+	<GameObject type="CheckPoint" position="201.5 10" />
 	<GameObject type="CheckPoint" position="165 17" />
 	<GameObject type="CheckPoint" position="119 14" />
 	<GameObject type="PickUp" position="194.5 17" />
 	<GameObject type="PickUp" position="101 13"/>
-	<GameObject type="PickUp" position="139.5 9.5"/>
-	<GameObject type="PickUp" position="139.5 11"/>
+	<GameObject type="PickUp" position="139 9"/>
+	<GameObject type="PickUp" position="139.5 12"/>
 	<GameObject type="PickUp" position="154 8"/>
 	<GameObject type="PickUp" position="156 8"/>
 	<GameObject type="PickUp" position="158 8"/>

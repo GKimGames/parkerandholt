@@ -14,14 +14,14 @@ public:
 	
 	virtual ~PickUp();
 
-	bool Initialize();
+	//bool Initialize();
 
 	void BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 	void EndContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture);
 	void PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture* collidedFixture, const b2ContactImpulse* impulse);
 
 	bool Update(double timeSinceLastFrame);
-	
+	void HasBeenPickedUp(bool pickedUp);
 
 protected:
 	b2Vec2			position_;

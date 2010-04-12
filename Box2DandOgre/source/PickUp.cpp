@@ -13,7 +13,7 @@
 
 //=============================================================================
 //								Constructor
-//
+// 
 PickUp::PickUp(Ogre::SceneManager *sceneManager, b2Vec2 center)
 {
 	sceneManager_ = sceneManager;
@@ -138,9 +138,8 @@ void PickUp::BeginContact(ContactPoint* contact, b2Fixture* contactFixture, b2Fi
 			if(go->GetGameObjectType() == GameObjectType::GOType_Character_Parker || go->GetGameObjectType() == GameObjectType::GOType_Character_Holt)
 			{
 				CharacterParker* temp = (CharacterParker*)go;
-				Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, temp->GetPlayerInfo()->GetId(), ADD_ITEM, 1);
-				pickedUp_ = true;
-				body_->SetActive(false);
+				Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, temp->GetPlayerInfo()->GetId(), ADD_ITEM, this);
+				HasBeenPickedUp(true);
 			}
 		}
 	}
@@ -174,9 +173,8 @@ void PickUp::PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture*
 				float totalImpulse = abs(impulse->normalImpulses[0]);
 				if(totalImpulse > breakingForce_ && totalImpulse < 500000)
 				{
-					Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, CharacterParker::GetHoltId(), ADD_ITEM, 1);
-					pickedUp_ = true;
-					body_->SetActive(false);
+					Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, CharacterParker::GetHoltId(), ADD_ITEM, this);
+					HasBeenPickedUp(true);
 				}			
 			}
 		}
@@ -192,11 +190,22 @@ void PickUp::PostSolve(b2Contact* contact, b2Fixture* contactFixture, b2Fixture*
 				float totalImpulse = abs(impulse->normalImpulses[0]);
 				if(totalImpulse > breakingForce_ && totalImpulse < 500000)
 				{
-					Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, CharacterParker::GetHoltId(), ADD_ITEM, 1);
-					pickedUp_ = true;
-					body_->SetActive(false);
+					Dispatch->DispatchMessage(SEND_IMMEDIATELY, 0, CharacterParker::GetHoltId(), ADD_ITEM, this);
+					HasBeenPickedUp(true);
 				}
 			}
 		}
 	}
+}
+
+
+//=============================================================================
+//								HasBeenPickedUp
+//
+/// Sets whether the object has been picked up or not, toggles visibility
+void PickUp::HasBeenPickedUp(bool pickedUp)
+{
+	pickedUp_ = pickedUp;
+	sceneNode_->setVisible(!pickedUp);
+	body_->SetActive(!pickedUp);
 }
