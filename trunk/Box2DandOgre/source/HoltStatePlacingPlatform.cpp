@@ -122,6 +122,7 @@ bool HoltStatePlacingPlatform::Update()
 		// Checks distance been click and release to see if it is within a valid length for a platform
 		if(tempLength > 0.5 && tempLength < 8.0)
 		{
+			driver_->mousePicking_->SetVisibility(false);
 			if(platform_ == 0)
 			{
 				SpawnPlatform();
@@ -205,6 +206,8 @@ bool HoltStatePlacingPlatform::HandleMessage(const KGBMessage message)
 				platform_->SetGraphics(platform_->GetBody()->GetPosition(), tempLength, platform_->GetBody()->GetAngle(), true);
 				platform_ = 0;
 			}
+
+			driver_->mousePicking_->SetVisibility(true);
 
 			return true;
 		}
