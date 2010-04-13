@@ -95,5 +95,6 @@ void PlayerInfo::PlayerDied()
 		AddToInventory(-1);
 		pickUpResetList_[i]->HasBeenPickedUp(false);
 	}
+	pickUpResetList_.clear();
 }
 
