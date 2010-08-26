@@ -40,9 +40,6 @@
 #include "MessageDispatcher.h"
 #include "PressureSwitch.h"
 
-
-#include "MyGUI.h"
-
 #include "MousePicking.h"
 #include "CheckPoint.h"
 #include "TraumaMeter.h"
@@ -174,8 +171,6 @@ protected:
 
 	/// Update the overlays' values.
 	void UpdateOverlay();
-
-	MyGUI::Gui* myGUI;
 
 	// This is to be used a game object that calls methods on this class.
 	// Not implemented.

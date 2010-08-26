@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\MyGUI2.2.3_source\MyGUIEngine\include;..\..\boost\boost;..\..\boost;..\..\Box2DG\Box2D;include\GameObject;include;..\..\OgreSDK\include;..\..\OgreSDK\include\TinyXML;..\..\OgreSDK\include\CEGUI;..\..\OgreSDK\include\OIS;..\..\OgreSDK\samples\include"
+				AdditionalIncludeDirectories="..\OgreSDK\include\;..\OgreSDK\include\CEGUI;..\OgreSDK\include\OIS;..\MyGUI2.2.3_source\MyGUIEngine\include;..\boost\boost;..\boost;..\Box2D\Box2D;include;include\GameObject;TinyXML"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
@@ -69,7 +69,7 @@
 				AdditionalDependencies="OgreMain_d.lib OIS_d.lib CEGUIBase_d.lib OgreGUIRenderer_d.lib tinyxmld_STL.lib MyGUI_d.lib box2d_d.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\MyGUI2.2.3_source\MyGUIEngine\lib\Debug\;..\..\Box2DG\Box2D\Build\VC8\Box2D\Debug;..\..\OgreSDK\lib;..\..\boost\stage\lib"
+				AdditionalLibraryDirectories="..\Box2D\Box2D\Build\VC8\Box2D\Debug;..\OgreSDK\lib;..\boost\stage\lib"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
@@ -131,7 +131,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\..\boost\boost;include\GameObject;include;..\..\Box2DG\Box2D;..\..\OgreSDK\include;..\..\OgreSDK\include\TinyXML;..\..\OgreSDK\include\CEGUI;..\..\OgreSDK\include\OIS;..\..\OgreSDK\samples\include;..\..\boost;..\..\MyGUI2.2.3_source\MyGUIEngine\include"
+				AdditionalIncludeDirectories="..\boost\boost;include\GameObject;include;..\Box2D\Box2D;..\OgreSDK\include;..\OgreSDK\include\TinyXML;..\OgreSDK\include\CEGUI;..\OgreSDK\include\OIS;..\OgreSDK\samples\include;..\boost;..\MyGUI2.2.3_source\MyGUIEngine\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -157,10 +157,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="OgreMain.lib OIS.lib CEGUIBase.lib OgreGUIRenderer.lib tinyxml_STL.lib box2d.lib MyGUI.lib"
+				AdditionalDependencies="OgreMain.lib OIS.lib CEGUIBase.lib OgreGUIRenderer.lib tinyxml_STL.lib box2d.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\MyGUI2.2.3_source\MyGUIEngine\lib\Release;..\..\boost\lib;..\..\boost\stage\lib;..\..\OgreSDK\lib;..\..\Box2DG\Box2D\Build\VC8\Box2D\Release"
+				AdditionalLibraryDirectories="..\boost\lib;..\boost\stage\lib;..\OgreSDK\lib;..\Box2D\Box2D\Build\VC8\Box2D\Release"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -922,6 +922,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\ClassDiagram1.cd"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

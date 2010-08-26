@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 		
 		ogreApp.Start();
 
-    }
+	    }
 	catch(std::exception& e)
     {
 #if OGRE_PLATFORM == PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WIN32

@@ -14,7 +14,7 @@
 #include <boost/any.hpp>
 #include <iostream>
 #include <math.h>
-#include "Ogre.h"
+#include <Ogre.h>
 
 typedef unsigned int GameObjectId;
 
